@@ -1,0 +1,593 @@
+From a4b52f80d592756b495da20d51fdf48d0a335760 Mon Sep 17 00:00:00 2001
+From: Karthik Senthil <skk3@illinois.edu>
+Date: Sun, 16 Sep 2018 10:38:56 -0700
+Subject: [PATCH] Initial implementation to integrate union-find library in
+ ChaNGa.
+
+Change-Id: I90f1250f54a23b7d3962cbd2c2117542446fa140
+---
+ GravityParticle.h   | 21 +++++++++++++++
+ Makefile.in         | 11 +++++---
+ Makefile.uflib      | 10 ++++++++
+ ParallelGravity.cpp | 74 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ ParallelGravity.h   | 26 +++++++++++++++++++
+ TreePiece.cpp       | 52 +++++++++++++++++++++++++++++++++++++
+ configure           | 21 +++++++++++++++
+ configure.ac        | 13 ++++++++++
+ sinks.cpp           |  1 +
+ smooth.cpp          | 46 +++++++++++++++++++++++++++++++++
+ smooth.h            | 31 ++++++++++++++++++++++
+ 11 files changed, 302 insertions(+), 4 deletions(-)
+ create mode 100644 Makefile.uflib
+
+diff --git a/GravityParticle.h b/GravityParticle.h
+index d3e9054..39e7e30 100644
+--- a/GravityParticle.h
++++ b/GravityParticle.h
+@@ -273,6 +273,10 @@ public:
+ 	double extpartmass;
+ #endif
+ 
++#ifdef FOF_UNION_FIND
++    uint64_t fofLibVertexID;
++#endif
++
+         cosmoType interMass;
+ 	
+         GravityParticle(SFC::Key k) : ExternalGravityParticle() {
+@@ -302,6 +306,9 @@ public:
+ #endif
+ #ifdef NEED_DT
+ 	  p | dt;
++#endif
++#ifdef FOF_UNION_FIND
++      p | fofLibVertexID;
+ #endif
+         }
+ #endif
+@@ -417,6 +424,7 @@ public:
+           position = p.position;
+ 	  return *this;
+         }
++
+ };
+ 
+ /// @brief Test for a type flag.
+@@ -511,6 +519,9 @@ class ExternalSmoothParticle {
+   int64_t iEaterOrder;
+   double dTimeFB;
+   int iBucketOff;               /* Used by the Cache */
++#ifdef FOF_UNION_FIND
++  uint64_t fofLibVertexID;
++#endif
+ 
+   ExternalSmoothParticle() {}
+ 
+@@ -566,6 +577,9 @@ class ExternalSmoothParticle {
+ 	      fNSN = p->fNSN();
+ 	      iEaterOrder = p->iEaterOrder();
+ 	      }
++#ifdef FOF_UNION_FIND
++          fofLibVertexID = p->fofLibVertexID;
++#endif
+ 	  }
+   
+   /// @brief Fill in a full gravity particle from this object.
+@@ -620,6 +634,9 @@ class ExternalSmoothParticle {
+ 	  tmp->fNSN() = fNSN;
+ 	  tmp->iEaterOrder() = iEaterOrder;
+ 	  }
++#ifdef FOF_UNION_FIND
++      tmp->fofLibVertexID = fofLibVertexID;
++#endif
+       }
+ 	  
+ #ifdef __CHARMC__
+@@ -636,6 +653,7 @@ class ExternalSmoothParticle {
+     p | dt;
+     p | dtNew;
+ #endif
++
+     p | treeAcceleration;
+     p | vPred;
+     p | mumax;
+@@ -669,6 +687,9 @@ class ExternalSmoothParticle {
+     p | iEaterOrder;
+     p | dTimeFB;
+     p | iBucketOff;
++#ifdef FOF_UNION_FIND
++    p | fofLibVertexID;
++#endif
+   }
+ #endif
+ };
+diff --git a/Makefile.in b/Makefile.in
+index 387bfbf..55d1836 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -33,6 +33,11 @@ FLAG_FEEDBACKDIFFLIMIT = @FLAG_FEEDBACKDIFFLIMIT@
+ FLAG_CULLENALPHA = @FLAG_CULLENALPHA@
+ FLAG_VSIGVISC = @FLAG_VSIGVISC@
+ FLAG_DAMPING = @FLAG_DAMPING@
++FLAG_CLUSTER_DETECTION= @FLAG_CLUSTER_DETECTION@
++ifneq (,@FLAG_CLUSTER_DETECTION@)
++  include Makefile.uflib
++endif
++
+ OPTS = @OPTS@ # compiler options
+ 
+ # optional CUDA flags: 
+@@ -96,7 +101,7 @@ DEFINE_FLAGS = $(FLAG_PRINT) $(FLAG_STATISTICS) $(FLAG_DEBUG) $(CACHE_TREE) \
+ 	       -DREDUCTION_HELPER $(FLAG_TREE_BUILD) \
+                $(FLAG_DIFFHARMONIC) $(FLAG_FEEDBACKDIFFLIMIT) \
+                $(FLAG_SSE) $(FLAG_AVX) @FLAG_FLOAT@ \
+-	       $(FLAG_CHANGESOFT) $(FLAG_DAMPING) \
++	       $(FLAG_CHANGESOFT) $(FLAG_DAMPING) $(FLAG_CLUSTER_DETECTION)\
+ 	       $(KERNEL_FLAGS)
+ 
+ CHARM_PATH = @CHARM_PATH@
+@@ -130,7 +135,7 @@ NVCC_LIBS = -lcuda -lcudart -lGL
+ endif
+ 
+ # add -module Orb3dLB here for load balancing during singlestepped runs
+-INCLUDE_FLAGS += -I$(STRUCTURES_PATH) -I.. -I$(CACHE_LIB_PATH) -I$(THREADSAFE_HT_PATH) -I$(SOURCE_DIR) -I$(BUILD_DIR)
++INCLUDE_FLAGS += -I$(STRUCTURES_PATH) -I.. -I$(CACHE_LIB_PATH) -I$(THREADSAFE_HT_PATH) $(UNION_FIND_INC) -I$(SOURCE_DIR) -I$(BUILD_DIR)
+ CPPFLAGS += $(INCLUDE_FLAGS) $(DEFINE_FLAGS) @CPPFLAGS@
+ CXXFLAGS += $(OPTS) $(CPPFLAGS)
+ LDFLAGS += $(OPTS) -L. -L../libs @LDFLAGS@ -language charm++ -module CkCache \
+@@ -144,7 +149,7 @@ LDFLAGS += $(OPTS) -L. -L../libs @LDFLAGS@ -language charm++ -module CkCache \
+ 	   #-tracemode projections -memory charmdebug -memory paranoid
+ XDR_DIR = ../rpc
+ XDR_OBJS = $(XDR_DIR)/xdr.o $(XDR_DIR)/xdr_float.o $(XDR_DIR)/xdr_mem.o $(XDR_DIR)/xdr_stdio.o
+-LDLIBS += $(STRUCTURES_PATH)/libTipsy.a  @LIBS@
++LDLIBS += $(STRUCTURES_PATH)/libTipsy.a $(UNION_FIND_LIBS) @LIBS@
+ 
+ CHARMC = $(CHARM_PATH)/bin/charmc
+ 
+diff --git a/Makefile.uflib b/Makefile.uflib
+new file mode 100644
+index 0000000..4da8914
+--- /dev/null
++++ b/Makefile.uflib
+@@ -0,0 +1,10 @@
++#set the following variables to absolute paths
++UNION_FIND_DIR = $(HOME)/UIUC/projects/unionFind
++PREFIX_LIB_DIR = $(UNION_FIND_DIR)/prefixLib
++
++#options for building union-find library and prefix library
++PREFIX_LIBS = -L${PREFIX_LIB_DIR} -lprefix
++PREFIX_INC = -I${PREFIX_LIB_DIR}
++
++UNION_FIND_LIBS = -L${UNION_FIND_DIR} -lunionFind ${PREFIX_LIBS}
++UNION_FIND_INC = -I${UNION_FIND_DIR} ${PREFIX_INC}
+diff --git a/ParallelGravity.cpp b/ParallelGravity.cpp
+index fa73d01..3aa8cd7 100644
+--- a/ParallelGravity.cpp
++++ b/ParallelGravity.cpp
+@@ -1243,7 +1243,13 @@ Main::Main(CkArgMsg* m) {
+ 
+ 	if(verbosity)
+ 	  ckerr << "Created " << numTreePieces << " pieces of tree" << endl;
+-	
++
++#ifdef FOF_UNION_FIND
++    ckerr << "[Main] Initializing FOF library" << endl;
++    fofLibProxy = UnionFindLib::unionFindInit(treeProxy, numTreePieces);
++    ckerr << "[Main] FOF library array created and proxy obtained" << endl;
++#endif
++
+ 	CProxy_Main(thishandle).setupICs();
+ }
+ 
+@@ -2916,13 +2922,19 @@ Main::doSimulation()
+   cacheSmoothPart.stopHPM(CkCallbackResumeThread());
+ #endif
+   ckout << endl << "******************" << endl << endl; 
++
++
++
++
+   // Some memory cleanup
+   // This is just for debugging memory problems, so comment it out for
+   // now to avoid tickling QD bugs.
+   // delete param.stfm;
+   // treeProxy.ckDestroy();
+   // CkWaitQD();
++#ifndef FOF_UNION_FIND
+   CkExit();
++#endif
+ }
+ /**
+  * @brief Main::starCenterOfMass Calculates the total mass and center of mass
+@@ -3430,8 +3442,67 @@ void Main::writeOutput(int iStep)
+ 		      << endl;
+ 	    }
+ 	}
++
++#ifdef FOF_UNION_FIND
++startClusterDetection();
++#endif
+     }
+ 
++#ifdef FOF_UNION_FIND
++void Main::startClusterDetection() {
++    ckerr << "[Main] FOF library starting up..." << endl;
++    // create callback to Main after inverted trees construction
++    CkCallback uf1_cb(CkIndex_Main::fofDonePhaseOne(), thisProxy);
++    fofLibProxy[0].register_phase_one_cb(uf1_cb);
++
++    fofLibStartTime = CkWallTimer();
++
++    // initialize FOF lib vertices
++    treeProxy.initFofLibVertices(fofLibProxy, CkCallbackResumeThread());
++    ckerr << "[Main] FOF library vertices initialized" << endl;
++    // start Smooth traversal on particles to initiate union_requests i.e. edges
++    ckerr << "[Main] Starting FOF Smooth traversal" << endl;
++    treeProxy.drift(0.0, 0, 0, 0.0, 0.0, 0, true, CkCallbackResumeThread());
++    sorter.startSorting(dataManagerID, ddTolerance, CkCallbackResumeThread(), true);
++#ifdef PUSH_GRAVITY
++    treeProxy.buildTree(bucketSize, CkCallbackResumeThread(), true);
++#else
++    treeProxy.buildTree(bucketSize, CkCallbackResumeThread());
++#endif
++    FOFSmoothParams fofInit(TYPE_GAS|TYPE_DARK|TYPE_STAR, 0, fofLibProxy);
++    double dfBall2OverSoft2 = 0.0;
++    //treeProxy.startSmooth(&fofInit, 1, param.nSmooth, dfBall2OverSoft2,
++    //        CkCallbackResumeThread());
++    treeProxy.startReSmooth(&fofInit, CkCallbackResumeThread());
++    ckerr << "[Main] Done with intiating Phase 1 of cluster detection" << endl;
++}
++
++void Main::fofDonePhaseOne() {
++  ckerr << "[Main] Cluster detection Phase 1 completed." << endl;
++  ckerr << "[Main] Tree construction time: " << CkWallTimer()-fofLibStartTime << endl;
++  CkCallback uf2_cb(CkIndex_Main::fofDonePhaseTwo(), thisProxy);
++  fofLibProxy.find_components(uf2_cb);
++}
++
++void Main::fofDonePhaseTwo() {
++  ckerr << "[Main] Cluster detection Phase 2 completed." << endl;
++  ckerr << "[Main] Components labelling time: " << CkWallTimer()-fofLibStartTime << endl;
++  treeProxy[0].fofPrintNumBosses();
++#if 0
++  CkCallback uf3_cb(CkIndex_Main::fofDonePhaseThree(), thisProxy);
++  int fofPruneThreshold = 1; // change this as input param?
++  fofLibProxy.prune_components(fofPruneThreshold, uf3_cb);
++#endif
++}
++
++void Main::fofDonePhaseThree() {
++  ckerr << "[Main] All phases for cluster detection complete!" << endl;
++  ckerr << "[Main] Total runtime for cluster detection: " << CkWallTimer() - fofLibStartTime << endl;
++  CkExit();
++}
++
++#endif
++
+ ///
+ /// @brief Calculate timesteps of particles.
+ ///
+@@ -3919,6 +3990,7 @@ void Main::liveVizImagePrep(liveVizRequestMsg *msg)
+   
+ }
+ 
++
+ #ifdef SELECTIVE_TRACING
+ void Main::turnProjectionsOn(int activeRung){
+   CkAssert(!projectionsOn);
+diff --git a/ParallelGravity.h b/ParallelGravity.h
+index 6966dbe..53b7a44 100644
+--- a/ParallelGravity.h
++++ b/ParallelGravity.h
+@@ -50,6 +50,10 @@ PUPbytes(COOLPARAM);
+ 
+ #include <map>
+ 
++#ifdef FOF_UNION_FIND
++#include "unionFindLib.h"
++#endif
++
+ #define MERGE_REMOTE_REQUESTS_VERBOSE /*CkPrintf*/
+ 
+ using namespace std;
+@@ -487,6 +491,12 @@ class Main : public CBase_Main {
+        double wallTimeStart;
+ #endif
+ 
++#ifdef FOF_UNION_FIND
++    double fofLibStartTime;
++    CProxy_UnionFindLib fofLibProxy;
++#endif
++
++
+        /// @brief Hold wall clock timings of calculation phases for a
+        /// given rung.
+        class timing_fields {
+@@ -582,6 +592,12 @@ public:
+ 	void memoryStatsCache();
+ 	void pup(PUP::er& p);
+ 	void liveVizImagePrep(liveVizRequestMsg *msg);
++#ifdef FOF_UNION_FIND
++    void startClusterDetection();
++    void fofDonePhaseOne();
++    void fofDonePhaseTwo();
++    void fofDonePhaseThree();
++#endif
+ };
+ 
+ /* IBM brain damage */
+@@ -2031,6 +2047,16 @@ public:
+         void mergeAllParticlesAndSaveCentroid();
+         bool otherIdlePesAvail();
+ 
++#ifdef FOF_UNION_FIND
++    public:
++    bool fofLibStarted = false;
++    UnionFindLib *fofLibPtr;
++    CProxy_UnionFindLib fofLibProxy;
++    unionFindVertex *fofLibVertices;
++    void initFofLibVertices(CProxy_UnionFindLib libProxy, const CkCallback &cb);
++    void fofPrintNumBosses();
++    static std::pair<int, int> fofGetLocationFromID(long int vid);
++#endif
+ };
+ 
+ /// @brief Class for shadow arrays to avoid reduction conflicts in
+diff --git a/TreePiece.cpp b/TreePiece.cpp
+index 6bffe5b..92f6f81 100644
+--- a/TreePiece.cpp
++++ b/TreePiece.cpp
+@@ -5772,6 +5772,18 @@ void TreePiece::pup(PUP::er& p) {
+       ckout << endl;
+       }
+   }
++
++#ifdef FOF_UNION_FIND
++    p|fofLibStarted;
++    p|fofLibProxy;
++    if (p.isUnpacking() && fofLibStarted) {
++        fofLibPtr = fofLibProxy[thisIndex].ckLocal();
++        fofLibVertices = new unionFindVertex[myNumParticles];
++    }
++    for (int i = 0; i < myNumParticles && fofLibStarted; i++) {
++        p|fofLibVertices[i];
++    }
++#endif
+ }
+ 
+ void TreePiece::reconstructNodeLookup(GenericTreeNode *node) {
+@@ -6646,6 +6658,46 @@ void TreePiece::clearMarkedBucketsAll(){
+ 
+ #endif
+ 
++#ifdef FOF_UNION_FIND
++void TreePiece::initFofLibVertices(CProxy_UnionFindLib libProxy, const CkCallback &cb) {
++   // allocate memory for library vertices
++   fofLibStarted = true;
++   fofLibVertices = new unionFindVertex[myNumParticles];
++   for(int i = 0; i < myNumParticles; i++) {
++     // unique 64-bit ID for each particle (chare idx | array idx)
++     myParticles[i+1].fofLibVertexID = ((uint64_t) thisIndex) << 32 | ((uint64_t) i);
++     // assign unique 64 bit ID and parent
++     fofLibVertices[i].vertexID = myParticles[i+1].fofLibVertexID;
++     fofLibVertices[i].parent = -1;
++  }
++  //CkPrintf("[TP %d] Done populating fofLibVertices\n", thisIndex);
++
++  fofLibProxy = libProxy;
++  fofLibPtr = fofLibProxy[thisIndex].ckLocal();
++  //CkPrintf("[TP %d] Got local lib pointer\n", thisIndex);
++  fofLibPtr->initialize_vertices(fofLibVertices, myNumParticles);
++  // register getLocationFromID
++  fofLibPtr->registerGetLocationFromID(fofGetLocationFromID);
++  //ckerr << "[TP " << thisIndex << "] initialized " << myNumParticles << "vertices" << endl;
++  //std::pair<int, int> p = fofGetLocationFromID(fofLibVertices[myNumParticles-1].vertexID);
++  //ckerr << "[TP " << thisIndex << "] " << p.first << " ," << p.second << endl;
++  contribute(cb);
++}
++
++void TreePiece::fofPrintNumBosses() {
++    CkAssert(thisIndex == 0);
++    ckerr << "Total number of components in the simulation: " << fofLibPtr->get_total_num_bosses() << endl;
++    CkExit();
++}
++
++std::pair<int, int>
++TreePiece::fofGetLocationFromID(long int vid) {
++  int chareIdx = (int)(vid >> 32);
++  int arrIdx = (int)(vid & 0xffffffff);
++  return std::make_pair(chareIdx, arrIdx);
++}
++#endif
++
+ #ifdef REDUCTION_HELPER
+ ReductionHelper::ReductionHelper(){
+ }
+diff --git a/configure b/configure
+index 5d040e2..c766741 100755
+--- a/configure
++++ b/configure
+@@ -632,6 +632,7 @@ NVCC_PATH
+ CUDA_DIR
+ LIBOBJS
+ OPTS
++FLAG_CLUSTER_DETECTION
+ FLAG_RTFORCE
+ FLAG_VSIGVISC
+ FLAG_CULLENALPHA
+@@ -722,6 +723,7 @@ enable_feedbacklimit
+ enable_cullenalpha
+ enable_vsigvisc
+ enable_rtforce
++enable_cluster_detection
+ enable_opts
+ with_cuda
+ with_cuda_sdk
+@@ -1367,6 +1369,8 @@ Optional Features:
+   --enable-cullenalpha    enable Cullen Dehnen artificial viscosity
+   --enable-vsigvisc       enable alternative Monahan artificial viscosity
+   --enable-rtforce        enable Richie-Thomas forces
++  --enable-cluster-detection
++                          enable Cluster Detection library
+   --enable-opts="options" Set compiler flags (override defaults)
+ 
+ Optional Packages:
+@@ -4357,6 +4361,23 @@ fi
+ 
+ 
+ 
++# Cluster detection using Union-Find based FOF algorithm
++# Check whether --enable-cluster-detection was given.
++if test "${enable_cluster_detection+set}" = set; then :
++  enableval=$enable_cluster_detection; cluster=$enableval
++else
++  cluster=no
++fi
++
++if test "$cluster" = "yes"; then
++    echo "CLUSTER DETECTION selected"
++    FLAG_CLUSTER_DETECTION="-DFOF_UNION_FIND"
++else
++    FLAG_CLUSTER_DETECTION=""
++fi
++
++
++
+ # Compiler flags
+ # Check whether --enable-opts was given.
+ if test "${enable_opts+set}" = set; then :
+diff --git a/configure.ac b/configure.ac
+index b8917c3..2347cbd 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -323,6 +323,19 @@ fi
+ 
+ AC_SUBST([FLAG_RTFORCE])
+ 
++# Cluster detection using Union-Find based FOF algorithm
++AC_ARG_ENABLE([cluster-detection],
++    [AS_HELP_STRING([--enable-cluster-detection], [enable Cluster Detection library])],
++    [cluster=$enableval], [cluster=no])
++if test "$cluster" = "yes"; then
++    echo "CLUSTER DETECTION selected"
++    FLAG_CLUSTER_DETECTION="-DFOF_UNION_FIND"
++else
++    FLAG_CLUSTER_DETECTION=""
++fi
++
++AC_SUBST([FLAG_CLUSTER_DETECTION])
++
+ # Compiler flags
+ AC_ARG_ENABLE([opts],
+ 	[AS_HELP_STRING([--enable-opts="options"], [Set compiler flags (override defaults)])],
+diff --git a/sinks.cpp b/sinks.cpp
+index 857cf79..229be00 100644
+--- a/sinks.cpp
++++ b/sinks.cpp
+@@ -226,6 +226,7 @@ void Sinks::CheckParams(PRM prm, struct parameters &param)
+ ///
+ void Main::outputBlackHoles(double dTime)
+ {
++#define MAXPATHLEN 256
+     char achOutFile[MAXPATHLEN];
+     FILE *fp;
+     double dOutTime;
+diff --git a/smooth.cpp b/smooth.cpp
+index 14283a4..c5651e2 100644
+--- a/smooth.cpp
++++ b/smooth.cpp
+@@ -1270,3 +1270,49 @@ void DensitySmoothParams::fcnSmooth(GravityParticle *p,int nSmooth,
+ 		q->fDensity += rs*p->mass;
+ 		}
+ 	}
++
++#ifdef FOF_UNION_FIND
++/// FOFSmoothParams functions
++int FOFSmoothParams::isSmoothActive(GravityParticle *p) 
++{
++    return (p->rung >= activeRung && TYPETest(p, iType));
++}
++
++void FOFSmoothParams::initSmoothParticle(GravityParticle *p) 
++{
++    if (p->rung >= activeRung) {
++        p->fBall = 0.2;
++    }
++}
++
++void FOFSmoothParams::initSmoothCache(GravityParticle *p) 
++{
++}
++
++void FOFSmoothParams::combSmoothCache(GravityParticle *p1,
++					  ExternalSmoothParticle *p2)
++{
++}
++
++void FOFSmoothParams::fcnSmooth(GravityParticle *p,int nSmooth,
++				      pqSmoothNode *nnList)
++{
++    //CkPrintf("Inside FOFSmoothParams of %d TP\n", tp->thisIndex);
++	GravityParticle *q;
++    CkAssert(tp->thisIndex >= 0 && tp->thisIndex < (CkNumPes() * 8));
++    UnionFindLib *fofLibPtr = fofLibProxy[tp->thisIndex].ckLocal();
++    CkAssert(fofLibPtr->thisIndex == tp->thisIndex);
++
++    //CkPrintf("[TP %d] Particle %d has %d neighbors\n", tp->thisIndex, p->key, nSmooth);
++	for (int i = 0; i < nSmooth; i++) {
++		q = nnList[i].p;
++        std::pair<int,int> p_loc = tp->fofGetLocationFromID(p->fofLibVertexID);
++        std::pair<int,int> q_loc = tp->fofGetLocationFromID(q->fofLibVertexID);
++        //CkPrintf("[TP %d] Vertex p:<%d,%d> is connected to Vertex q:<%d,%d>\n", tp->thisIndex, p_loc.first, p_loc.second, q_loc.first, q_loc.second);
++        //if (p_loc.first == q_loc.first && p_loc.second == q_loc.second)
++            //continue;
++        fofLibPtr->union_request(p->fofLibVertexID, q->fofLibVertexID);
++    }
++}
++#endif
++
+diff --git a/smooth.h b/smooth.h
+index 38cca36..3eb851b 100644
+--- a/smooth.h
++++ b/smooth.h
+@@ -74,6 +74,37 @@ class DensitySmoothParams : public SmoothParams
+ 	}
+     };
+ 
++#ifdef FOF_UNION_FIND
++/// Class to specify smooth particle traversal for FOF based cluster detection library
++class FOFSmoothParams : public SmoothParams
++{
++    CProxy_UnionFindLib fofLibProxy; // library proxy to make union-requests
++    virtual void fcnSmooth(GravityParticle *p, int nSmooth,
++			     pqSmoothNode *nList);
++    virtual int isSmoothActive(GravityParticle *p);
++    virtual void initSmoothParticle(GravityParticle *p);
++    virtual void initTreeParticle(GravityParticle *p) {}
++    virtual void postTreeParticle(GravityParticle *p) {}
++    virtual void initSmoothCache(GravityParticle *p);
++    virtual void combSmoothCache(GravityParticle *p1,
++				 ExternalSmoothParticle *p2);
++ public:
++    FOFSmoothParams() {}
++    FOFSmoothParams(int _iType, int am, CProxy_UnionFindLib libProxy) {
++	iType = _iType;
++	activeRung = am;
++    fofLibProxy = libProxy;
++	}
++    PUPable_decl(FOFSmoothParams);
++    FOFSmoothParams(CkMigrateMessage *m) : SmoothParams(m) {}
++
++    virtual void pup(PUP::er &p) {
++        SmoothParams::pup(p);//Call base class
++        p|fofLibProxy;
++	}
++};
++#endif
++
+ /// Super class for Smooth and Resmooth computation.
+ class SmoothCompute : public Compute
+ {
+-- 
+2.16.2
+
