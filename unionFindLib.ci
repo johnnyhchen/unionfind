@@ -1,0 +1,59 @@
+module unionFindLib {
+    extern module prefixBalance;
+
+    include "types.h";
+    // initnode function to register custom reduction
+    initnode void register_merge_count_maps_reduction(void);
+
+    readonly CProxy_UnionFindLib _UfLibProxy;
+    readonly CProxy_Prefix prefixLibArray;
+    readonly CkGroupID libGroupID;
+
+    array[1D] UnionFindLib {
+        entry UnionFindLib();
+        // function to register Phase 1 callback
+        entry void register_phase_one_cb(CkCallback cb);
+        // functions to build inverted trees
+#ifndef ANCHOR_ALGO
+        entry void find_boss1(int arrIdx, long partnerID, long initID);
+        entry void find_boss2(int arrIdx, long boss1ID, long initID);
+#else
+        entry void anchor(int w_arrIdx, long v, long path_base_arrIdx);
+#endif
+        // function for grandparent short-circuiting
+        entry [aggregate] void short_circuit_parent(shortCircuitData scd);
+
+        // function for path compression support
+        entry void compress_path(int arrIdx, long compressedParent);
+
+        // functions to perform distributed connected components
+        entry void find_components(CkCallback cb);
+        entry [reductiontarget] void boss_count_prefix_done(int totalCount);
+        entry void need_boss(int arrIdx, int fromID);
+        entry void set_component(int arrIdx, int compNum);
+
+        // functions to prune out small components
+        entry void prune_components(int threshold, CkCallback cb);
+        entry [reductiontarget] void perform_pruning();
+        //entry [reductiontarget,nokeep] void merge_count_results(CkReductionMsg *msg);
+        //entry [reductiontarget] void merge_count_results(int totalCounts[numElems], int numElems);
+
+        // TRAM functions
+        entry [aggregate] void insertDataFindBoss(const findBossData & data);
+        entry [aggregate] void insertDataNeedBoss(const uint64_t & data);
+#ifdef ANCHOR_ALGO
+        entry [aggregate] void insertDataAnchor(const anchorData & data);
+#endif
+#ifdef PROFILING
+        entry [reductiontarget] void profiling_count_max(long maxCount);
+#endif
+    }
+
+    // group chare to support the library chares
+    group UnionFindLibGroup {
+        entry UnionFindLibGroup();
+        entry [reductiontarget] void build_component_count_array(int totalCounts[numElems], int numElems);
+        entry [reductiontarget] void done_profiling(int result);
+        entry void contribute_count();
+    }
+};

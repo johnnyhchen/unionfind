@@ -1,0 +1,15 @@
+mainmodule kway {
+	include "types.h";
+
+	initnode void register_merge_counts_reduction(void);
+
+	mainchare Main {
+		entry Main(CkArgMsg *m);
+		entry [reductiontarget] void merge_count_results(CkReductionMsg *msg);
+	}
+
+	array[1D] Generator {
+		entry Generator(CProxy_Main mproxy);
+		entry void start();
+	};	
+};

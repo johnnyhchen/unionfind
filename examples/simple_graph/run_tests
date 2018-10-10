@@ -1,0 +1,30 @@
+#!/bin/bash
+
+outfile=obtained.out
+logfile=obtained.results
+
+rm -f $logfile
+
+for f in ./graphs/*.g; do
+    echo "Running test graph $f ..."
+    if [ "$f" == "./graphs/triangle_bug.g" ]
+    then
+        ./charmrun +p3 ./graph $f 1 ++local > $outfile
+    else
+        ./charmrun +p4 ./graph $f 1 ++local > $outfile
+    fi
+    components=`grep -i "Number of components found" $outfile | cut -d ":" -f 2 | cut -d " " -f 2`
+    graph=`echo $f | cut -d "/" -f 3`
+    echo "$graph $components" >> $logfile
+done
+
+results_diff=`diff $logfile expected.results`
+
+if [ "$results_diff" == "" ]
+then
+    echo "All tests passed. Expected number of components obtained."
+    rm $outfile $logfile
+else
+    echo "Mismatch in results!"
+    echo $results_diff
+fi

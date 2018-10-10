@@ -1,0 +1,25 @@
+mainmodule mesh {
+    extern module unionFindLib;
+
+    readonly CProxy_UnionFindLib libProxy;
+    readonly CProxy_Main mainProxy;
+    readonly int MESH_SIZE;
+    readonly int MESHPIECE_SIZE;
+    readonly float PROBABILITY;
+
+    mainchare Main {
+        entry Main(CkArgMsg *m);
+        entry void doneInveretdTree();
+        entry void doneFindComponents();
+        entry [reductiontarget] void donePrinting();
+    }
+
+    array[1D] MeshPiece {
+        entry MeshPiece();
+        entry void initializeLibVertices();
+        entry [reductiontarget] void doWork();
+        entry void printVertices();
+    }
+
+    //array[1D] UnionFindLib;
+};
