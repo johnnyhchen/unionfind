@@ -42,7 +42,7 @@ module unionFindLib {
         entry [aggregate] void insertDataFindBoss(const findBossData & data);
         entry [aggregate] void insertDataNeedBoss(const uint64_t & data);
 #ifdef ANCHOR_ALGO
-        entry [aggregate] void insertDataAnchor(const anchorData & data);
+        entry [inline, aggregate] void insertDataAnchor(const anchorData & data);
 #endif
 #ifdef PROFILING
         entry [reductiontarget] void profiling_count_max(long maxCount);
