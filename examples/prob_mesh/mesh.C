@@ -46,6 +46,7 @@ class Main : public CBase_Main {
     void doneInveretdTree() {
         CkPrintf("[Main] Inveretd trees constructed. Notify library to do component detection\n");
         CkPrintf("[Main] Tree construction time: %f\n", CkWallTimer()-start_time);
+        CkExit();
        /* // ask the lib group chares to contribute counts
         CProxy_UnionFindLibGroup libGroup(libGroupID);
         libGroup.contribute_count();*/
@@ -90,6 +91,7 @@ class MeshPiece : public CBase_MeshPiece {
     static std::pair<int,int> getLocationFromID(long int vid);
         
     void initializeLibVertices() {    
+        numMyVertices = MESHPIECE_SIZE*MESHPIECE_SIZE;
         libPtr = libProxy.ckLocalBranch();
  
         // libPtr->initialize_vertices(MESHPIECE_SIZE*MESHPIECE_SIZE, libVertices, offset);
@@ -99,10 +101,12 @@ class MeshPiece : public CBase_MeshPiece {
         long int totalCharesinPe = numMeshPieces / CkNumPes();
         assert ((thisIndex / totalCharesinPe) == CkMyPe()); 
         offset = thisIndex % totalCharesinPe;
+        // CkPrintf("thisIndex: %d totalChareinPe: %ld offset: %ld\n", thisIndex, totalCharesinPe, offset);
         if (offset == 0) {
           libProxy.ckLocalBranch()->allocate_libVertices((MESHPIECE_SIZE * MESHPIECE_SIZE), numMeshPieces);
         }
         offset = numMyVertices * offset;
+        // CkPrintf("thisIndex: %d totalChareinPe: %ld offset: %ld\n", thisIndex, totalCharesinPe, offset);
         libPtr->initialize_vertices(MESHPIECE_SIZE*MESHPIECE_SIZE, libVertices, offset);
         libPtr->registerGetLocationFromID(getLocationFromID);
         init_vertices();
@@ -112,7 +116,6 @@ class MeshPiece : public CBase_MeshPiece {
     void init_vertices()
     {
         myVertices = new meshVertex[MESHPIECE_SIZE*MESHPIECE_SIZE];
-        numMyVertices = MESHPIECE_SIZE*MESHPIECE_SIZE;
 
         //conversion of thisIndex to 2D array indices
         int chare_x = thisIndex / (MESH_SIZE/MESHPIECE_SIZE);
@@ -127,17 +130,20 @@ class MeshPiece : public CBase_MeshPiece {
                 myVertices[i*MESHPIECE_SIZE+j].x = global_x;
                 myVertices[i*MESHPIECE_SIZE+j].y = global_y;
                 myVertices[i*MESHPIECE_SIZE+j].id = global_x*MESH_SIZE + global_y;
+                // CkPrintf("init_vertices() id: %d\n", myVertices[i*MESHPIECE_SIZE+j].id);
 
                 // convert global x & y to unique id for libVertices
                 // retain the id decided by the application; getLocationFromID converts this id, to provide the groupIdx and offset
-                libVertices[offset + i*MESHPIECE_SIZE+j].vertexID = global_x*MESH_SIZE + global_y;
-                libVertices[offset + i*MESHPIECE_SIZE+j].parent = libVertices[i*MESHPIECE_SIZE+j].vertexID;
+                libVertices[i*MESHPIECE_SIZE+j].vertexID = global_x*MESH_SIZE + global_y;
+                libVertices[i*MESHPIECE_SIZE+j].parent = libVertices[i*MESHPIECE_SIZE+j].vertexID;
             }
         }
     }
 
     void doWork() {
-        CkPrintf("Starting doWork()\n");
+        // CkPrintf("Starting doWork()\n");
+        // printVertices();
+        // libPtr->printVertices();
         for (int i = 0; i < numMyVertices; i++) {
             // check probability for east edge
             float eastProb = 0.0;
@@ -163,7 +169,7 @@ class MeshPiece : public CBase_MeshPiece {
                 }
             }
         }
-        CkPrintf("Done doWork() myIndex: %d myPE: %d\n", thisIndex, CkMyPe());
+        // CkPrintf("Done doWork() myIndex: %d myPE: %d\n", thisIndex, CkMyPe());
     }
 
     float checkProbabilityEast(int val1, int val2) {
@@ -178,9 +184,11 @@ class MeshPiece : public CBase_MeshPiece {
 
     void printVertices() {
         for (int i = 0; i < numMyVertices; i++) {
+            std::pair<int, int> loc = getLocationFromID(myVertices[i].id);
+            CkPrintf("i: %d thisIndex: %d myPE: %d id: %d group: %d offset: %d\n", i, thisIndex, CkMyPe(), myVertices[i].id, loc.first, loc.second);
             //CkPrintf("[mpProxy %d] libVertices[%d] - vertexID: %ld, parent: %ld, component: %d\n", thisIndex, i, libVertices[i].vertexID, libVertices[i].parent, libVertices[i].componentNumber);
         }
-        contribute(CkCallback(CkReductionTarget(Main, donePrinting), mainProxy));
+        //contribute(CkCallback(CkReductionTarget(Main, donePrinting), mainProxy));
     }
 };
 

@@ -63,7 +63,7 @@ void UnionFindLib::
 allocate_libVertices(long int numVertices, long int numCharesinPe)
 {
   assert (myVertices.size() == 0);
-  CkPrintf("PE: %d, calling allocate for: %ld\n", CkMyPe(), (numVertices * numCharesinPe));
+  // CkPrintf("PE: %d, calling allocate for: %ld\n", CkMyPe(), (numVertices * numCharesinPe));
   myVertices.resize((numVertices * numCharesinPe));
 }
 
@@ -78,9 +78,12 @@ initialize_vertices(long int numVertices, unionFindVertex* &appVertices, long in
     }
     else {
       // The application provides the offset; application's main chare has already called allocate_libVertices()
+      /*
       if ((offset + numMyVertices) > myVertices.size()) {
         CkPrintf("offset: %ld numMyVertices: %ld myVertices.size(): %d\n", offset, numMyVertices, myVertices.size());
       }
+      CkPrintf("offset: %ld numMyVertices: %ld myVertices.size(): %d\n", offset, numMyVertices, myVertices.size());
+      */
       assert ((offset + numMyVertices) <= myVertices.size());
       appVertices = &myVertices[offset];
     }
@@ -94,13 +97,15 @@ initialize_vertices(long int numVertices, unionFindVertex* &appVertices, long in
 
 void UnionFindLib::
 union_request(long int v, long int w) {
+    /*
     if (v < 0 || w < 0)
       CkPrintf("v: %ld w: %ld\n", v, w);
+    */
 
     std::pair<int, int> w_loc = getLocationFromID(w);
     
-    std::pair<int, int> v_loc = getLocationFromID(v);
-    CkPrintf("w: %d %d v: %d %d\n", w_loc.first, w_loc.second, v_loc.first, v_loc.second);
+    // std::pair<int, int> v_loc = getLocationFromID(v);
+    // CkPrintf("w_id: %ld v_id: %ld w: %d %d v: %d %d\n", w, v, w_loc.first, w_loc.second, v_loc.first, v_loc.second);
     // message w to anchor to v
     anchorData d;
     d.arrIdx = w_loc.second;
@@ -109,22 +114,25 @@ union_request(long int v, long int w) {
     assert(w_loc.first < CkNumPes());
     // assert(w_loc.second >= 0 && w_loc.second < 64);
     
+    /*
     if (w_loc.first != 0)
       CkPrintf("sending to PE: %d\n", w_loc.first);
-    
+    */
     thisProxy[w_loc.first].insertDataAnchor(d);
 }
 
 void UnionFindLib::
 anchor(int w_arrIdx, long int v, long int path_base_arrIdx) {
     unionFindVertex *w = &myVertices[w_arrIdx];
+
+    // CkPrintf("anchor() w_arrIdx: %d w->vertexID: %ld to vid: %ld\n", w_arrIdx, w->vertexID, v);
     w->findOrAnchorCount++;
 
     if (w->parent == v) {
       // call local_path_compression with v as parent
       if (path_base_arrIdx != -1) {
         unionFindVertex *path_base = &myVertices[path_base_arrIdx];
-        // local_path_compression(path_base, v);
+        local_path_compression(path_base, v);
       }
       return;
     }
@@ -133,8 +141,7 @@ anchor(int w_arrIdx, long int v, long int path_base_arrIdx) {
         // incorrect order, swap the vertices
         std::pair<int, int> v_loc = getLocationFromID(v);
         // if (v_loc.first == thisIndex) {
-        // if (v_loc.first == CkMyPe()) {
-        if (0) {
+        if (v_loc.first == CkMyPe()) {
             // vertex available locally, avoid extra message
             if (path_base_arrIdx != -1) {
               // Have to change the direction; so compress path for w
@@ -169,8 +176,10 @@ anchor(int w_arrIdx, long int v, long int path_base_arrIdx) {
         assert(v_loc.first >= 0);
         assert(v_loc.first < CkNumPes());
 
+        /*
         if (v_loc.first != 0)
           CkPrintf("sending to PE: %d\n", v_loc.first);
+        */
         // assert(v_loc.second >= 0 && v_loc.second < 64);
         thisProxy[v_loc.first].insertDataAnchor(d);
     }
@@ -186,8 +195,7 @@ anchor(int w_arrIdx, long int v, long int path_base_arrIdx) {
     else {
         // call anchor for w's parent
         std::pair<int, int> w_parent_loc = getLocationFromID(w->parent);
-        // if (w_parent_loc.first == CkMyPe()) {
-        if (0) {
+        if (w_parent_loc.first == CkMyPe()) {
             if (path_base_arrIdx == -1) {
               // Start from w; a wasted call if there is only one node and its child in the PE
               std::pair<int, int> w_loc = getLocationFromID(w->vertexID);
@@ -207,7 +215,7 @@ anchor(int w_arrIdx, long int v, long int path_base_arrIdx) {
             unionFindVertex *path_base = &myVertices[path_base_arrIdx];
             // Make all nodes point to this parent w
             assert (path_base->vertexID != w->vertexID);
-            // local_path_compression(path_base, w->vertexID);
+            local_path_compression(path_base, w->vertexID);
           }
           /*
           UnionFindLib *lc = thisProxy[w_parent_loc.first].ckLocal();
@@ -225,8 +233,10 @@ anchor(int w_arrIdx, long int v, long int path_base_arrIdx) {
         assert(w_parent_loc.first < CkNumPes());
 
          // assert(w_parent_loc.second >= 0 && w_parent_loc.second < 64);
+        /*
         if (w_parent_loc.first != 0)
           CkPrintf("sending to PE: %d\n", w_parent_loc.first);
+        */
         thisProxy[w_parent_loc.first].insertDataAnchor(d);
     }
 }
@@ -349,8 +359,13 @@ insertDataNeedBoss(const uint64_t & data) {
 
 void UnionFindLib::
 insertDataAnchor(const anchorData & data) {
-    // CkPrintf("insertDataAnchor() arrIdx: %d v: %d\n", data.arrIdx, data.v);
     anchor(data.arrIdx, data.v, -1);
+}
+
+void UnionFindLib::
+printVertices() {
+  for (int i = 0; i < myVertices.size(); i++)
+    CkPrintf("i: %d vertexID: %ld\n", i, myVertices[i].vertexID);
 }
 
 void UnionFindLib::

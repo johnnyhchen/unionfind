@@ -60,6 +60,7 @@ class UnionFindLib : public CBase_UnionFindLib {
     void local_path_compression(unionFindVertex *src, long int compressedParent);
     bool check_same_chares(long int v1, long int v2);
     void registerGetLocationFromID(std::pair<int, int> (*gloc)(long int v));
+    void printVertices();
 
     // functions and data structures for finding connected components
 
