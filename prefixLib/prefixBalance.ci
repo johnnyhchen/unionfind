@@ -1,6 +1,6 @@
 
 module prefixBalance{
-  array [1D] Prefix {
+  array[1D] Prefix {
     entry Prefix(int nElements);
 
     entry void passValue(int step, unsigned int incomingValue);

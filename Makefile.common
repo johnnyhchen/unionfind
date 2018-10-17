@@ -8,7 +8,7 @@ ANCHOR= -DANCHOR_ALGO
 #ANCHOR= 
 PROFILE= -DPROFILING
 CHARMC = $(CHARM_DIR)/bin/charmc $(ANCHOR) $(PROFILE)
-OPTS = -std=c++11 -O3 -g
+OPTS = -std=c++11 -O0 -g
 LD_OPTS =
 
 #options for building union-find library and prefix library

@@ -6,6 +6,7 @@ mainmodule mesh {
     readonly int MESH_SIZE;
     readonly int MESHPIECE_SIZE;
     readonly float PROBABILITY;
+    readonly int numMeshPieces;
 
     mainchare Main {
         entry Main(CkArgMsg *m);

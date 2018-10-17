@@ -37,7 +37,7 @@ extern CkReduction::reducerType mergeCountMapsReductionType;
 
 // class definition for library chares
 class UnionFindLib : public CBase_UnionFindLib {
-    unionFindVertex *myVertices;
+    std::vector<unionFindVertex> myVertices;
     int numMyVertices;
     int pathCompressionThreshold = 5;
     int componentPruneThreshold;
@@ -51,33 +51,25 @@ class UnionFindLib : public CBase_UnionFindLib {
     UnionFindLib(CkMigrateMessage *m) { }
     static CProxy_UnionFindLib unionFindInit(CkArrayID clientArray, int n);
     void register_phase_one_cb(CkCallback cb);
-    void initialize_vertices(unionFindVertex *appVertices, int numVertices);
-#ifndef ANCHOR_ALGO
-    void union_request(long int vid1, long int vid2);
-    void find_boss1(int arrIdx, long int partnerID, long int senderID);
-    void find_boss2(int arrIdx, long int boss1ID, long int senderID);
-#else
+    // void initialize_vertices(unionFindVertex *appVertices, int numVertices);
+    void allocate_libVertices(long int numVertices, long int numCharesinPe);
+    void initialize_vertices(long int numVertices, unionFindVertex* &appVertices, long int &offset);
+
     void union_request(long int v, long int w);
     void anchor(int w_arrIdx, long int v, long int path_base_arrIdx);
-#endif
     void local_path_compression(unionFindVertex *src, long int compressedParent);
     bool check_same_chares(long int v1, long int v2);
-    void short_circuit_parent(shortCircuitData scd);
-    void compress_path(int arrIdx, long int compressedParent);
-    unionFindVertex* return_vertices();
     void registerGetLocationFromID(std::pair<int, int> (*gloc)(long int v));
 
     // functions and data structures for finding connected components
 
     public:
     void find_components(CkCallback cb);
+    void insertDataFindBoss(const findBossData & data);
     void boss_count_prefix_done(int totalCount);
     void start_component_labeling();
     void insertDataNeedBoss(const uint64_t & data);
-    void insertDataFindBoss(const findBossData & data);
-#ifdef ANCHOR_ALGO
     void insertDataAnchor(const anchorData & data);
-#endif
     void need_boss(int arrIdx, long int fromID);
     void set_component(int arrIdx, long int compNum);
     void prune_components(int threshold, CkCallback appReturnCb);

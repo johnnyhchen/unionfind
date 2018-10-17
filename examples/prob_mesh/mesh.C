@@ -1,4 +1,5 @@
 #include <iostream>
+#include <assert.h>
 #include "unionFindLib.h"
 #include "mesh.decl.h"
 
@@ -7,6 +8,7 @@
 /*readonly*/ int MESH_SIZE;
 /*readonly*/ int MESHPIECE_SIZE;
 /*readonly*/ float PROBABILITY;
+/*readonly*/ int numMeshPieces;
 
 class Main : public CBase_Main {
     CProxy_MeshPiece mpProxy;
@@ -29,7 +31,8 @@ class Main : public CBase_Main {
             CkAbort("Mesh piece size should divide mesh size\n");
         }
 
-        int numMeshPieces = (MESH_SIZE/MESHPIECE_SIZE) * (MESH_SIZE/MESHPIECE_SIZE);
+        numMeshPieces = (MESH_SIZE/MESHPIECE_SIZE) * (MESH_SIZE/MESHPIECE_SIZE);
+        assert ((numMeshPieces % CkNumPes()) == 0); // Finicky handling of group based union-find library
         mpProxy = CProxy_MeshPiece::ckNew(numMeshPieces);
         // callback for library to return to after inverted tree construction
         CkCallback cb(CkIndex_Main::doneInveretdTree(), thisProxy);
@@ -75,12 +78,41 @@ class MeshPiece : public CBase_MeshPiece {
     int numMyVertices;
     UnionFindLib *libPtr;
     unionFindVertex *libVertices;
+    long int offset;
 
     public:
-    MeshPiece() {
+    MeshPiece() { }
+
+    MeshPiece(CkMigrateMessage *m) { }
+
+    // function needed by library for quick lookup of
+    // vertices location
+    static std::pair<int,int> getLocationFromID(long int vid);
+        
+    void initializeLibVertices() {    
+        libPtr = libProxy.ckLocalBranch();
+ 
+        // libPtr->initialize_vertices(MESHPIECE_SIZE*MESHPIECE_SIZE, libVertices, offset);
+        // Initialize vertices by providing the library what the offset should be
+        // The library in this case would allocate memory for all the chares in the PE by using allocate_libVertices()
+        // A different usage of this library is where the application decides the offset, and allocates the vertices in the initialize_vertices() call; so offset should be passed as -1
+        long int totalCharesinPe = numMeshPieces / CkNumPes();
+        assert ((thisIndex / totalCharesinPe) == CkMyPe()); 
+        offset = thisIndex % totalCharesinPe;
+        if (offset == 0) {
+          libProxy.ckLocalBranch()->allocate_libVertices((MESHPIECE_SIZE * MESHPIECE_SIZE), numMeshPieces);
+        }
+        offset = numMyVertices * offset;
+        libPtr->initialize_vertices(MESHPIECE_SIZE*MESHPIECE_SIZE, libVertices, offset);
+        libPtr->registerGetLocationFromID(getLocationFromID);
+        init_vertices();
+        contribute(CkCallback(CkReductionTarget(MeshPiece, doWork), thisProxy));
+    }
+
+    void init_vertices()
+    {
         myVertices = new meshVertex[MESHPIECE_SIZE*MESHPIECE_SIZE];
         numMyVertices = MESHPIECE_SIZE*MESHPIECE_SIZE;
-        libVertices = new unionFindVertex[MESHPIECE_SIZE*MESHPIECE_SIZE];
 
         //conversion of thisIndex to 2D array indices
         int chare_x = thisIndex / (MESH_SIZE/MESHPIECE_SIZE);
@@ -97,31 +129,15 @@ class MeshPiece : public CBase_MeshPiece {
                 myVertices[i*MESHPIECE_SIZE+j].id = global_x*MESH_SIZE + global_y;
 
                 // convert global x & y to unique id for libVertices
-                libVertices[i*MESHPIECE_SIZE+j].vertexID = global_x*MESH_SIZE + global_y;
-#ifndef ANCHOR_ALGO
-                libVertices[i*MESHPIECE_SIZE+j].parent = -1;
-#else
-                libVertices[i*MESHPIECE_SIZE+j].parent = libVertices[i*MESHPIECE_SIZE+j].vertexID;
-#endif
+                // retain the id decided by the application; getLocationFromID converts this id, to provide the groupIdx and offset
+                libVertices[offset + i*MESHPIECE_SIZE+j].vertexID = global_x*MESH_SIZE + global_y;
+                libVertices[offset + i*MESHPIECE_SIZE+j].parent = libVertices[i*MESHPIECE_SIZE+j].vertexID;
             }
         }
-
-    }
-
-    MeshPiece(CkMigrateMessage *m) { }
-
-    // function needed by library for quick lookup of
-    // vertices location
-    static std::pair<int,int> getLocationFromID(long int vid);
-        
-    void initializeLibVertices() {    
-        libPtr = libProxy[thisIndex].ckLocal();
-        libPtr->initialize_vertices(libVertices, MESHPIECE_SIZE*MESHPIECE_SIZE);
-        libPtr->registerGetLocationFromID(getLocationFromID);
-        contribute(CkCallback(CkReductionTarget(MeshPiece, doWork), thisProxy));
     }
 
     void doWork() {
+        CkPrintf("Starting doWork()\n");
         for (int i = 0; i < numMyVertices; i++) {
             // check probability for east edge
             float eastProb = 0.0;
@@ -147,6 +163,7 @@ class MeshPiece : public CBase_MeshPiece {
                 }
             }
         }
+        CkPrintf("Done doWork() myIndex: %d myPE: %d\n", thisIndex, CkMyPe());
     }
 
     float checkProbabilityEast(int val1, int val2) {
@@ -179,8 +196,14 @@ MeshPiece::getLocationFromID(long int vid) {
     int chare_y = (global_y-local_y) / MESHPIECE_SIZE;
 
     int chareIdx = chare_x * (MESH_SIZE/MESHPIECE_SIZE) + chare_y;
-    int arrIdx = local_x * MESHPIECE_SIZE + local_y;
-    return std::make_pair(chareIdx, arrIdx);
+    int totalCharesinPe = numMeshPieces / CkNumPes();
+    int groupIdx = chareIdx / totalCharesinPe;
+    // Depending on the chareIdx, get the offset in the group
+    long int offset = chareIdx % totalCharesinPe;
+    offset *= MESHPIECE_SIZE * MESHPIECE_SIZE;
+    int arrIdx = offset + (local_x * MESHPIECE_SIZE + local_y);
+
+    return std::make_pair(groupIdx, arrIdx);
 }
 
 #include "mesh.def.h"
