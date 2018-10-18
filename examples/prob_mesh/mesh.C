@@ -103,7 +103,7 @@ class MeshPiece : public CBase_MeshPiece {
         offset = thisIndex % totalCharesinPe;
         // CkPrintf("thisIndex: %d totalChareinPe: %ld offset: %ld\n", thisIndex, totalCharesinPe, offset);
         if (offset == 0) {
-          libProxy.ckLocalBranch()->allocate_libVertices((MESHPIECE_SIZE * MESHPIECE_SIZE), numMeshPieces);
+          libProxy.ckLocalBranch()->allocate_libVertices((MESHPIECE_SIZE * MESHPIECE_SIZE), totalCharesinPe);
         }
         offset = numMyVertices * offset;
         // CkPrintf("thisIndex: %d totalChareinPe: %ld offset: %ld\n", thisIndex, totalCharesinPe, offset);

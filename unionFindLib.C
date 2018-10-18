@@ -110,8 +110,8 @@ union_request(long int v, long int w) {
     anchorData d;
     d.arrIdx = w_loc.second;
     d.v = v;
-    assert(w_loc.first >= 0);
-    assert(w_loc.first < CkNumPes());
+    // assert(w_loc.first >= 0);
+    // assert(w_loc.first < CkNumPes());
     // assert(w_loc.second >= 0 && w_loc.second < 64);
     
     /*
@@ -173,8 +173,8 @@ anchor(int w_arrIdx, long int v, long int path_base_arrIdx) {
         anchorData d;
         d.arrIdx = v_loc.second;
         d.v = w->parent;
-        assert(v_loc.first >= 0);
-        assert(v_loc.first < CkNumPes());
+        // assert(v_loc.first >= 0);
+        // assert(v_loc.first < CkNumPes());
 
         /*
         if (v_loc.first != 0)
@@ -214,7 +214,7 @@ anchor(int w_arrIdx, long int v, long int path_base_arrIdx) {
           if (path_base_arrIdx != -1) {
             unionFindVertex *path_base = &myVertices[path_base_arrIdx];
             // Make all nodes point to this parent w
-            assert (path_base->vertexID != w->vertexID);
+            // assert (path_base->vertexID != w->vertexID);
             local_path_compression(path_base, w->vertexID);
           }
           /*
@@ -229,8 +229,8 @@ anchor(int w_arrIdx, long int v, long int path_base_arrIdx) {
         anchorData d;
         d.arrIdx = w_parent_loc.second;
         d.v = v;
-        assert(w_parent_loc.first >= 0);
-        assert(w_parent_loc.first < CkNumPes());
+        // assert(w_parent_loc.first >= 0);
+        // assert(w_parent_loc.first < CkNumPes());
 
          // assert(w_parent_loc.second >= 0 && w_parent_loc.second < 64);
         /*
