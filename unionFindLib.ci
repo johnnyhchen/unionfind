@@ -37,6 +37,8 @@ module unionFindLib {
 #ifdef PROFILING
         entry [reductiontarget] void profiling_count_max(long maxCount);
 #endif
+        entry void recv_reqs_processed();
+        entry void register_batch_cb(CkCallback cb);
     }
 
     // group chare to support the library chares

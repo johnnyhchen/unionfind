@@ -52,23 +52,31 @@ registerGetLocationFromID(std::pair<int, int> (*gloc)(long int vid)) {
 
 void UnionFindLib::
 register_phase_one_cb(CkCallback cb) {
-    if (thisIndex != 0)
-        CkAbort("[UnionFindLib] Phase 1 callback must be registered on first chare only!");
+    if (CkMyPe() != 0)
+        CkAbort("[UnionFindLib] Phase 1 callback must be registered on first PE only!");
 
     CkStartQD(cb);
 }
 
 // Called only by the one chare in the PE
 void UnionFindLib::
-allocate_libVertices(long int numVertices, long int numCharesinPe)
+allocate_libVertices(long int numVertices, long int nPe)
 {
   assert (myVertices.size() == 0);
+  numCharesinPe = nPe;
   // CkPrintf("PE: %d, calling allocate for: %ld\n", CkMyPe(), (numVertices * numCharesinPe));
   myVertices.resize((numVertices * numCharesinPe));
 }
 
+// batchSize should be -1 if all the union_requests are to be handled at once
 void UnionFindLib::
-initialize_vertices(long int numVertices, unionFindVertex* &appVertices, long int &offset) {
+initialize_vertices(long int numVertices, unionFindVertex* &appVertices, long int &offset, long int bs) {
+    batchSize = bs;
+    totalReqsPerBatch = batchSize * numCharesinPe;
+    thresholdReqs = totalReqsPerBatch / CkNumPes();
+    batchNo = 1;
+    reqsProcessed = 0;
+    totalReqsProcessed = 0;
     // local vertices corresponding to one treepiece in application
     numMyVertices = numVertices;
     if (offset == -1) {
@@ -87,12 +95,37 @@ initialize_vertices(long int numVertices, unionFindVertex* &appVertices, long in
       assert ((offset + numMyVertices) <= myVertices.size());
       appVertices = &myVertices[offset];
     }
-    //myVertices = appVertices; // no need to do memcpy, array in same address space as app
-    /*myVertices = (unionFindVertex*)malloc(numVertices * sizeof(unionFindVertex));
-    memcpy(myVertices, appVertices, sizeof(unionFindVertex)*numVertices);*/
-    /*for (int i = 0; i < numMyVertices; i++) {
-        CkPrintf("[LibProxy %d] myVertices[%d] - vertexID: %ld, parent: %ld, component: %d\n", this->thisIndex, i, myVertices[i].vertexID, myVertices[i].parent, myVertices[i].componentNumber);
-    }*/
+}
+
+void UnionFindLib::
+register_batch_cb(CkCallback cb) {
+  if (CkMyPe() != 0) {
+    CkAbort("[UnionFindLib] Batch callback must be registered on first PE only!");
+  }
+  batchCb = cb;
+}
+
+void UnionFindLib::
+reqs_processed() {
+  reqsProcessed++;
+  if (reqsProcessed >= thresholdReqs) {
+    // Communicate to node 0
+    thisProxy[0].recv_reqs_processed();
+    reqsProcessed = 0;
+  }
+}
+
+// Only on node 0
+void UnionFindLib::
+recv_reqs_processed() {
+  totalReqsProcessed += thresholdReqs;
+  double th = 0.5 * totalReqsPerBatch * batchNo; // How many requests should have been processed till now
+  if (totalReqsProcessed > th) {
+    // CkPrintf("Batch: %ld done totalReqsProcessed: %ld\n", batchNo, totalReqsProcessed);
+    batchNo++;
+    // Broadcast a message to all application PEs using a callback
+    batchCb.send();
+  }
 }
 
 void UnionFindLib::
@@ -134,6 +167,7 @@ anchor(int w_arrIdx, long int v, long int path_base_arrIdx) {
         unionFindVertex *path_base = &myVertices[path_base_arrIdx];
         local_path_compression(path_base, v);
       }
+      reqs_processed();
       return;
     }
 
@@ -191,6 +225,7 @@ anchor(int w_arrIdx, long int v, long int path_base_arrIdx) {
         local_path_compression(path_base, v);
       }
       w->parent = v;
+      reqs_processed();
     }
     else {
         // call anchor for w's parent

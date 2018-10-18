@@ -9,6 +9,7 @@
 /*readonly*/ int MESHPIECE_SIZE;
 /*readonly*/ float PROBABILITY;
 /*readonly*/ int numMeshPieces;
+/*readonly*/ long batchSize;
 
 class Main : public CBase_Main {
     CProxy_MeshPiece mpProxy;
@@ -16,7 +17,7 @@ class Main : public CBase_Main {
 
     public:
     Main(CkArgMsg *m) {
-        if (m->argc != 4) {
+        if (m->argc != 5) {
             CkPrintf("Usage: ./mesh <mesh_size> <mesh_piece_size> <probability>");
             CkExit();
         }
@@ -26,6 +27,7 @@ class Main : public CBase_Main {
         if (MESH_SIZE % MESHPIECE_SIZE != 0)
             CkAbort("Invalid input: Mesh piece size must divide the mesh size!\n");
         PROBABILITY = atof(m->argv[3]);
+        batchSize = atol(m->argv[4]);
 
         if (MESH_SIZE % MESHPIECE_SIZE != 0) {
             CkAbort("Mesh piece size should divide mesh size\n");
@@ -39,6 +41,10 @@ class Main : public CBase_Main {
         libProxy = UnionFindLib::unionFindInit(mpProxy, numMeshPieces);
         CkPrintf("[Main] Library array with %d chares created and proxy obtained\n", numMeshPieces);
         libProxy[0].register_phase_one_cb(cb);
+        
+        CkCallback cbB(CkIndex_MeshPiece::allowNextBatch(), mpProxy);
+        libProxy[0].register_batch_cb(cbB);
+        
         start_time = CkWallTimer();
         mpProxy.initializeLibVertices();
     }
@@ -69,6 +75,7 @@ class Main : public CBase_Main {
 };
 
 class MeshPiece : public CBase_MeshPiece {
+    MeshPiece_SDAG_CODE
     struct meshVertex {
         int x,y;
         int id;
@@ -80,6 +87,10 @@ class MeshPiece : public CBase_MeshPiece {
     UnionFindLib *libPtr;
     unionFindVertex *libVertices;
     long int offset;
+    long int i;
+    long int totalReqs;
+    bool allowBatch;
+    bool blockedBatch;
 
     public:
     MeshPiece() { }
@@ -107,9 +118,10 @@ class MeshPiece : public CBase_MeshPiece {
         }
         offset = numMyVertices * offset;
         // CkPrintf("thisIndex: %d totalChareinPe: %ld offset: %ld\n", thisIndex, totalCharesinPe, offset);
-        libPtr->initialize_vertices(MESHPIECE_SIZE*MESHPIECE_SIZE, libVertices, offset);
+        libPtr->initialize_vertices(MESHPIECE_SIZE*MESHPIECE_SIZE, libVertices, offset, batchSize);
         libPtr->registerGetLocationFromID(getLocationFromID);
         init_vertices();
+        blockedBatch = true;
         contribute(CkCallback(CkReductionTarget(MeshPiece, doWork), thisProxy));
     }
 
@@ -140,37 +152,6 @@ class MeshPiece : public CBase_MeshPiece {
         }
     }
 
-    void doWork() {
-        // CkPrintf("Starting doWork()\n");
-        // printVertices();
-        // libPtr->printVertices();
-        for (int i = 0; i < numMyVertices; i++) {
-            // check probability for east edge
-            float eastProb = 0.0;
-            if (myVertices[i].y + 1 < MESH_SIZE) {
-                eastProb = checkProbabilityEast(myVertices[i].y, myVertices[i].y+1);
-
-                if (eastProb < PROBABILITY) {
-                    // edge found, make library union_request call
-                    int eastID = (myVertices[i].x*MESH_SIZE) + (myVertices[i].y+1);
-                    libPtr->union_request(myVertices[i].id, eastID);
-                }
-            }
-
-            // check probability for south edge
-            float southProb = 0.0;
-            if (myVertices[i].x + 1 < MESH_SIZE) {
-                southProb = checkProbabilitySouth(myVertices[i].x, myVertices[i].x+1);
-
-                if (southProb < PROBABILITY) {
-                    // edge found, make library union_request call
-                    int southID = (myVertices[i].x+1)*MESH_SIZE + myVertices[i].y;
-                    libPtr->union_request(myVertices[i].id, southID);
-                }
-            }
-        }
-        // CkPrintf("Done doWork() myIndex: %d myPE: %d\n", thisIndex, CkMyPe());
-    }
 
     float checkProbabilityEast(int val1, int val2) {
         float t = ((132967*val1) + (969407*val2)) % 100;
@@ -189,6 +170,58 @@ class MeshPiece : public CBase_MeshPiece {
             //CkPrintf("[mpProxy %d] libVertices[%d] - vertexID: %ld, parent: %ld, component: %d\n", thisIndex, i, libVertices[i].vertexID, libVertices[i].parent, libVertices[i].componentNumber);
         }
         //contribute(CkCallback(CkReductionTarget(Main, donePrinting), mainProxy));
+    }
+    void doWork() {
+      // CkPrintf("Starting doWork()\n");
+      // printVertices();
+      // libPtr->printVertices();
+      allowBatch = false;
+      totalReqs = 0;
+      // continue from previous iteration
+      for (; i < numMyVertices; i++) {
+        // check probability for east edge
+        float eastProb = 0.0;
+        if (myVertices[i].y + 1 < MESH_SIZE) {
+          eastProb = checkProbabilityEast(myVertices[i].y, myVertices[i].y+1);
+
+          if (eastProb < PROBABILITY) {
+            // edge found, make library union_request call
+            int eastID = (myVertices[i].x*MESH_SIZE) + (myVertices[i].y+1);
+            libPtr->union_request(myVertices[i].id, eastID);
+            totalReqs++;
+          }
+        }
+
+        // check probability for south edge
+        float southProb = 0.0;
+        if (myVertices[i].x + 1 < MESH_SIZE) {
+          southProb = checkProbabilitySouth(myVertices[i].x, myVertices[i].x+1);
+
+          if (southProb < PROBABILITY) {
+            // edge found, make library union_request call
+            int southID = (myVertices[i].x+1)*MESH_SIZE + myVertices[i].y;
+            libPtr->union_request(myVertices[i].id, southID);
+            totalReqs++;
+          }
+        }
+
+        if (totalReqs >= batchSize) {
+          if (allowBatch == false) {
+            blockedBatch = true;
+            break;
+          }
+        }
+      }
+      if (i == numMyVertices)
+        blockedBatch = false;
+      // CkPrintf("Done doWork() myIndex: %d myPE: %d totalReqs: %ld\n", thisIndex, CkMyPe(), totalReqs);
+    }
+
+    void allowNextBatch() {
+      allowBatch = true;
+      if (blockedBatch == true) {
+        thisProxy[thisIndex].doWork();
+      }
     }
 };
 

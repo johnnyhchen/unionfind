@@ -45,6 +45,16 @@ class UnionFindLib : public CBase_UnionFindLib {
     int myLocalNumBosses;
     int totalNumBosses;
     CkCallback postComponentLabelingCb;
+    
+    // Batch
+    long int numCharesinPe;
+    long int batchSize;
+    long int batchNo;
+    long int reqsProcessed;
+    long int totalReqsPerBatch;
+    long int thresholdReqs;
+    long int totalReqsProcessed;
+    CkCallback batchCb;
 
     public:
     UnionFindLib() {}
@@ -52,8 +62,8 @@ class UnionFindLib : public CBase_UnionFindLib {
     static CProxy_UnionFindLib unionFindInit(CkArrayID clientArray, int n);
     void register_phase_one_cb(CkCallback cb);
     // void initialize_vertices(unionFindVertex *appVertices, int numVertices);
-    void allocate_libVertices(long int numVertices, long int numCharesinPe);
-    void initialize_vertices(long int numVertices, unionFindVertex* &appVertices, long int &offset);
+    void allocate_libVertices(long int numVertices, long int nPe);
+    void initialize_vertices(long int numVertices, unionFindVertex* &appVertices, long int &offset, long int bs);
 
     void union_request(long int v, long int w);
     void anchor(int w_arrIdx, long int v, long int path_base_arrIdx);
@@ -63,6 +73,10 @@ class UnionFindLib : public CBase_UnionFindLib {
     void printVertices();
 
     // functions and data structures for finding connected components
+    void reqs_processed();
+    void recv_reqs_processed();
+    void register_batch_cb(CkCallback cb);
+
 
     public:
     void find_components(CkCallback cb);
