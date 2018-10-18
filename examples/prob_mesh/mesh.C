@@ -212,9 +212,10 @@ class MeshPiece : public CBase_MeshPiece {
           }
         }
       }
-      if (i == numMyVertices)
+      if (i == numMyVertices) {
         blockedBatch = false;
-      // CkPrintf("Done doWork() myIndex: %d myPE: %d totalReqs: %ld\n", thisIndex, CkMyPe(), totalReqs);
+        CkPrintf("Done doWork() myIndex: %d myPE: %d totalReqs: %ld\n", thisIndex, CkMyPe(), totalReqs);
+      }
     }
 
     void allowNextBatch() {
