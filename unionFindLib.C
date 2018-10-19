@@ -162,7 +162,12 @@ union_request(int64_t v, int64_t w) {
     if (w_loc.first != 0)
       CkPrintf("sending to PE: %d\n", w_loc.first);
     */
-    thisProxy[w_loc.first].insertDataAnchor(d);
+    if (w_loc.first == CkMyPe()) {
+      insertDataAnchor(d);
+    }
+    else {
+      thisProxy[w_loc.first].insertDataAnchor(d);
+    }
 }
 
 void UnionFindLib::
@@ -226,7 +231,12 @@ anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx) {
           CkPrintf("sending to PE: %d\n", v_loc.first);
         */
         // assert(v_loc.second >= 0 && v_loc.second < 64);
-        thisProxy[v_loc.first].insertDataAnchor(d);
+        if (v_loc.first == CkMyPe()) {
+          insertDataAnchor(d);
+        }
+        else {
+          thisProxy[v_loc.first].insertDataAnchor(d);
+        }
     }
     else if (w->parent == w->vertexID) {
       // I have reached the root; check if I can call local_path_compression
@@ -283,7 +293,12 @@ anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx) {
         if (w_parent_loc.first != 0)
           CkPrintf("sending to PE: %d\n", w_parent_loc.first);
         */
-        thisProxy[w_parent_loc.first].insertDataAnchor(d);
+        if (w_parent_loc.first == CkMyPe()) {
+          insertDataAnchor(d);
+        }
+        else {
+          thisProxy[w_parent_loc.first].insertDataAnchor(d);
+        }
     }
 }
 
