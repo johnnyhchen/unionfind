@@ -5,10 +5,10 @@
 
 /*readonly*/ CProxy_UnionFindLib libProxy;
 /*readonly*/ CProxy_Main mainProxy;
-/*readonly*/ int MESH_SIZE;
-/*readonly*/ int MESHPIECE_SIZE;
+/*readonly*/ int64_t MESH_SIZE;
+/*readonly*/ int64_t MESHPIECE_SIZE;
 /*readonly*/ float PROBABILITY;
-/*readonly*/ int numMeshPieces;
+/*readonly*/ int64_t numMeshPieces;
 /*readonly*/ long batchSize;
 
 class Main : public CBase_Main {
@@ -22,8 +22,8 @@ class Main : public CBase_Main {
             CkExit();
         }
 
-        MESH_SIZE = atoi(m->argv[1]);
-        MESHPIECE_SIZE = atoi(m->argv[2]);
+        MESH_SIZE = atol(m->argv[1]);
+        MESHPIECE_SIZE = atol(m->argv[2]);
         if (MESH_SIZE % MESHPIECE_SIZE != 0)
             CkAbort("Invalid input: Mesh piece size must divide the mesh size!\n");
         PROBABILITY = atof(m->argv[3]);
@@ -77,18 +77,18 @@ class Main : public CBase_Main {
 class MeshPiece : public CBase_MeshPiece {
     MeshPiece_SDAG_CODE
     struct meshVertex {
-        long int x,y;
-        long int id;
-        long int data = -1;
+        int64_t x,y;
+        int64_t id;
+        int64_t data = -1;
     };
     
     meshVertex *myVertices;
-    int numMyVertices;
+    int64_t numMyVertices;
     UnionFindLib *libPtr;
     unionFindVertex *libVertices;
-    long int offset;
-    long int witer;
-    long int totalReqs;
+    int64_t offset;
+    int64_t witer;
+    int64_t totalReqs;
     bool allowBatch;
     bool blockedBatch;
 
@@ -99,7 +99,7 @@ class MeshPiece : public CBase_MeshPiece {
 
     // function needed by library for quick lookup of
     // vertices location
-    static std::pair<int,int> getLocationFromID(long int vid);
+    static std::pair<int64_t, int64_t> getLocationFromID(int64_t vid);
         
     void initializeLibVertices() {    
         numMyVertices = MESHPIECE_SIZE*MESHPIECE_SIZE;
@@ -109,7 +109,7 @@ class MeshPiece : public CBase_MeshPiece {
         // Initialize vertices by providing the library what the offset should be
         // The library in this case would allocate memory for all the chares in the PE by using allocate_libVertices()
         // A different usage of this library is where the application decides the offset, and allocates the vertices in the initialize_vertices() call; so offset should be passed as -1
-        long int totalCharesinPe = numMeshPieces / CkNumPes();
+        int64_t totalCharesinPe = numMeshPieces / CkNumPes();
         assert ((thisIndex / totalCharesinPe) == CkMyPe()); 
         offset = thisIndex % totalCharesinPe;
         // CkPrintf("thisIndex: %d totalChareinPe: %ld offset: %ld\n", thisIndex, totalCharesinPe, offset);
@@ -140,15 +140,15 @@ class MeshPiece : public CBase_MeshPiece {
 
 
         //conversion of thisIndex to 2D array indices
-        int chare_x = thisIndex / (MESH_SIZE/MESHPIECE_SIZE);
-        int chare_y = thisIndex % (MESH_SIZE/MESHPIECE_SIZE);
+        int64_t chare_x = thisIndex / (MESH_SIZE/MESHPIECE_SIZE);
+        int64_t chare_y = thisIndex % (MESH_SIZE/MESHPIECE_SIZE);
 
         // populate myVertices and libVertices
-        for (int i = 0; i < MESHPIECE_SIZE; i++) {
-            for (int j = 0; j < MESHPIECE_SIZE; j++) {
+        for (int64_t i = 0; i < MESHPIECE_SIZE; i++) {
+            for (int64_t j = 0; j < MESHPIECE_SIZE; j++) {
                 // i & j are local x & local y for the vertices here
-                int global_x = chare_x*MESHPIECE_SIZE + i;
-                int global_y = chare_y*MESHPIECE_SIZE + j;
+                int64_t global_x = chare_x*MESHPIECE_SIZE + i;
+                int64_t global_y = chare_y*MESHPIECE_SIZE + j;
                 myVertices[i*MESHPIECE_SIZE+j].x = global_x;
                 myVertices[i*MESHPIECE_SIZE+j].y = global_y;
                 myVertices[i*MESHPIECE_SIZE+j].id = global_x*MESH_SIZE + global_y;
@@ -163,19 +163,19 @@ class MeshPiece : public CBase_MeshPiece {
     }
 
 
-    float checkProbabilityEast(int val1, int val2) {
+    float checkProbabilityEast(int64_t val1, int64_t val2) {
         float t = ((132967*val1) + (969407*val2)) % 100;
         return t/100;
     }
 
-    float checkProbabilitySouth(int val1, int val2) {
+    float checkProbabilitySouth(int64_t val1, int64_t val2) {
         float t = ((379721*val1) + (523927*val2)) % 100;
         return t/100;
     }
 
     void printVertices() {
-        for (int i = 0; i < numMyVertices; i++) {
-            std::pair<int, int> loc = getLocationFromID(myVertices[i].id);
+        for (int64_t i = 0; i < numMyVertices; i++) {
+            std::pair<int64_t, int64_t> loc = getLocationFromID(myVertices[i].id);
             CkPrintf("i: %d thisIndex: %d myPE: %d id: %d group: %d offset: %d\n", i, thisIndex, CkMyPe(), myVertices[i].id, loc.first, loc.second);
             //CkPrintf("[mpProxy %d] libVertices[%d] - vertexID: %ld, parent: %ld, component: %d\n", thisIndex, i, libVertices[i].vertexID, libVertices[i].parent, libVertices[i].componentNumber);
         }
@@ -196,7 +196,7 @@ class MeshPiece : public CBase_MeshPiece {
 
           if (eastProb < PROBABILITY) {
             // edge found, make library union_request call
-            int eastID = (myVertices[witer].x*MESH_SIZE) + (myVertices[witer].y+1);
+            int64_t eastID = (myVertices[witer].x*MESH_SIZE) + (myVertices[witer].y+1);
             libPtr->union_request(myVertices[witer].id, eastID);
             totalReqs++;
           }
@@ -209,7 +209,7 @@ class MeshPiece : public CBase_MeshPiece {
 
           if (southProb < PROBABILITY) {
             // edge found, make library union_request call
-            int southID = (myVertices[witer].x+1)*MESH_SIZE + myVertices[witer].y;
+            int64_t southID = (myVertices[witer].x+1)*MESH_SIZE + myVertices[witer].y;
             libPtr->union_request(myVertices[witer].id, southID);
             totalReqs++;
           }
@@ -225,7 +225,7 @@ class MeshPiece : public CBase_MeshPiece {
       }
       // if (i == numMyVertices && blockedBatch == true) {
       if (witer == numMyVertices) {
-        CkPrintf("Done doWork() thisIndex: %d myPE: %d totalReqs: %ld blockedBatch: %d\n", thisIndex, CkMyPe(), totalReqs, blockedBatch);
+        // CkPrintf("Done doWork() thisIndex: %d myPE: %d totalReqs: %ld blockedBatch: %d\n", thisIndex, CkMyPe(), totalReqs, blockedBatch);
         blockedBatch = false;
       }
     }
@@ -239,24 +239,24 @@ class MeshPiece : public CBase_MeshPiece {
     }
 };
 
-std::pair<int,int>
-MeshPiece::getLocationFromID(long int vid) {
-    int global_y = vid % MESH_SIZE;
-    int global_x = (vid - global_y)/MESH_SIZE;
+std::pair<int64_t, int64_t>
+MeshPiece::getLocationFromID(int64_t vid) {
+    int64_t global_y = vid % MESH_SIZE;
+    int64_t global_x = (vid - global_y)/MESH_SIZE;
 
-    int local_x = global_x % MESHPIECE_SIZE;
-    int local_y = global_y % MESHPIECE_SIZE;
+    int64_t local_x = global_x % MESHPIECE_SIZE;
+    int64_t local_y = global_y % MESHPIECE_SIZE;
     
-    int chare_x = (global_x-local_x) / MESHPIECE_SIZE;
-    int chare_y = (global_y-local_y) / MESHPIECE_SIZE;
+    int64_t chare_x = (global_x-local_x) / MESHPIECE_SIZE;
+    int64_t chare_y = (global_y-local_y) / MESHPIECE_SIZE;
 
-    int chareIdx = chare_x * (MESH_SIZE/MESHPIECE_SIZE) + chare_y;
-    int totalCharesinPe = numMeshPieces / CkNumPes();
-    int groupIdx = chareIdx / totalCharesinPe;
+    int64_t chareIdx = chare_x * (MESH_SIZE/MESHPIECE_SIZE) + chare_y;
+    int64_t totalCharesinPe = numMeshPieces / CkNumPes();
+    int64_t groupIdx = chareIdx / totalCharesinPe;
     // Depending on the chareIdx, get the offset in the group
-    long int offset = chareIdx % totalCharesinPe;
+    int64_t offset = chareIdx % totalCharesinPe;
     offset *= MESHPIECE_SIZE * MESHPIECE_SIZE;
-    int arrIdx = offset + (local_x * MESHPIECE_SIZE + local_y);
+    int64_t arrIdx = offset + (local_x * MESHPIECE_SIZE + local_y);
 
     return std::make_pair(groupIdx, arrIdx);
 }

@@ -3,11 +3,11 @@ mainmodule mesh {
 
     readonly CProxy_UnionFindLib libProxy;
     readonly CProxy_Main mainProxy;
-    readonly int MESH_SIZE;
-    readonly int MESHPIECE_SIZE;
+    readonly int64_t MESH_SIZE;
+    readonly int64_t MESHPIECE_SIZE;
     readonly float PROBABILITY;
-    readonly int numMeshPieces;
-    readonly long batchSize;
+    readonly int64_t numMeshPieces;
+    readonly int64_t batchSize;
 
     mainchare Main {
         entry Main(CkArgMsg *m);

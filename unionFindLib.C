@@ -46,7 +46,7 @@ static void register_merge_count_maps_reduction() {
 // class function implementations
 
 void UnionFindLib::
-registerGetLocationFromID(std::pair<int, int> (*gloc)(long int vid)) {
+registerGetLocationFromID(std::pair<int64_t, int64_t> (*gloc)(int64_t vid)) {
     getLocationFromID = gloc;
 }
 
@@ -60,7 +60,7 @@ register_phase_one_cb(CkCallback cb) {
 
 // Called only by the one chare in the PE
 void UnionFindLib::
-allocate_libVertices(long int numVertices, long int nPe)
+allocate_libVertices(int64_t numVertices, int64_t nPe)
 {
   // assert (myVertices.size() == 0);
   numCharesinPe = nPe;
@@ -81,7 +81,7 @@ allocate_libVertices(long int numVertices, long int nPe)
 
 // batchSize should be -1 if all the union_requests are to be handled at once
 void UnionFindLib::
-initialize_vertices(long int numVertices, unionFindVertex* &appVertices, long int &offset, long int bs) {
+initialize_vertices(int64_t numVertices, unionFindVertex* &appVertices, int64_t &offset, int64_t bs) {
     batchSize = bs;
     totalReqsPerBatch = batchSize * numCharesinPe;
     thresholdReqs = totalReqsPerBatch / CkNumPes();
@@ -140,13 +140,13 @@ recv_reqs_processed() {
 }
 
 void UnionFindLib::
-union_request(long int v, long int w) {
+union_request(int64_t v, int64_t w) {
     /*
     if (v < 0 || w < 0)
       CkPrintf("v: %ld w: %ld\n", v, w);
     */
 
-    std::pair<int, int> w_loc = getLocationFromID(w);
+    std::pair<int64_t, int64_t> w_loc = getLocationFromID(w);
     
     // std::pair<int, int> v_loc = getLocationFromID(v);
     // CkPrintf("w_id: %ld v_id: %ld w: %d %d v: %d %d\n", w, v, w_loc.first, w_loc.second, v_loc.first, v_loc.second);
@@ -166,7 +166,7 @@ union_request(long int v, long int w) {
 }
 
 void UnionFindLib::
-anchor(int w_arrIdx, long int v, long int path_base_arrIdx) {
+anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx) {
     unionFindVertex *w = &myVertices[w_arrIdx];
 
     // CkPrintf("anchor() w_arrIdx: %d w->vertexID: %ld to vid: %ld\n", w_arrIdx, w->vertexID, v);
@@ -184,7 +184,7 @@ anchor(int w_arrIdx, long int v, long int path_base_arrIdx) {
 
     if (w->vertexID < v) {
         // incorrect order, swap the vertices
-        std::pair<int, int> v_loc = getLocationFromID(v);
+        std::pair<int64_t, int64_t> v_loc = getLocationFromID(v);
         // if (v_loc.first == thisIndex) {
         if (v_loc.first == CkMyPe()) {
             // vertex available locally, avoid extra message
@@ -240,15 +240,15 @@ anchor(int w_arrIdx, long int v, long int path_base_arrIdx) {
     }
     else {
         // call anchor for w's parent
-        std::pair<int, int> w_parent_loc = getLocationFromID(w->parent);
+        std::pair<int64_t, int64_t> w_parent_loc = getLocationFromID(w->parent);
         if (w_parent_loc.first == CkMyPe()) {
             if (path_base_arrIdx == -1) {
               // Start from w; a wasted call if there is only one node and its child in the PE
-              std::pair<int, int> w_loc = getLocationFromID(w->vertexID);
+              std::pair<int64_t, int64_t> w_loc = getLocationFromID(w->vertexID);
               path_base_arrIdx = w_loc.second; 
             }
             else {
-              std::pair<int, int> w_loc = getLocationFromID(w->vertexID);
+              std::pair<int64_t, int64_t> w_loc = getLocationFromID(w->vertexID);
               // assert (path_base_arrIdx != w_loc.second);
             }
             // anchor(w_parent_loc.second, v, -1);
@@ -289,7 +289,7 @@ anchor(int w_arrIdx, long int v, long int path_base_arrIdx) {
 
 // perform local path compression
 void UnionFindLib::
-local_path_compression(unionFindVertex *src, long int compressedParent) {
+local_path_compression(unionFindVertex *src, int64_t compressedParent) {
     unionFindVertex* tmp;
     // An infinite loop if this function is called on itself (a node which does not have itself as its parent)
     while (src->parent != compressedParent) {
@@ -302,9 +302,9 @@ local_path_compression(unionFindVertex *src, long int compressedParent) {
 
 // check if two vertices are on same chare
 bool UnionFindLib::
-check_same_chares(long int v1, long int v2) {
-    std::pair<int,int> v1_loc = getLocationFromID(v1);
-    std::pair<int,int> v2_loc = getLocationFromID(v2);
+check_same_chares(int64_t v1, int64_t v2) {
+    std::pair<int64_t, int64_t> v1_loc = getLocationFromID(v1);
+    std::pair<int64_t, int64_t> v2_loc = getLocationFromID(v2);
     if (v1_loc.first == v2_loc.first)
         return true;
     return false;
@@ -317,7 +317,7 @@ find_components(CkCallback cb) {
     postComponentLabelingCb = cb;
     // count local numBosses
     myLocalNumBosses = 0;
-    for (int i = 0; i < numMyVertices; i++) {
+    for (int64_t i = 0; i < numMyVertices; i++) {
         if (myVertices[i].parent == myVertices[i].vertexID) {
             myLocalNumBosses += 1;
         }
@@ -333,18 +333,18 @@ find_components(CkCallback cb) {
 
 // Recveive total boss count from prefix library and start labelling phase
 void UnionFindLib::
-boss_count_prefix_done(int totalCount) {
+boss_count_prefix_done(int64_t totalCount) {
     totalNumBosses = totalCount;
     // access value from prefix lib elem to find starting index
     Prefix* myPrefixElem = prefixLibArray[thisIndex].ckLocal();
-    int v = myPrefixElem->getValue();
-    int myStartIndex = v - myLocalNumBosses;
+    int64_t v = myPrefixElem->getValue();
+    int64_t myStartIndex = v - myLocalNumBosses;
     //CkPrintf("[%d] My start index: %d\n", thisIndex, myStartIndex);
 
     // start labeling my local bosses from myStartIndex
     // ensures sequential numbering of components
     if (myLocalNumBosses != 0) {
-        for (int i = 0; i < numMyVertices; i++) {
+        for (int64_t i = 0; i < numMyVertices; i++) {
             if (myVertices[i].parent == myVertices[i].vertexID) {
                 myVertices[i].componentNumber = myStartIndex;
                 myStartIndex++;
@@ -360,7 +360,7 @@ boss_count_prefix_done(int totalCount) {
 
 void UnionFindLib::
 start_component_labeling() {
-    for (int i = 0; i < numMyVertices; i++) {
+    for (int64_t i = 0; i < numMyVertices; i++) {
         unionFindVertex *v = &myVertices[i];
         if (v->parent == v->vertexID) {
             // one of the bosses/root found
@@ -370,7 +370,7 @@ start_component_labeling() {
 
         if (v->componentNumber == -1) {
             // an internal node or leaf node, request parent for boss
-            std::pair<int, int> parent_loc = getLocationFromID(v->parent);
+            std::pair<int64_t, int64_t> parent_loc = getLocationFromID(v->parent);
             //this->thisProxy[parent_loc.first].need_boss(parent_loc.second, v->vertexID);
             uint64_t data = ((uint64_t) parent_loc.second) << 32 | ((uint64_t) v->vertexID);
             this->thisProxy[parent_loc.first].insertDataNeedBoss(data);
@@ -398,8 +398,8 @@ insertDataFindBoss(const findBossData & data) {
 
 void UnionFindLib::
 insertDataNeedBoss(const uint64_t & data) {
-    int arrIdx = (int)(data >> 32);
-    long int fromID = (long int)(data & 0xffffffff);
+    int64_t arrIdx = (int64_t)(data >> 32);
+    int64_t fromID = (int64_t)(data & 0xffffffff);
     this->need_boss(arrIdx, fromID);
 }
 
@@ -410,18 +410,18 @@ insertDataAnchor(const anchorData & data) {
 
 void UnionFindLib::
 printVertices() {
-  for (int i = 0; i < myVertices.size(); i++)
+  for (int64_t i = 0; i < myVertices.size(); i++)
     CkPrintf("i: %d vertexID: %ld\n", i, myVertices[i].vertexID);
 }
 
 void UnionFindLib::
-need_boss(int arrIdx, long int fromID) {
+need_boss(int64_t arrIdx, int64_t fromID) {
     // one of children of this node needs boss, handle by either replying immediately
     // or queueing the request
 
     if (myVertices[arrIdx].componentNumber != -1) {
         // component already set, reply back
-        std::pair<int, int> requestor_loc = getLocationFromID(fromID);
+        std::pair<int64_t, int64_t> requestor_loc = getLocationFromID(fromID);
         if (requestor_loc.first == thisIndex)
             set_component(requestor_loc.second, myVertices[arrIdx].componentNumber);
         else
@@ -434,14 +434,14 @@ need_boss(int arrIdx, long int fromID) {
 }
 
 void UnionFindLib::
-set_component(int arrIdx, long int compNum) {
+set_component(int64_t arrIdx, int64_t compNum) {
     myVertices[arrIdx].componentNumber = compNum;
 
     // since component number is set, respond to your requestors
-    std::vector<long int>::iterator req_iter = myVertices[arrIdx].need_boss_requests.begin();
+    std::vector<int64_t>::iterator req_iter = myVertices[arrIdx].need_boss_requests.begin();
     while (req_iter != myVertices[arrIdx].need_boss_requests.end()) {
-        long int requestorID = *req_iter;
-        std::pair<int, int> requestor_loc = getLocationFromID(requestorID);
+        int64_t requestorID = *req_iter;
+        std::pair<int64_t, int64_t> requestor_loc = getLocationFromID(requestorID);
         if (requestor_loc.first == thisIndex)
             set_component(requestor_loc.second, compNum);
         else
@@ -452,17 +452,17 @@ set_component(int arrIdx, long int compNum) {
 }
 
 void UnionFindLib::
-prune_components(int threshold, CkCallback appReturnCb) {
+prune_components(int64_t threshold, CkCallback appReturnCb) {
     componentPruneThreshold = threshold;
 
     //int *localCounts = new int[totalNumBosses]();
-    std::vector<int> localCounts(totalNumBosses, 0);
+    std::vector<int64_t> localCounts(totalNumBosses, 0);
     //if (localCounts == NULL) {
     //    CkAbort("We are out of memory!");
     //}
 
-    for (int i = 0; i < numMyVertices; i++) {
-        long int bossID = myVertices[i].componentNumber;
+    for (int64_t i = 0; i < numMyVertices; i++) {
+        int64_t bossID = myVertices[i].componentNumber;
         CkAssert(bossID >= 0 && bossID < totalNumBosses);
         localCounts[bossID]++;
     }
@@ -473,7 +473,7 @@ prune_components(int threshold, CkCallback appReturnCb) {
     CProxy_UnionFindLibGroup libGroupProxy(libGroupID);
     CkCallback cb(CkReductionTarget(UnionFindLibGroup, build_component_count_array), libGroupProxy);
     //contribute(sizeof(int)*totalNumBosses, localCounts, CkReduction::sum_int, cb);
-    contribute(localCounts, CkReduction::sum_int, cb);
+    contribute(localCounts, CkReduction::sum_long_long, cb);
 
     //delete[] localCounts;
 
@@ -489,8 +489,8 @@ perform_pruning() {
 
     CProxy_UnionFindLibGroup libGroup(libGroupID);
 
-    for (int i = 0; i < numMyVertices; i++) {
-        int myComponentCount = libGroup.ckLocalBranch()->get_component_count(myVertices[i].componentNumber);
+    for (int64_t i = 0; i < numMyVertices; i++) {
+        int64_t myComponentCount = libGroup.ckLocalBranch()->get_component_count(myVertices[i].componentNumber);
         if (myComponentCount <= componentPruneThreshold) {
             myVertices[i].componentNumber = -1;
         }
@@ -501,9 +501,9 @@ perform_pruning() {
 
     if (thisIndex == 0) {
         CkPrintf("Number of components found: %d\n", totalNumBosses);
-        int numPrunedComponents = 0;
-        for (int i = 0; i < totalNumBosses; i++) {
-            int compCount = libGroup.ckLocalBranch()->get_component_count(i);
+        int64_t numPrunedComponents = 0;
+        for (int64_t i = 0; i < totalNumBosses; i++) {
+            int64_t compCount = libGroup.ckLocalBranch()->get_component_count(i);
             if (compCount <= componentPruneThreshold) {
                 numPrunedComponents++;
             }
@@ -512,19 +512,19 @@ perform_pruning() {
     }
 
 #ifdef PROFILING
-    long int maxCount = -1;
-    for (int i = 0; i < numMyVertices; i++) {
+    int64_t maxCount = -1;
+    for (int64_t i = 0; i < numMyVertices; i++) {
         if (myVertices[i].findOrAnchorCount > maxCount)
             maxCount = myVertices[i].findOrAnchorCount;
     }
     CkCallback cb(CkReductionTarget(UnionFindLib, profiling_count_max), thisProxy[0]);
-    contribute(sizeof(long int), &maxCount, CkReduction::max_long, cb);
+    contribute(sizeof(int64_t), &maxCount, CkReduction::max_long, cb);
 #endif
 }
 
 #ifdef PROFILING
 void UnionFindLib::
-profiling_count_max(long int maxCount) {
+profiling_count_max(int64_t maxCount) {
     CkAssert(thisIndex == 0);
     CkPrintf("Max number of find/anchor messages per vertex: %ld\n", maxCount);
 }
@@ -532,15 +532,15 @@ profiling_count_max(long int maxCount) {
 
 // library group chare class definitions
 void UnionFindLibGroup::
-build_component_count_array(int *totalCounts, int numElems) {
+build_component_count_array(int64_t *totalCounts, int64_t numElems) {
     //CkPrintf("[PE %d] Count array size: %d\n", thisIndex, numElems);
-    component_count_array = new int[numElems];
-    memcpy(component_count_array, totalCounts, sizeof(int)*numElems);
+    component_count_array = new int64_t[numElems];
+    memcpy(component_count_array, totalCounts, sizeof(int64_t)*numElems);
     contribute(CkCallback(CkReductionTarget(UnionFindLib, perform_pruning), _UfLibProxy));
 }
 
-int UnionFindLibGroup::
-get_component_count(long int component_id) {
+int64_t UnionFindLibGroup::
+get_component_count(int64_t component_id) {
     return component_count_array[component_id];
 }
 
@@ -552,20 +552,20 @@ increase_message_count() {
 void UnionFindLibGroup::
 contribute_count() {
     CkCallback cb(CkReductionTarget(UnionFindLibGroup, done_profiling), thisProxy);
-    contribute(sizeof(int), &thisPeMessages, CkReduction::sum_int, cb);
+    contribute(sizeof(int64_t), &thisPeMessages, CkReduction::sum_long_long, cb);
 }
 
 void UnionFindLibGroup::
-done_profiling(int total_count) {
+done_profiling(int64_t total_count) {
     if (CkMyPe() == 0) {
-        CkPrintf("Phase 1 profiling done. Total number of messages is : %d\n", total_count);
+        CkPrintf("Phase 1 profiling done. Total number of messages is : %ld\n", total_count);
         CkExit();
     }
 }
 
 // library initialization function
 CProxy_UnionFindLib UnionFindLib::
-unionFindInit(CkArrayID clientArray, int n) {
+unionFindInit(CkArrayID clientArray, int64_t n) {
     /*  
     CkArrayOptions opts(n);
     opts.bindTo(clientArray);

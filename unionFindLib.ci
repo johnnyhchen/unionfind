@@ -14,20 +14,20 @@ module unionFindLib {
         // function to register Phase 1 callback
         entry void register_phase_one_cb(CkCallback cb);
         // functions to build inverted trees
-        entry void anchor(int w_arrIdx, long v, long path_base_arrIdx);
+        entry void anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx);
         // function for grandparent short-circuiting
 
         // functions to perform distributed connected components
         entry void find_components(CkCallback cb);
-        entry [reductiontarget] void boss_count_prefix_done(int totalCount);
-        entry void need_boss(int arrIdx, int fromID);
-        entry void set_component(int arrIdx, int compNum);
+        entry [reductiontarget] void boss_count_prefix_done(int64_t totalCount);
+        entry void need_boss(int64_t arrIdx, int64_t fromID);
+        entry void set_component(int64_t arrIdx, int64_t compNum);
 
         // functions to prune out small components
-        entry void prune_components(int threshold, CkCallback cb);
+        entry void prune_components(int64_t threshold, CkCallback cb);
         entry [reductiontarget] void perform_pruning();
         //entry [reductiontarget,nokeep] void merge_count_results(CkReductionMsg *msg);
-        //entry [reductiontarget] void merge_count_results(int totalCounts[numElems], int numElems);
+        //entry [reductiontarget] void merge_count_results(int64_t totalCounts[numElems], int64_t numElems);
 
         // TRAM functions
         entry [aggregate] void insertDataFindBoss(const findBossData & data);
@@ -44,8 +44,8 @@ module unionFindLib {
     // group chare to support the library chares
     group UnionFindLibGroup {
         entry UnionFindLibGroup();
-        entry [reductiontarget] void build_component_count_array(int totalCounts[numElems], int numElems);
-        entry [reductiontarget] void done_profiling(int result);
+        entry [reductiontarget] void build_component_count_array(int64_t totalCounts[numElems], int64_t numElems);
+        entry [reductiontarget] void done_profiling(int64_t result);
         entry void contribute_count();
     }
 };
