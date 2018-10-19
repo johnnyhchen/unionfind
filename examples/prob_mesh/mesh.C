@@ -77,9 +77,9 @@ class Main : public CBase_Main {
 class MeshPiece : public CBase_MeshPiece {
     MeshPiece_SDAG_CODE
     struct meshVertex {
-        int x,y;
-        int id;
-        int data = -1;
+        long int x,y;
+        long int id;
+        long int data = -1;
     };
     
     meshVertex *myVertices;
@@ -87,7 +87,7 @@ class MeshPiece : public CBase_MeshPiece {
     UnionFindLib *libPtr;
     unionFindVertex *libVertices;
     long int offset;
-    long int i;
+    long int witer;
     long int totalReqs;
     bool allowBatch;
     bool blockedBatch;
@@ -121,13 +121,23 @@ class MeshPiece : public CBase_MeshPiece {
         libPtr->initialize_vertices(MESHPIECE_SIZE*MESHPIECE_SIZE, libVertices, offset, batchSize);
         libPtr->registerGetLocationFromID(getLocationFromID);
         init_vertices();
+
         blockedBatch = true;
+        witer = 0;
+
         contribute(CkCallback(CkReductionTarget(MeshPiece, doWork), thisProxy));
     }
 
     void init_vertices()
     {
-        myVertices = new meshVertex[MESHPIECE_SIZE*MESHPIECE_SIZE];
+        try {
+          myVertices = new meshVertex[MESHPIECE_SIZE*MESHPIECE_SIZE];
+        }
+        catch (const std::bad_alloc& ba) {
+          ckout << "mem alloc error in the application: " << ba.what() << endl;
+          CkExit();
+        }
+
 
         //conversion of thisIndex to 2D array indices
         int chare_x = thisIndex / (MESH_SIZE/MESHPIECE_SIZE);
@@ -178,29 +188,29 @@ class MeshPiece : public CBase_MeshPiece {
       allowBatch = false;
       totalReqs = 0;
       // continue from previous iteration
-      for (; i < numMyVertices; i++) {
+      for (; witer < numMyVertices; witer++) {
         // check probability for east edge
         float eastProb = 0.0;
-        if (myVertices[i].y + 1 < MESH_SIZE) {
-          eastProb = checkProbabilityEast(myVertices[i].y, myVertices[i].y+1);
+        if (myVertices[witer].y + 1 < MESH_SIZE) {
+          eastProb = checkProbabilityEast(myVertices[witer].y, myVertices[witer].y+1);
 
           if (eastProb < PROBABILITY) {
             // edge found, make library union_request call
-            int eastID = (myVertices[i].x*MESH_SIZE) + (myVertices[i].y+1);
-            libPtr->union_request(myVertices[i].id, eastID);
+            int eastID = (myVertices[witer].x*MESH_SIZE) + (myVertices[witer].y+1);
+            libPtr->union_request(myVertices[witer].id, eastID);
             totalReqs++;
           }
         }
 
         // check probability for south edge
         float southProb = 0.0;
-        if (myVertices[i].x + 1 < MESH_SIZE) {
-          southProb = checkProbabilitySouth(myVertices[i].x, myVertices[i].x+1);
+        if (myVertices[witer].x + 1 < MESH_SIZE) {
+          southProb = checkProbabilitySouth(myVertices[witer].x, myVertices[witer].x+1);
 
           if (southProb < PROBABILITY) {
             // edge found, make library union_request call
-            int southID = (myVertices[i].x+1)*MESH_SIZE + myVertices[i].y;
-            libPtr->union_request(myVertices[i].id, southID);
+            int southID = (myVertices[witer].x+1)*MESH_SIZE + myVertices[witer].y;
+            libPtr->union_request(myVertices[witer].id, southID);
             totalReqs++;
           }
         }
@@ -208,20 +218,23 @@ class MeshPiece : public CBase_MeshPiece {
         if (totalReqs >= batchSize) {
           if (allowBatch == false) {
             blockedBatch = true;
+            // CkPrintf("In doWork() thisIndex: %d blockedBatch: %d\n", thisIndex, blockedBatch);
             break;
           }
         }
       }
-      if (i == numMyVertices) {
+      // if (i == numMyVertices && blockedBatch == true) {
+      if (witer == numMyVertices) {
+        CkPrintf("Done doWork() thisIndex: %d myPE: %d totalReqs: %ld blockedBatch: %d\n", thisIndex, CkMyPe(), totalReqs, blockedBatch);
         blockedBatch = false;
-        CkPrintf("Done doWork() myIndex: %d myPE: %d totalReqs: %ld\n", thisIndex, CkMyPe(), totalReqs);
       }
     }
 
     void allowNextBatch() {
       allowBatch = true;
       if (blockedBatch == true) {
-        thisProxy[thisIndex].doWork();
+        // CkPrintf("In allowNextBatch() thisIndex: %d blockedBatch: %d witer: %ld numMyVertices: %ld\n", thisIndex, blockedBatch, witer, numMyVertices);
+        doWork();
       }
     }
 };

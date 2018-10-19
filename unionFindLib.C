@@ -62,10 +62,21 @@ register_phase_one_cb(CkCallback cb) {
 void UnionFindLib::
 allocate_libVertices(long int numVertices, long int nPe)
 {
-  assert (myVertices.size() == 0);
+  // assert (myVertices.size() == 0);
   numCharesinPe = nPe;
+  if (CkMyPe() == 0) {
+    CkPrintf("Trying to allocate myVertices in library size: %lf GB myPE: %d elements: %ld numVertices: %ld numCharesinPe: %ld\n", (double)(sizeof(unionFindVertex) * numVertices * numCharesinPe) / (1024 * 1024 * 1024), CkMyPe(), (numVertices * numCharesinPe), numVertices, numCharesinPe);
+  }   
+  try {
+    // myVertices = new unionFindVertex[numVertices * numCharesinPe];
+    myVertices.resize((numVertices * numCharesinPe));
+  }
+  catch (const std::bad_alloc& ba) {
+    ckout << "mem alloc error in library: " << ba.what() << endl;
+    CkExit();
+  }
+
   // CkPrintf("PE: %d, calling allocate for: %ld\n", CkMyPe(), (numVertices * numCharesinPe));
-  myVertices.resize((numVertices * numCharesinPe));
 }
 
 // batchSize should be -1 if all the union_requests are to be handled at once
