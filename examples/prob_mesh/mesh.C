@@ -11,6 +11,15 @@
 /*readonly*/ int64_t numMeshPieces;
 /*readonly*/ long batchSize;
 
+class Map : public CkArrayMap {
+  public:
+    Map() {}
+    inline int procNum(int, const CkArrayIndex &ind) {
+      int *index=(int *) ind.data();
+      return (index[0] % CkNumPes());
+    }
+};
+
 class Main : public CBase_Main {
     CProxy_MeshPiece mpProxy;
     double start_time;
@@ -34,8 +43,12 @@ class Main : public CBase_Main {
         }
 
         numMeshPieces = (MESH_SIZE/MESHPIECE_SIZE) * (MESH_SIZE/MESHPIECE_SIZE);
-        assert ((numMeshPieces % CkNumPes()) == 0); // Finicky handling of group based union-find library
-        mpProxy = CProxy_MeshPiece::ckNew(numMeshPieces);
+        // assert ((numMeshPieces % CkNumPes()) == 0); // Finicky handling of group based union-find library
+        CProxy_Map myMap = CProxy_Map::ckNew();
+        CkArrayOptions opts(numMeshPieces);
+        opts.setMap(myMap);
+        mpProxy = CProxy_MeshPiece::ckNew(opts);
+        // mpProxy = CProxy_MeshPiece::ckNew(numMeshPieces);
         // callback for library to return to after inverted tree construction
         CkCallback cb(CkIndex_Main::doneInveretdTree(), thisProxy);
         libProxy = UnionFindLib::unionFindInit(mpProxy, numMeshPieces);
@@ -93,7 +106,9 @@ class MeshPiece : public CBase_MeshPiece {
     bool blockedBatch;
 
     public:
-    MeshPiece() { }
+    MeshPiece() { 
+      CkPrintf("I am chare: %d in PE: %d\n", thisIndex, CkMyPe());
+    }
 
     MeshPiece(CkMigrateMessage *m) { }
 
@@ -110,10 +125,15 @@ class MeshPiece : public CBase_MeshPiece {
         // The library in this case would allocate memory for all the chares in the PE by using allocate_libVertices()
         // A different usage of this library is where the application decides the offset, and allocates the vertices in the initialize_vertices() call; so offset should be passed as -1
         int64_t totalCharesinPe = numMeshPieces / CkNumPes();
-        assert ((thisIndex / totalCharesinPe) == CkMyPe()); 
-        offset = thisIndex % totalCharesinPe;
+        int64_t remChares = numMeshPieces % CkNumPes();
+        // assert ((thisIndex / totalCharesinPe) == CkMyPe()); 
+        // offset = thisIndex % totalCharesinPe;
+        offset = thisIndex / CkNumPes();
         // CkPrintf("thisIndex: %d totalChareinPe: %ld offset: %ld\n", thisIndex, totalCharesinPe, offset);
         if (offset == 0) {
+          // This PE gets one extra chare
+          if (thisIndex < remChares)
+            totalCharesinPe++;
           libProxy.ckLocalBranch()->allocate_libVertices((MESHPIECE_SIZE * MESHPIECE_SIZE), totalCharesinPe);
         }
         offset = numMyVertices * offset;
@@ -251,10 +271,12 @@ MeshPiece::getLocationFromID(int64_t vid) {
     int64_t chare_y = (global_y-local_y) / MESHPIECE_SIZE;
 
     int64_t chareIdx = chare_x * (MESH_SIZE/MESHPIECE_SIZE) + chare_y;
-    int64_t totalCharesinPe = numMeshPieces / CkNumPes();
-    int64_t groupIdx = chareIdx / totalCharesinPe;
+    // int64_t totalCharesinPe = numMeshPieces / CkNumPes();
+    // int64_t groupIdx = chareIdx / totalCharesinPe;
+    int64_t groupIdx = chareIdx % CkNumPes();
     // Depending on the chareIdx, get the offset in the group
-    int64_t offset = chareIdx % totalCharesinPe;
+    // int64_t offset = chareIdx % totalCharesinPe;
+    int64_t offset = chareIdx / CkNumPes();
     offset *= MESHPIECE_SIZE * MESHPIECE_SIZE;
     int64_t arrIdx = offset + (local_x * MESHPIECE_SIZE + local_y);
 

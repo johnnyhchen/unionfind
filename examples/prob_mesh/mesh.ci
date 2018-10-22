@@ -8,6 +8,10 @@ mainmodule mesh {
     readonly float PROBABILITY;
     readonly int64_t numMeshPieces;
     readonly int64_t batchSize;
+    
+    group Map : CkArrayMap {
+      entry Map();
+    };
 
     mainchare Main {
         entry Main(CkArgMsg *m);

@@ -255,12 +255,15 @@ anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx) {
             if (path_base_arrIdx == -1) {
               // Start from w; a wasted call if there is only one node and its child in the PE
               std::pair<int64_t, int64_t> w_loc = getLocationFromID(w->vertexID);
-              path_base_arrIdx = w_loc.second; 
+              path_base_arrIdx = w_loc.second;
+              assert(path_base_arrIdx == w_arrIdx); 
             }
+            /*
             else {
               std::pair<int64_t, int64_t> w_loc = getLocationFromID(w->vertexID);
               // assert (path_base_arrIdx != w_loc.second);
             }
+            */
             // anchor(w_parent_loc.second, v, -1);
             anchor(w_parent_loc.second, v, path_base_arrIdx);
             return;
