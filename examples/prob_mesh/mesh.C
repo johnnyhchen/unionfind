@@ -11,6 +11,7 @@
 /*readonly*/ int64_t numMeshPieces;
 /*readonly*/ long batchSize;
 
+
 class Map : public CkArrayMap {
   public:
     Map() {}
@@ -23,6 +24,8 @@ class Map : public CkArrayMap {
 class Main : public CBase_Main {
     CProxy_MeshPiece mpProxy;
     double start_time;
+    uint64_t totEdges;
+    uint64_t recvMPs;
 
     public:
     Main(CkArgMsg *m) {
@@ -41,6 +44,9 @@ class Main : public CBase_Main {
         if (MESH_SIZE % MESHPIECE_SIZE != 0) {
             CkAbort("Mesh piece size should divide mesh size\n");
         }
+
+        totEdges = 0;
+        recvMPs = 0;
 
         numMeshPieces = (MESH_SIZE/MESHPIECE_SIZE) * (MESH_SIZE/MESHPIECE_SIZE);
         // assert ((numMeshPieces % CkNumPes()) == 0); // Finicky handling of group based union-find library
@@ -63,14 +69,24 @@ class Main : public CBase_Main {
     }
 
     void doneInveretdTree() {
-        CkPrintf("[Main] Inveretd trees constructed. Notify library to do component detection\n");
+        CkPrintf("[Main] Inverted trees constructed. Notify library to do component detection\n");
         CkPrintf("[Main] Tree construction time: %f\n", CkWallTimer()-start_time);
-        CkExit();
+        mpProxy.getNumEdges();
        /* // ask the lib group chares to contribute counts
         CProxy_UnionFindLibGroup libGroup(libGroupID);
         libGroup.contribute_count();*/
         CkCallback cb(CkIndex_Main::doneFindComponents(), thisProxy);
         libProxy.find_components(cb);
+    }
+
+    void recvNumEdges(uint64_t numEdges)
+    {
+      totEdges += numEdges;
+      recvMPs++;
+      if (recvMPs == numMeshPieces) {
+        CkPrintf("Total edges: %lld\n", totEdges);
+        CkExit();
+      }
     }
 
     void doneFindComponents() {
@@ -104,6 +120,7 @@ class MeshPiece : public CBase_MeshPiece {
     int64_t totalReqs;
     bool allowBatch;
     bool blockedBatch;
+    uint64_t numEdges;
 
     public:
     MeshPiece() { 
@@ -144,6 +161,7 @@ class MeshPiece : public CBase_MeshPiece {
 
         blockedBatch = true;
         witer = 0;
+        numEdges = 0;
 
         contribute(CkCallback(CkReductionTarget(MeshPiece, doWork), thisProxy));
     }
@@ -236,6 +254,7 @@ class MeshPiece : public CBase_MeshPiece {
         }
 
         if (totalReqs >= batchSize) {
+          numEdges += totalReqs;
           if (allowBatch == false) {
             blockedBatch = true;
             // CkPrintf("In doWork() thisIndex: %d blockedBatch: %d\n", thisIndex, blockedBatch);
@@ -243,7 +262,6 @@ class MeshPiece : public CBase_MeshPiece {
           }
         }
       }
-      // if (i == numMyVertices && blockedBatch == true) {
       if (witer == numMyVertices) {
         // CkPrintf("Done doWork() thisIndex: %d myPE: %d totalReqs: %ld blockedBatch: %d\n", thisIndex, CkMyPe(), totalReqs, blockedBatch);
         blockedBatch = false;
@@ -256,6 +274,11 @@ class MeshPiece : public CBase_MeshPiece {
         // CkPrintf("In allowNextBatch() thisIndex: %d blockedBatch: %d witer: %ld numMyVertices: %ld\n", thisIndex, blockedBatch, witer, numMyVertices);
         doWork();
       }
+    }
+
+    void getNumEdges()
+    {
+      mainProxy.recvNumEdges(numEdges);
     }
 };
 

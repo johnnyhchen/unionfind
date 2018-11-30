@@ -17,6 +17,7 @@ mainmodule mesh {
         entry Main(CkArgMsg *m);
         entry void doneInveretdTree();
         entry void doneFindComponents();
+        entry void recvNumEdges(uint64_t numEdges);
         entry [reductiontarget] void donePrinting();
     }
 
@@ -25,6 +26,7 @@ mainmodule mesh {
       entry void initializeLibVertices();
       entry [reductiontarget] void doWork();
       entry void allowNextBatch();
+      entry void getNumEdges();
       /*
       entry [reductiontarget] void doWork() {
         // CkPrintf("Starting doWork()\n");
