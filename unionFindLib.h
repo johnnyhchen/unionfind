@@ -19,21 +19,9 @@ struct unionFindVertex {
     }
 };
 
-struct componentCountMap {
-    int64_t compNum;
-    int64_t count;
-
-    void pup(PUP::er &p) {
-        p|compNum;
-        p|count;
-    }
-};
-
 
 /* global variables */
 /*readonly*/ extern CkGroupID libGroupID;
-// declaration for custom reduction
-extern CkReduction::reducerType mergeCountMapsReductionType;
 
 // class definition for library chares
 class UnionFindLib : public CBase_UnionFindLib {
@@ -125,57 +113,3 @@ class UnionFindLibGroup : public CBase_UnionFindLibGroup {
 #undef CK_TEMPLATES_ONLY
 
 #endif
-
-/// Some old functions for backup/reference ///
-
-/*
-void UnionFindLib::
-start_boss_propagation() {
-    // iterate over local bosses and send messages to requestors
-    CkPrintf("Should never get executed!\n");
-    std::vector<int>::iterator iter = local_boss_indices.begin();
-    while (iter != local_boss_indices.end()) {
-        int bossIdx = *iter;
-        int64_t bossID = myVertices[bossIdx].vertexID;
-        std::vector<int64_t>::iterator req_iter = myVertices[bossIdx].need_boss_requests.begin();
-        while (req_iter != myVertices[bossIdx].need_boss_requests.end()) {
-            int64_t requestorID = *req_iter;
-            std::pair<int,int> requestor_loc = appPtr->getLocationFromID(requestorID);
-            this->thisProxy[requestor_loc.first].set_component(requestor_loc.second, bossID);
-            // done with requestor, delete from requests queue
-            req_iter = myVertices[bossIdx].need_boss_requests.erase(req_iter);
-        }
-        // done with this local boss, delete from vector
-        iter = local_boss_indices.erase(iter);
-    }
-}*/
-
-/*
-void UnionFindLib::
-merge_count_results(CkReductionMsg *msg) {
-    componentCountMap *final_map = (componentCountMap*)msg->getData();
-    int numComps = msg->getSize();
-    numComps = numComps/ sizeof(componentCountMap);
-
-    if (this->thisIndex == 0) {
-        CkPrintf("Number of components found: %d\n", numComps);
-    }
-
-    // convert custom map back to STL, for easier lookup
-    std::map<int64_t,int> quick_final_map;
-    for (int i = 0; i < numComps; i++) {
-        if (this->thisIndex == 0) {
-            //CkPrintf("Component %ld : Total vertices count = %d\n", final_map[i].compNum, final_map[i].count);
-        }
-        quick_final_map[final_map[i].compNum] = final_map[i].count;
-    }
-
-    for (int i = 0; i < numMyVertices; i++) {
-        if (quick_final_map[myVertices[i].componentNumber] <= componentPruneThreshold) {
-            // vertex belongs to a minor component, ignore by setting to -1
-            myVertices[i].componentNumber = -1;
-        }
-    }
-
-    delete msg;
-}*/

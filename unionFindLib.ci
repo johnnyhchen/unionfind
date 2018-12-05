@@ -2,8 +2,6 @@ module unionFindLib {
     extern module prefixBalance;
 
     include "types.h";
-    // initnode function to register custom reduction
-    initnode void register_merge_count_maps_reduction(void);
 
     readonly CProxy_UnionFindLib _UfLibProxy;
     readonly CProxy_Prefix prefixLibArray;

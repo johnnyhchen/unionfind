@@ -5,46 +5,8 @@
 /*readonly*/ CProxy_UnionFindLib _UfLibProxy;
 /*readonly*/ CProxy_Prefix prefixLibArray;
 /*readonly*/ CkGroupID libGroupID;
-CkReduction::reducerType mergeCountMapsReductionType;
-
-// custom reduction for merging local count maps
-CkReductionMsg* merge_count_maps(int nMsgs, CkReductionMsg **msgs) {
-    std::unordered_map<long int,int> merged_temp_map;
-    for (int i = 0; i < nMsgs; i++) {
-        // any sanity check for map size?
-        // extract this message's local map
-        componentCountMap *curr_map = (componentCountMap*)msgs[i]->getData();
-        int numComps = msgs[i]->getSize();
-        numComps = numComps / sizeof(componentCountMap);
-
-        // convert custom map to STL map for easier lookup
-        for (int j = 0; j < numComps; j++) {
-            merged_temp_map[curr_map[j].compNum] += curr_map[j].count;
-        }
-    } // all messages processed
-
-    // convert the STL back to custom map for messaging
-    componentCountMap *merged_map = new componentCountMap[merged_temp_map.size()];
-    std::unordered_map<long int,int>::iterator iter = merged_temp_map.begin();
-    for (int i = 0; i < merged_temp_map.size(); i++) {
-        componentCountMap entry;
-        entry.compNum = iter->first;
-        entry.count = iter->second;
-        merged_map[i] = entry;
-        iter++;
-    }
-
-    int retSize = sizeof(componentCountMap) * merged_temp_map.size();
-    return CkReductionMsg::buildNew(retSize, merged_map);
-}
-
-// initnode function to register reduction
-static void register_merge_count_maps_reduction() {
-    mergeCountMapsReductionType = CkReduction::addReducer(merge_count_maps);
-}
 
 // class function implementations
-
 void UnionFindLib::
 registerGetLocationFromID(std::pair<int64_t, int64_t> (*gloc)(int64_t vid)) {
     getLocationFromID = gloc;
@@ -65,7 +27,7 @@ allocate_libVertices(int64_t numVertices, int64_t nPe)
   // assert (myVertices.size() == 0);
   numCharesinPe = nPe;
   if (CkMyPe() == 0) {
-    CkPrintf("Trying to allocate myVertices in library size: %lf GB myPE: %d elements: %ld numVertices: %ld numCharesinPe: %ld\n", (double)(sizeof(unionFindVertex) * numVertices * numCharesinPe) / (1024 * 1024 * 1024), CkMyPe(), (numVertices * numCharesinPe), numVertices, numCharesinPe);
+    CkPrintf("Trying to allocate myVertices in library size: %lf GB myPE: %d elements: %ld numVertices in each chare: %ld numCharesinPe: %ld\n", (double)(sizeof(unionFindVertex) * numVertices * numCharesinPe) / (1024 * 1024 * 1024), CkMyPe(), (numVertices * numCharesinPe), numVertices, numCharesinPe);
   }   
   try {
     // myVertices = new unionFindVertex[numVertices * numCharesinPe];
@@ -168,6 +130,11 @@ union_request(int64_t v, int64_t w) {
     else {
       thisProxy[w_loc.first].insertDataAnchor(d);
     }
+}
+
+void UnionFindLib::
+insertDataAnchor(const anchorData & data) {
+    anchor(data.arrIdx, data.v, -1);
 }
 
 void UnionFindLib::
@@ -318,18 +285,8 @@ local_path_compression(unionFindVertex *src, int64_t compressedParent) {
     }
 }
 
-// check if two vertices are on same chare
-bool UnionFindLib::
-check_same_chares(int64_t v1, int64_t v2) {
-    std::pair<int64_t, int64_t> v1_loc = getLocationFromID(v1);
-    std::pair<int64_t, int64_t> v2_loc = getLocationFromID(v2);
-    if (v1_loc.first == v2_loc.first)
-        return true;
-    return false;
-}
 
 /** Functions for finding connected components **/
-
 void UnionFindLib::
 find_components(CkCallback cb) {
     postComponentLabelingCb = cb;
@@ -421,10 +378,6 @@ insertDataNeedBoss(const uint64_t & data) {
     this->need_boss(arrIdx, fromID);
 }
 
-void UnionFindLib::
-insertDataAnchor(const anchorData & data) {
-    anchor(data.arrIdx, data.v, -1);
-}
 
 void UnionFindLib::
 printVertices() {
