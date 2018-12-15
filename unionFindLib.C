@@ -113,9 +113,6 @@ union_request(int64_t v, int64_t w) {
     // std::pair<int, int> v_loc = getLocationFromID(v);
     // CkPrintf("w_id: %ld v_id: %ld w: %d %d v: %d %d\n", w, v, w_loc.first, w_loc.second, v_loc.first, v_loc.second);
     // message w to anchor to v
-    anchorData d;
-    d.arrIdx = w_loc.second;
-    d.v = v;
     // assert(w_loc.first >= 0);
     // assert(w_loc.first < CkNumPes());
     // assert(w_loc.second >= 0 && w_loc.second < 64);
@@ -125,9 +122,13 @@ union_request(int64_t v, int64_t w) {
       CkPrintf("sending to PE: %d\n", w_loc.first);
     */
     if (w_loc.first == CkMyPe()) {
-      insertDataAnchor(d);
+      // insertDataAnchor(d);
+      anchor(w_loc.second, v, -1);
     }
     else {
+      anchorData d;
+      d.arrIdx = w_loc.second;
+      d.v = v;
       thisProxy[w_loc.first].insertDataAnchor(d);
     }
 }
@@ -187,9 +188,6 @@ anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx) {
           }
         }
         */
-        anchorData d;
-        d.arrIdx = v_loc.second;
-        d.v = w->parent;
         // assert(v_loc.first >= 0);
         // assert(v_loc.first < CkNumPes());
 
@@ -199,9 +197,13 @@ anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx) {
         */
         // assert(v_loc.second >= 0 && v_loc.second < 64);
         if (v_loc.first == CkMyPe()) {
-          insertDataAnchor(d);
+          anchor(v_loc.second, w->parent, -1);
+          // insertDataAnchor(d);
         }
         else {
+          anchorData d;
+          d.arrIdx = v_loc.second;
+          d.v = w->parent;
           thisProxy[v_loc.first].insertDataAnchor(d);
         }
     }
@@ -252,9 +254,6 @@ anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx) {
           }
           */
         }
-        anchorData d;
-        d.arrIdx = w_parent_loc.second;
-        d.v = v;
         // assert(w_parent_loc.first >= 0);
         // assert(w_parent_loc.first < CkNumPes());
 
@@ -264,9 +263,13 @@ anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx) {
           CkPrintf("sending to PE: %d\n", w_parent_loc.first);
         */
         if (w_parent_loc.first == CkMyPe()) {
-          insertDataAnchor(d);
+          anchor(w_parent_loc.second, v, -1);
+          // insertDataAnchor(d);
         }
         else {
+          anchorData d;
+          d.arrIdx = w_parent_loc.second;
+          d.v = v;
           thisProxy[w_parent_loc.first].insertDataAnchor(d);
         }
     }
