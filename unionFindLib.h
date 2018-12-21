@@ -44,8 +44,22 @@ class UnionFindLib : public CBase_UnionFindLib {
     int64_t totalReqsProcessed;
     CkCallback batchCb;
 
+    // path compression
+    std::vector<int64_t> verticesToCompress;
+
+    // component labeling
+    uint64_t reqs_sent;
+    uint64_t reqs_recv;
+    std::map<int64_t, std::vector<int64_t> > need_label_reqs;
+  public:
+    void need_label(int64_t req_vertex, int64_t parent_arrID);
+    void recv_label(int64_t recv_vertex_arrID, int64_t labelID);
+
     public:
-    UnionFindLib() {}
+    UnionFindLib() {
+      reqs_sent = 0;
+      reqs_recv = 0;
+    }
     UnionFindLib(CkMigrateMessage *m) { }
     static CProxy_UnionFindLib unionFindInit(CkArrayID clientArray, int64_t n);
     void register_phase_one_cb(CkCallback cb);

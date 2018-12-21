@@ -293,6 +293,8 @@ local_path_compression(unionFindVertex *src, int64_t compressedParent) {
 void UnionFindLib::
 find_components(CkCallback cb) {
     postComponentLabelingCb = cb;
+
+    /*
     // count local numBosses
     myLocalNumBosses = 0;
     for (int64_t i = 0; i < numMyVertices; i++) {
@@ -307,6 +309,8 @@ find_components(CkCallback cb) {
     // myPrefixElem->startPrefixCalculation(myLocalNumBosses, doneCb);
     prefixLibArray[thisIndex].startPrefixCalculation(myLocalNumBosses, doneCb);
     //CkPrintf("[%d] Local num bosses: %d\n", thisIndex, myLocalNumBosses);
+    */
+    start_component_labeling();
 }
 
 // Recveive total boss count from prefix library and start labelling phase
@@ -338,28 +342,103 @@ boss_count_prefix_done(int64_t totalCount) {
 
 void UnionFindLib::
 start_component_labeling() {
+  // Send requests only from those vertices whose parents are not in my PE
+  for (int64_t i = 0; i < numMyVertices; i++) {
+    unionFindVertex *v = &myVertices[i];
+    if (v->parent == v->vertexID) {
+      v->componentNumber = v->vertexID;
+      continue;
+    }
+    std::pair<int64_t, int64_t> parent_loc = getLocationFromID(v->parent);
+    if (parent_loc.first != CkMyPe()) {
+      thisProxy[parent_loc.first].need_label(v->vertexID, parent_loc.second);
+      reqs_sent++;
+      // Can there be a case where reqs_sent == reqs_recv; and still this PE is in this for-loop?
+    }
+
+    /*
+    if (v->parent == v->vertexID) {
+      // one of the bosses/root found
+      CkAssert(v->componentNumber != -1); // phase 2a assigned serial numbers
+      set_component(i, v->componentNumber);
+    }
+
+    if (v->componentNumber == -1) {
+      // an internal node or leaf node, request parent for boss
+      std::pair<int64_t, int64_t> parent_loc = getLocationFromID(v->parent);
+      //this->thisProxy[parent_loc.first].need_boss(parent_loc.second, v->vertexID);
+      uint64_t data = ((uint64_t) parent_loc.second) << 32 | ((uint64_t) v->vertexID);
+      this->thisProxy[parent_loc.first].insertDataNeedBoss(data);
+    }
+    */
+  }
+
+  if (this->thisIndex == 0) {
+    // return back to application after completing all messaging related to
+    // connected components algorithm
+    CkStartQD(postComponentLabelingCb);
+  }
+}
+
+void UnionFindLib::need_label(int64_t req_vertex, int64_t parent_arrID)
+{
+  // Traverse through the path and add it to the map of the vertex whose parent is not in this PE
+  // TODO: opportunity to do local path compression here
+  while (1) {
+    unionFindVertex *p = &myVertices[parent_arrID];
+    if (p->parent == p->vertexID) {
+      // found the component number; reply back to the requestor
+      assert(p->componentNumber != -1);
+      std::pair<int64_t, int64_t> req_loc = getLocationFromID(req_vertex);
+      thisProxy[req_loc.first].recv_label(req_loc.second, p->componentNumber);
+      break;
+    }
+    else if (gparent_loc.first != CkMyPe()) {
+      // parent's parent not in this PE; add it to the map, and do nothing
+      assert(p->componentNumber == -1); // not yet received the componentID; would have already sent a request
+      need_label_reqs[p->vertexID].push_back(req_vertex);
+      break;
+    }
+    else {
+      // parent's parent is in this PE; set this as the parent for the next iteration
+      std::pair<int64_t, int64_t> gparent_loc = getLocationFromID(p->parent);
+      parent_arrID = gparent_loc.second;
+    }
+  }
+}
+
+void UnionFindLib::recv_label(int64_t recv_vertex_arrID, int64_t labelID)
+{
+  reqs_recv++;
+  unionFindVertex *v = &myVertices[recv_vertex_arrID];
+  assert(v->componentNumber == -1);
+  v->componentNumber = labelID;
+  // reply back to all those requests that were queued in this ID
+  for (std::vector<int>::iterator it = need_label_reqs[v->vertexID].begin() ; it != need_label_reqs[v->vertexID].end(); ++it) {
+    std::pair<int64_t, int64_t> req_loc = getLocationFromID(*it);
+    thisProxy[req_loc.first].recv_label(req_loc.second, labelID);
+  }
+
+  // all reqs received for my PE
+  if (reqs_recv == reqs_sent) {
     for (int64_t i = 0; i < numMyVertices; i++) {
-        unionFindVertex *v = &myVertices[i];
-        if (v->parent == v->vertexID) {
-            // one of the bosses/root found
-            CkAssert(v->componentNumber != -1); // phase 2a assigned serial numbers
-            set_component(i, v->componentNumber);
+      unionFindVertex *v = &myVertices[i];
+      if (v->componentNumber == -1) {
+        // I don't have my label; does my parent have it?
+        std::pair<int64_t, int64_t> parent_loc = getLocationFromID(v->parent);
+        assert(parent_loc.first == CkMyPe());
+        unionFindVertex *p = &myVertices[parent_loc.second];
+        while (p->componentNumber == -1) {
+          std::pair<int64_t, int64_t> gparent_loc = getLocationFromID(p->parent);
+          assert(gparent_loc.first == CkMyPe());
+          unionFindVertex *gp = &myVertices[gparent_loc.second];
+          p = gp;
+          // TODO: optimization possible here?
         }
-
-        if (v->componentNumber == -1) {
-            // an internal node or leaf node, request parent for boss
-            std::pair<int64_t, int64_t> parent_loc = getLocationFromID(v->parent);
-            //this->thisProxy[parent_loc.first].need_boss(parent_loc.second, v->vertexID);
-            uint64_t data = ((uint64_t) parent_loc.second) << 32 | ((uint64_t) v->vertexID);
-            this->thisProxy[parent_loc.first].insertDataNeedBoss(data);
-        }
+        v->componentNumber = p->componentNumber;
+      }
     }
-
-    if (this->thisIndex == 0) {
-        // return back to application after completing all messaging related to
-        // connected components algorithm
-        CkStartQD(postComponentLabelingCb);
-    }
+  }
 }
 
 void UnionFindLib::
