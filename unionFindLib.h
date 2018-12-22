@@ -33,6 +33,7 @@ class UnionFindLib : public CBase_UnionFindLib {
     int64_t myLocalNumBosses;
     int64_t totalNumBosses;
     CkCallback postComponentLabelingCb;
+    int64_t totalVerticesinPE;
     
     // Batch
     int64_t numCharesinPe;
