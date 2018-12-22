@@ -219,6 +219,7 @@ anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx) {
         // local_path_compression(path_base, w->vertexID);
         verticesToCompress.push_back(path_base_arrIdx);
       }
+      local_path_compression(w->vertexID);
       anchorData d;
       d.arrIdx = w_parent_loc.second;
       d.v = v;
