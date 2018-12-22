@@ -17,7 +17,6 @@ module unionFindLib {
 
         // functions to perform distributed connected components
         entry void find_components(CkCallback cb);
-        entry [reductiontarget] void boss_count_prefix_done(int64_t totalCount);
         entry void need_boss(int64_t arrIdx, int64_t fromID);
         entry void set_component(int64_t arrIdx, int64_t compNum);
 

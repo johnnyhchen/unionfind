@@ -83,7 +83,6 @@ class UnionFindLib : public CBase_UnionFindLib {
     public:
     void find_components(CkCallback cb);
     void insertDataFindBoss(const findBossData & data);
-    void boss_count_prefix_done(int64_t totalCount);
     void start_component_labeling();
     void insertDataNeedBoss(const uint64_t & data);
     void insertDataAnchor(const anchorData & data);
