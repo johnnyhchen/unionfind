@@ -126,7 +126,7 @@ class MeshPiece : public CBase_MeshPiece {
 
     public:
     MeshPiece() { 
-      CkPrintf("I am chare: %d in PE: %d\n", thisIndex, CkMyPe());
+      // CkPrintf("I am chare: %d in PE: %d\n", thisIndex, CkMyPe());
     }
 
     MeshPiece(CkMigrateMessage *m) { }

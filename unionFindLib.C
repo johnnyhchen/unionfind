@@ -453,7 +453,7 @@ void UnionFindLib::
 insertDataNeedBoss(const uint64_t & data) {
     int64_t arrIdx = (int64_t)(data >> 32);
     int64_t fromID = (int64_t)(data & 0xffffffff);
-    this->need_boss(arrIdx, fromID);
+    // this->need_boss(arrIdx, fromID);
 }
 
 
