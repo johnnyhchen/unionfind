@@ -330,22 +330,29 @@ start_component_labeling() {
       reqs_sent++;
       // Can there be a case where reqs_sent == reqs_recv; and still this PE is in this for-loop?
     }
-
-    /*
-    if (v->parent == v->vertexID) {
-      // one of the bosses/root found
-      CkAssert(v->componentNumber != -1); // phase 2a assigned serial numbers
-      set_component(i, v->componentNumber);
+  }
+  // my PE is not sending any request
+  if (reqs_sent == 0) {
+    CkPrintf("PE: %d is not sending any requests!\n", CkMyPe());
+    for (int64_t i = 0; i < numMyVertices; i++) {
+      unionFindVertex *v = &myVertices[i];
+      if (v->componentNumber == -1) {
+        // I don't have my label; does my parent have it?
+        std::pair<int64_t, int64_t> parent_loc = getLocationFromID(v->parent);
+        assert(parent_loc.first == CkMyPe());
+        unionFindVertex *p = &myVertices[parent_loc.second];
+        while (p->componentNumber == -1) {
+          std::pair<int64_t, int64_t> gparent_loc = getLocationFromID(p->parent);
+          assert(gparent_loc.first == CkMyPe());
+          unionFindVertex *gp = &myVertices[gparent_loc.second];
+          p = gp;
+          // TODO: optimization possible here?
+        }
+        v->componentNumber = p->componentNumber;
+      }
     }
-
-    if (v->componentNumber == -1) {
-      // an internal node or leaf node, request parent for boss
-      std::pair<int64_t, int64_t> parent_loc = getLocationFromID(v->parent);
-      //this->thisProxy[parent_loc.first].need_boss(parent_loc.second, v->vertexID);
-      uint64_t data = ((uint64_t) parent_loc.second) << 32 | ((uint64_t) v->vertexID);
-      this->thisProxy[parent_loc.first].insertDataNeedBoss(data);
-    }
-    */
+    CkCallback cb(CkReductionTarget(UnionFindLib, total_components), thisProxy[0]);
+    contribute(sizeof(int64_t), &myLocalNumBosses, CkReduction::sum_long_long, cb);
   }
 
   // if (this->thisIndex == 0) {
@@ -384,6 +391,7 @@ void UnionFindLib::need_label(int64_t req_vertex, int64_t parent_arrID)
 
 void UnionFindLib::recv_label(int64_t recv_vertex_arrID, int64_t labelID)
 {
+  assert(reqs_sent != 0);
   reqs_recv++;
   unionFindVertex *v = &myVertices[recv_vertex_arrID];
   assert(v->componentNumber == -1);
