@@ -37,7 +37,8 @@ allocate_libVertices(int64_t numVertices, int64_t nPe)
     ckout << "mem alloc error in library: " << ba.what() << endl;
     CkExit();
   }
-
+  totalVerticesinPE = myVertices.size();
+  assert(totalVerticesinPE == (numVertices * numCharesinPe));
   // CkPrintf("PE: %d, calling allocate for: %ld\n", CkMyPe(), (numVertices * numCharesinPe));
 }
 
@@ -53,6 +54,7 @@ initialize_vertices(int64_t numVertices, unionFindVertex* &appVertices, int64_t 
     // local vertices corresponding to one treepiece in application
     numMyVertices = numVertices;
     if (offset == -1) {
+      assert (0); // TODO: check logic!
       offset = myVertices.size();
       myVertices.resize(numVertices);
       appVertices = &myVertices[myVertices.size() - numMyVertices];
@@ -317,7 +319,7 @@ void UnionFindLib::
 start_component_labeling() {
   // Send requests only from those vertices whose parents are not in my PE
   myLocalNumBosses = 0;
-  for (int64_t i = 0; i < numMyVertices; i++) {
+  for (int64_t i = 0; i < totalVerticesinPE; i++) {
     unionFindVertex *v = &myVertices[i];
     if (v->parent == v->vertexID) {
       v->componentNumber = v->vertexID;
@@ -334,7 +336,7 @@ start_component_labeling() {
   // my PE is not sending any request
   if (reqs_sent == 0) {
     CkPrintf("PE: %d is not sending any requests!\n", CkMyPe());
-    for (int64_t i = 0; i < numMyVertices; i++) {
+    for (int64_t i = 0; i < totalVerticesinPE; i++) {
       unionFindVertex *v = &myVertices[i];
       if (v->componentNumber == -1) {
         // I don't have my label; does my parent have it?
@@ -405,7 +407,7 @@ void UnionFindLib::recv_label(int64_t recv_vertex_arrID, int64_t labelID)
 
   // all reqs received for my PE
   if (reqs_recv == reqs_sent) {
-    for (int64_t i = 0; i < numMyVertices; i++) {
+    for (int64_t i = 0; i < totalVerticesinPE; i++) {
       unionFindVertex *v = &myVertices[i];
       if (v->componentNumber == -1) {
         // I don't have my label; does my parent have it?
@@ -508,7 +510,7 @@ prune_components(int64_t threshold, CkCallback appReturnCb) {
     //    CkAbort("We are out of memory!");
     //}
 
-    for (int64_t i = 0; i < numMyVertices; i++) {
+    for (int64_t i = 0; i < totalVerticesinPE; i++) {
         int64_t bossID = myVertices[i].componentNumber;
         CkAssert(bossID >= 0 && bossID < totalNumBosses);
         localCounts[bossID]++;
@@ -536,7 +538,7 @@ perform_pruning() {
 
     CProxy_UnionFindLibGroup libGroup(libGroupID);
 
-    for (int64_t i = 0; i < numMyVertices; i++) {
+    for (int64_t i = 0; i < totalVerticesinPE; i++) {
         int64_t myComponentCount = libGroup.ckLocalBranch()->get_component_count(myVertices[i].componentNumber);
         if (myComponentCount <= componentPruneThreshold) {
             myVertices[i].componentNumber = -1;
@@ -560,7 +562,7 @@ perform_pruning() {
 
 #ifdef PROFILING
     int64_t maxCount = -1;
-    for (int64_t i = 0; i < numMyVertices; i++) {
+    for (int64_t i = 0; i < totalVerticesinPE; i++) {
         if (myVertices[i].findOrAnchorCount > maxCount)
             maxCount = myVertices[i].findOrAnchorCount;
     }
