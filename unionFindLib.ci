@@ -12,7 +12,7 @@ module unionFindLib {
         // function to register Phase 1 callback
         entry void register_phase_one_cb(CkCallback cb);
         // functions to build inverted trees
-        entry void anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx);
+        // entry void anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx);
         // function for grandparent short-circuiting
 
         // functions to perform distributed connected components
