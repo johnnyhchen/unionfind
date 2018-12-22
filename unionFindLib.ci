@@ -17,8 +17,6 @@ module unionFindLib {
 
         // functions to perform distributed connected components
         entry void find_components(CkCallback cb);
-        entry void need_boss(int64_t arrIdx, int64_t fromID);
-        entry void set_component(int64_t arrIdx, int64_t compNum);
 
         // functions to prune out small components
         entry void prune_components(int64_t threshold, CkCallback cb);

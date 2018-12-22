@@ -463,42 +463,6 @@ printVertices() {
     CkPrintf("i: %d vertexID: %ld\n", i, myVertices[i].vertexID);
 }
 
-void UnionFindLib::
-need_boss(int64_t arrIdx, int64_t fromID) {
-    // one of children of this node needs boss, handle by either replying immediately
-    // or queueing the request
-
-    if (myVertices[arrIdx].componentNumber != -1) {
-        // component already set, reply back
-        std::pair<int64_t, int64_t> requestor_loc = getLocationFromID(fromID);
-        if (requestor_loc.first == thisIndex)
-            set_component(requestor_loc.second, myVertices[arrIdx].componentNumber);
-        else
-            this->thisProxy[requestor_loc.first].set_component(requestor_loc.second, myVertices[arrIdx].componentNumber);
-    }
-    else {
-        // boss still not found, queue the request
-        myVertices[arrIdx].need_boss_requests.push_back(fromID);
-    }
-}
-
-void UnionFindLib::
-set_component(int64_t arrIdx, int64_t compNum) {
-    myVertices[arrIdx].componentNumber = compNum;
-
-    // since component number is set, respond to your requestors
-    std::vector<int64_t>::iterator req_iter = myVertices[arrIdx].need_boss_requests.begin();
-    while (req_iter != myVertices[arrIdx].need_boss_requests.end()) {
-        int64_t requestorID = *req_iter;
-        std::pair<int64_t, int64_t> requestor_loc = getLocationFromID(requestorID);
-        if (requestor_loc.first == thisIndex)
-            set_component(requestor_loc.second, compNum);
-        else
-            this->thisProxy[requestor_loc.first].set_component(requestor_loc.second, compNum);
-        // done with current requestor, delete from request queue
-        req_iter = myVertices[arrIdx].need_boss_requests.erase(req_iter);
-    }
-}
 
 void UnionFindLib::
 prune_components(int64_t threshold, CkCallback appReturnCb) {
