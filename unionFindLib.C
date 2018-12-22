@@ -313,33 +313,6 @@ find_components(CkCallback cb) {
     start_component_labeling();
 }
 
-// Recveive total boss count from prefix library and start labelling phase
-void UnionFindLib::
-boss_count_prefix_done(int64_t totalCount) {
-    totalNumBosses = totalCount;
-    // access value from prefix lib elem to find starting index
-    Prefix* myPrefixElem = prefixLibArray[thisIndex].ckLocal();
-    int64_t v = myPrefixElem->getValue();
-    int64_t myStartIndex = v - myLocalNumBosses;
-    //CkPrintf("[%d] My start index: %d\n", thisIndex, myStartIndex);
-
-    // start labeling my local bosses from myStartIndex
-    // ensures sequential numbering of components
-    if (myLocalNumBosses != 0) {
-        for (int64_t i = 0; i < numMyVertices; i++) {
-            if (myVertices[i].parent == myVertices[i].vertexID) {
-                myVertices[i].componentNumber = myStartIndex;
-                myStartIndex++;
-            }
-        }
-    }
-
-    CkAssert(myStartIndex == v);
-
-    // start the labeling phase for all vertices
-    start_component_labeling();
-}
-
 void UnionFindLib::
 start_component_labeling() {
   // Send requests only from those vertices whose parents are not in my PE
