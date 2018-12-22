@@ -386,6 +386,7 @@ void UnionFindLib::need_label(int64_t req_vertex, int64_t parent_arrID)
   // TODO: opportunity to do local path compression here
   while (1) {
     unionFindVertex *p = &myVertices[parent_arrID];
+    std::pair<int64_t, int64_t> gparent_loc = getLocationFromID(p->parent);
     if (p->parent == p->vertexID) {
       // found the component number; reply back to the requestor
       assert(p->componentNumber != -1);
@@ -401,7 +402,6 @@ void UnionFindLib::need_label(int64_t req_vertex, int64_t parent_arrID)
     }
     else {
       // parent's parent is in this PE; set this as the parent for the next iteration
-      std::pair<int64_t, int64_t> gparent_loc = getLocationFromID(p->parent);
       parent_arrID = gparent_loc.second;
     }
   }
@@ -414,7 +414,7 @@ void UnionFindLib::recv_label(int64_t recv_vertex_arrID, int64_t labelID)
   assert(v->componentNumber == -1);
   v->componentNumber = labelID;
   // reply back to all those requests that were queued in this ID
-  for (std::vector<int>::iterator it = need_label_reqs[v->vertexID].begin() ; it != need_label_reqs[v->vertexID].end(); ++it) {
+  for (std::vector<int64_t>::iterator it = need_label_reqs[v->vertexID].begin() ; it != need_label_reqs[v->vertexID].end(); ++it) {
     std::pair<int64_t, int64_t> req_loc = getLocationFromID(*it);
     thisProxy[req_loc.first].recv_label(req_loc.second, labelID);
   }
