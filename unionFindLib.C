@@ -328,7 +328,6 @@ start_component_labeling() {
     if (parent_loc.first != CkMyPe()) {
       thisProxy[parent_loc.first].need_label(v->vertexID, parent_loc.second);
       reqs_sent++;
-      assert(0);
       // Can there be a case where reqs_sent == reqs_recv; and still this PE is in this for-loop?
     }
   }
