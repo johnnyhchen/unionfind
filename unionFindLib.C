@@ -125,7 +125,7 @@ union_request(int64_t v, int64_t w) {
     */
     if (w_loc.first == CkMyPe()) {
       // insertDataAnchor(d);
-      anchor(w_loc.second, v, -1);
+      anchor(w_loc.second, v);
     }
     else {
       anchorData d;
@@ -137,157 +137,73 @@ union_request(int64_t v, int64_t w) {
 
 void UnionFindLib::
 insertDataAnchor(const anchorData & data) {
-    anchor(data.arrIdx, data.v, -1);
+    anchor(data.arrIdx, data.v);
 }
 
 void UnionFindLib::
-anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx) {
-    unionFindVertex *w = &myVertices[w_arrIdx];
+anchor(int64_t w_arrIdx, int64_t v) {
+  unionFindVertex *w = &myVertices[w_arrIdx];
 
-    // CkPrintf("anchor() w_arrIdx: %d w->vertexID: %ld to vid: %ld\n", w_arrIdx, w->vertexID, v);
-    w->findOrAnchorCount++;
+  // CkPrintf("anchor() w_arrIdx: %d w->vertexID: %ld to vid: %ld\n", w_arrIdx, w->vertexID, v);
+  w->findOrAnchorCount++;
 
-    if (w->parent == v) {
-      // call local_path_compression with v as parent
-      if (path_base_arrIdx != -1) {
-        unionFindVertex *path_base = &myVertices[path_base_arrIdx];
-        local_path_compression(path_base, v);
-      }
-      reqs_processed();
+  if (w->parent == v) {
+    // call local_path_compression with v as parent
+    local_path_compression(v);
+    reqs_processed();
+    return;
+  }
+
+  if (w->vertexID < v) {
+    // incorrect order, swap the vertices
+    std::pair<int64_t, int64_t> v_loc = getLocationFromID(v);
+    if (v_loc.first == CkMyPe()) {
+      // vertex available locally, avoid extra message
+      verticesToCompress.push_back(w_arrIdx);
+      anchor(v_loc.second, w->parent);
       return;
     }
-
-    if (w->vertexID < v) {
-        // incorrect order, swap the vertices
-        std::pair<int64_t, int64_t> v_loc = getLocationFromID(v);
-        // if (v_loc.first == thisIndex) {
-        if (v_loc.first == CkMyPe()) {
-            // vertex available locally, avoid extra message
-            if (path_base_arrIdx != -1) {
-              // Have to change the direction; so compress path for w
-              unionFindVertex *path_base = &myVertices[path_base_arrIdx];
-              // FIXME: what happens if w is not in this chare?
-              local_path_compression(path_base, w->vertexID);
-            }
-            // start a new base since I am changing direction; can't carry the old one
-            path_base_arrIdx = v_loc.second; 
-            // anchor(v_loc.second, w->parent, path_base_arrIdx);
-            anchor(v_loc.second, w->parent, -1);
-            return;
-        }
-        /*
-        else {
-          UnionFindLib *lc = thisProxy[v_loc.first].ckLocal();
-          if (lc != nullptr) {
-            // Moving away from this chare; see if local_path_compression should be done
-            // FIXME: still should be able to do local_compression within node, but across chares
-            if (path_base_arrIdx != -1) {
-              unionFindVertex *path_base = &myVertices[path_base_arrIdx];
-              local_path_compression(path_base, w->vertexID);
-            }
-            lc->anchor(v_loc.second, w->parent, -1);
-            return;
-          }
-        }
-        */
-        // assert(v_loc.first >= 0);
-        // assert(v_loc.first < CkNumPes());
-
-        /*
-        if (v_loc.first != 0)
-          CkPrintf("sending to PE: %d\n", v_loc.first);
-        */
-        // assert(v_loc.second >= 0 && v_loc.second < 64);
-        if (v_loc.first == CkMyPe()) {
-          anchor(v_loc.second, w->parent, -1);
-          // insertDataAnchor(d);
-        }
-        else {
-          anchorData d;
-          d.arrIdx = v_loc.second;
-          d.v = w->parent;
-          thisProxy[v_loc.first].insertDataAnchor(d);
-        }
+    else {
+      local_path_compression(w->vertexID);
+      anchorData d;
+      d.arrIdx = v_loc.second;
+      d.v = w->parent;
+      thisProxy[v_loc.first].insertDataAnchor(d);
     }
-    else if (w->parent == w->vertexID) {
-      // I have reached the root; check if I can call local_path_compression
-      if (path_base_arrIdx != -1) {
-        unionFindVertex *path_base = &myVertices[path_base_arrIdx];
-        // Make all nodes point to this parent v
-        local_path_compression(path_base, v);
-      }
-      w->parent = v;
-      reqs_processed();
+  }
+  else if (w->parent == w->vertexID) {
+    // I have reached the root; call local_path_compression
+    local_path_compression(v);
+    w->parent = v;
+    reqs_processed();
+  }
+  else {
+    // call anchor for w's parent
+    std::pair<int64_t, int64_t> w_parent_loc = getLocationFromID(w->parent);
+    if (w_parent_loc.first == CkMyPe()) {
+      verticesToCompress.push_back(w_arrIdx);
+      anchor(w_parent_loc.second, v);
+      return;
     }
     else {
-        // call anchor for w's parent
-        std::pair<int64_t, int64_t> w_parent_loc = getLocationFromID(w->parent);
-        if (w_parent_loc.first == CkMyPe()) {
-            if (path_base_arrIdx == -1) {
-              // Start from w; a wasted call if there is only one node and its child in the PE
-              std::pair<int64_t, int64_t> w_loc = getLocationFromID(w->vertexID);
-              path_base_arrIdx = w_loc.second;
-              assert(path_base_arrIdx == w_arrIdx); 
-            }
-            /*
-            else {
-              std::pair<int64_t, int64_t> w_loc = getLocationFromID(w->vertexID);
-              // assert (path_base_arrIdx != w_loc.second);
-            }
-            */
-            // anchor(w_parent_loc.second, v, -1);
-            anchor(w_parent_loc.second, v, path_base_arrIdx);
-            return;
-        }
-        else {
-          // Moving away from this node; see if local_path_compression should be done
-          if (path_base_arrIdx != -1) {
-            unionFindVertex *path_base = &myVertices[path_base_arrIdx];
-            // Make all nodes point to this parent w
-            // assert (path_base->vertexID != w->vertexID);
-            local_path_compression(path_base, w->vertexID);
-          }
-          /*
-          UnionFindLib *lc = thisProxy[w_parent_loc.first].ckLocal();
-          if (lc != nullptr) {
-            // FIXME: still should be able to do local_compression within node, but across chares
-            lc->anchor(w_parent_loc.second, v, -1);
-            return;
-          }
-          */
-        }
-        // assert(w_parent_loc.first >= 0);
-        // assert(w_parent_loc.first < CkNumPes());
-
-         // assert(w_parent_loc.second >= 0 && w_parent_loc.second < 64);
-        /*
-        if (w_parent_loc.first != 0)
-          CkPrintf("sending to PE: %d\n", w_parent_loc.first);
-        */
-        if (w_parent_loc.first == CkMyPe()) {
-          anchor(w_parent_loc.second, v, -1);
-          // insertDataAnchor(d);
-        }
-        else {
-          anchorData d;
-          d.arrIdx = w_parent_loc.second;
-          d.v = v;
-          thisProxy[w_parent_loc.first].insertDataAnchor(d);
-        }
+      // Moving away from this node; local_path_compression should be done
+      local_path_compression(w->vertexID);
+      anchorData d;
+      d.arrIdx = w_parent_loc.second;
+      d.v = v;
+      thisProxy[w_parent_loc.first].insertDataAnchor(d);
     }
+  }
 }
 
 // perform local path compression
 void UnionFindLib::
-local_path_compression(unionFindVertex *src, int64_t compressedParent) {
-    unionFindVertex* tmp;
-    // An infinite loop if this function is called on itself (a node which does not have itself as its parent)
-    while (src->parent != compressedParent) {
-        // CkPrintf("Stuck here\n");
-        tmp = &myVertices[getLocationFromID(src->parent).second];
-        src->parent = compressedParent;
-        src =tmp;
-    }
+local_path_compression(int64_t compressedParent) {
+  for (std::vector<int64_t>::iterator it = verticesToCompress.begin() ; it != verticesToCompress.end(); ++it) {
+    unionFindVertex *v = &myVertices[*it];
+    v->parent = compressedParent;
+  }
+  verticesToCompress.clear();
 }
 
 
