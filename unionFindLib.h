@@ -71,7 +71,7 @@ class UnionFindLib : public CBase_UnionFindLib {
 
     void union_request(int64_t v, int64_t w);
     void anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx);
-    void local_path_compression(unionFindVertex *src, int64_t compressedParent);
+    void local_path_compression(int64_t compressedParent);
     bool check_same_chares(int64_t v1, int64_t v2);
     void registerGetLocationFromID(std::pair<int64_t, int64_t> (*gloc)(int64_t v));
     void printVertices();
