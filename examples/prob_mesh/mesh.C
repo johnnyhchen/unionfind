@@ -238,7 +238,7 @@ class MeshPiece : public CBase_MeshPiece {
             // edge found, make library union_request call
             int64_t eastID = (myVertices[witer].x*MESH_SIZE) + (myVertices[witer].y+1);
             libPtr->union_request(myVertices[witer].id, eastID);
-            CkPrintf("%lld -- %lld\n", myVertices[witer].id, eastID);
+            // CkPrintf("%lld -- %lld\n", myVertices[witer].id, eastID);
             totalReqs++;
           }
         }
@@ -252,7 +252,7 @@ class MeshPiece : public CBase_MeshPiece {
             // edge found, make library union_request call
             int64_t southID = (myVertices[witer].x+1)*MESH_SIZE + myVertices[witer].y;
             libPtr->union_request(myVertices[witer].id, southID);
-            CkPrintf("%lld -- %lld\n", myVertices[witer].id, southID);
+            // CkPrintf("%lld -- %lld\n", myVertices[witer].id, southID);
             totalReqs++;
           }
         }

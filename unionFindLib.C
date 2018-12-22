@@ -352,6 +352,7 @@ start_component_labeling() {
       }
     }
     CkCallback cb(CkReductionTarget(UnionFindLib, total_components), thisProxy[0]);
+    CkPrintf("PE: %d totalRoots: %lld\n", CkMyPe(), myLocalNumBosses);
     contribute(sizeof(int64_t), &myLocalNumBosses, CkReduction::sum_long_long, cb);
   }
 
@@ -422,6 +423,7 @@ void UnionFindLib::recv_label(int64_t recv_vertex_arrID, int64_t labelID)
       }
     }
     CkCallback cb(CkReductionTarget(UnionFindLib, total_components), thisProxy[0]);
+    CkPrintf("PE: %d totalRoots: %lld\n", CkMyPe(), myLocalNumBosses);
     contribute(sizeof(int64_t), &myLocalNumBosses, CkReduction::sum_long_long, cb);
   }
 }
