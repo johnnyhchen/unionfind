@@ -54,6 +54,7 @@ class UnionFindLib : public CBase_UnionFindLib {
   public:
     void need_label(int64_t req_vertex, int64_t parent_arrID);
     void recv_label(int64_t recv_vertex_arrID, int64_t labelID);
+    void total_components(int64_t nComponents);
 
     public:
     UnionFindLib() {

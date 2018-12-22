@@ -39,6 +39,7 @@ module unionFindLib {
         
         entry void need_label(int64_t req_vertex, int64_t parent_arrID);
         entry void recv_label(int64_t recv_vertex_arrID, int64_t labelID);
+        entry [reductiontarget] void total_components(int64_t nComponents);
     }
 
     // group chare to support the library chares

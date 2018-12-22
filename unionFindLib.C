@@ -316,10 +316,12 @@ find_components(CkCallback cb) {
 void UnionFindLib::
 start_component_labeling() {
   // Send requests only from those vertices whose parents are not in my PE
+  myLocalNumBosses = 0;
   for (int64_t i = 0; i < numMyVertices; i++) {
     unionFindVertex *v = &myVertices[i];
     if (v->parent == v->vertexID) {
       v->componentNumber = v->vertexID;
+      myLocalNumBosses++;
       continue;
     }
     std::pair<int64_t, int64_t> parent_loc = getLocationFromID(v->parent);
@@ -346,11 +348,11 @@ start_component_labeling() {
     */
   }
 
-  if (this->thisIndex == 0) {
+  // if (this->thisIndex == 0) {
     // return back to application after completing all messaging related to
     // connected components algorithm
-    CkStartQD(postComponentLabelingCb);
-  }
+    // CkStartQD(postComponentLabelingCb);
+  // }
 }
 
 void UnionFindLib::need_label(int64_t req_vertex, int64_t parent_arrID)
@@ -411,7 +413,16 @@ void UnionFindLib::recv_label(int64_t recv_vertex_arrID, int64_t labelID)
         v->componentNumber = p->componentNumber;
       }
     }
+    CkCallback cb(CkReductionTarget(UnionFindLib, total_components), thisProxy[0]);
+    contribute(sizeof(int64_t), &myLocalNumBosses, CkReduction::sum_long_long, cb);
   }
+}
+
+// Executed only on PE0
+void UnionFindLib::total_components(int64_t nComponents)
+{
+  CkPrintf("Total components: %lld\n", nComponents);
+  postComponentLabelingCb.send();
 }
 
 void UnionFindLib::
