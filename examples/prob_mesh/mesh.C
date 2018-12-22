@@ -71,11 +71,12 @@ class Main : public CBase_Main {
     void doneInveretdTree() {
         CkPrintf("[Main] Inverted trees constructed. Notify library to do component detection\n");
         CkPrintf("[Main] Tree construction time: %f\n", CkWallTimer()-start_time);
-        mpProxy.getNumEdges();
+        // mpProxy.getNumEdges();
        /* // ask the lib group chares to contribute counts
         CProxy_UnionFindLibGroup libGroup(libGroupID);
         libGroup.contribute_count();*/
         CkCallback cb(CkIndex_Main::doneFindComponents(), thisProxy);
+        start_time = CkWallTimer();
         libProxy.find_components(cb);
     }
 
@@ -85,13 +86,14 @@ class Main : public CBase_Main {
       recvMPs++;
       if (recvMPs == numMeshPieces) {
         CkPrintf("Total edges: %lld\n", totEdges);
-        CkExit();
+        // CkExit();
       }
     }
 
     void doneFindComponents() {
         CkPrintf("[Main] Components identified, prune unecessary ones now\n");
         CkPrintf("[Main] Components detection time: %f\n", CkWallTimer()-start_time);
+        CkExit();
         // callback for library to report to after pruning
         CkCallback cb(CkIndex_MeshPiece::printVertices(), mpProxy);
         libProxy.prune_components(1, cb);
