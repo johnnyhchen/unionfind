@@ -46,7 +46,7 @@ class UnionFindLib : public CBase_UnionFindLib {
     CkCallback batchCb;
 
     // path compression
-    std::vector<int64_t> verticesToCompress;
+    int64_t verticesToCompress[2];
 
     // component labeling
     uint64_t reqs_sent;
@@ -61,6 +61,7 @@ class UnionFindLib : public CBase_UnionFindLib {
     UnionFindLib() {
       reqs_sent = 0;
       reqs_recv = 0;
+      verticesToCompress[0] = verticesToCompress[1] = -1;
     }
     UnionFindLib(CkMigrateMessage *m) { }
     static CProxy_UnionFindLib unionFindInit(CkArrayID clientArray, int64_t n);
@@ -70,7 +71,7 @@ class UnionFindLib : public CBase_UnionFindLib {
     void initialize_vertices(int64_t numVertices, unionFindVertex* &appVertices, int64_t &offset, int64_t bs);
 
     void union_request(int64_t v, int64_t w);
-    void anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx);
+    void anchor(int64_t w_arrIdx, int64_t v);
     void local_path_compression(int64_t compressedParent);
     bool check_same_chares(int64_t v1, int64_t v2);
     void registerGetLocationFromID(std::pair<int64_t, int64_t> (*gloc)(int64_t v));
