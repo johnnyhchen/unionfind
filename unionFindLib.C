@@ -155,6 +155,8 @@ anchor(int64_t w_arrIdx, int64_t v) {
     std::pair<int64_t, int64_t> v_loc = getLocationFromID(v);
     // if (v_loc.first == thisIndex) {
     if (v_loc.first == CkMyPe()) {
+      nSwitches++;
+      otherArrIDx = w->vertexID;
       // vertex available locally, avoid extra message
       /*
       if (path_base_arrIdx != -1) {
@@ -243,9 +245,22 @@ anchor(int64_t w_arrIdx, int64_t v) {
 void UnionFindLib::
 local_path_compression(int64_t compressedParent) {
   // for (std::vector<int64_t>::iterator it = verticesToCompress.begin() ; it != verticesToCompress.end(); ++it) {
+  int64_t pCP = compressedParent;
   for (int i = 0; i < 2; i++) {
     int64_t arrIdx = verticesToCompress[i];
     if (arrIdx != -1) {
+      if (nSwitches % 2 == 0) {
+        if (i == 1) {
+          assert (otherArrIDx != -1);
+          compressedParent = otherArrIDx;
+        }
+      }
+      else {
+        if (i == 0) {
+          assert (otherArrIDx != -1);
+          compressedParent = otherArrIDx;
+        }
+      }
       // CkPrintf("Look i: %d\n", i);
       unionFindVertex *src = &myVertices[arrIdx];
       unionFindVertex* tmp;
@@ -267,6 +282,8 @@ local_path_compression(int64_t compressedParent) {
     }
   }
   verticesToCompress[0] = verticesToCompress[1] = -1;
+  nSwitches = 0;
+  otherArrIDx = -1;
 }
 
 

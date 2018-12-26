@@ -47,6 +47,8 @@ class UnionFindLib : public CBase_UnionFindLib {
 
     // path compression
     int64_t verticesToCompress[2];
+    int64_t otherArrIDx;
+    int64_t nSwitches;
 
     // component labeling
     uint64_t reqs_sent;
@@ -62,6 +64,8 @@ class UnionFindLib : public CBase_UnionFindLib {
       reqs_sent = 0;
       reqs_recv = 0;
       verticesToCompress[0] = verticesToCompress[1] = -1;
+      otherArrIDx = -1;
+      nSwitches = 0;
     }
     UnionFindLib(CkMigrateMessage *m) { }
     static CProxy_UnionFindLib unionFindInit(CkArrayID clientArray, int64_t n);
