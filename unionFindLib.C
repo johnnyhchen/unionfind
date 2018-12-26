@@ -256,12 +256,12 @@ local_path_compression(int64_t compressedParent) {
       while (src->vertexID > compressedParent) {
         // CkPrintf("Stuck here\n");
         std::pair<int64_t, int64_t> src_parent_loc = getLocationFromID(src->parent);
+        src->parent = compressedParent;
+        // assert(src->vertexID > compressedParent);
         if (src_parent_loc.first != CkMyPe()) {
           break;
         }
         tmp = &myVertices[src_parent_loc.second];
-        src->parent = compressedParent;
-        assert(src->vertexID > compressedParent);
         src = tmp;
       }
     }
