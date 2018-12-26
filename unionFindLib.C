@@ -139,6 +139,7 @@ anchor(int64_t w_arrIdx, int64_t v) {
       verticesToCompress.push_back(path_base_arrIdx);
     }
     */
+    /*
     std::pair<int64_t, int64_t> v_loc = getLocationFromID(v);
     if (v_loc.first == CkMyPe()) {
       local_path_compression(v);
@@ -146,6 +147,8 @@ anchor(int64_t w_arrIdx, int64_t v) {
     else {
       local_path_compression(w->vertexID);
     }
+    */
+    local_path_compression(v);
     reqs_processed();
     return;
   }
@@ -193,6 +196,7 @@ anchor(int64_t w_arrIdx, int64_t v) {
       verticesToCompress.push_back(path_base_arrIdx);
     }
     */
+    /*
     std::pair<int64_t, int64_t> v_loc = getLocationFromID(v);
     if (v_loc.first == CkMyPe()) {
       local_path_compression(v);
@@ -200,6 +204,8 @@ anchor(int64_t w_arrIdx, int64_t v) {
     else {
       local_path_compression(w->vertexID);
     }
+    */
+    local_path_compression(v);
     w->parent = v;
     reqs_processed();
   }
