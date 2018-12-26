@@ -246,7 +246,7 @@ local_path_compression(int64_t compressedParent) {
   for (int i = 0; i < 2; i++) {
     int64_t arrIdx = verticesToCompress[i];
     if (arrIdx != -1) {
-      CkPrintf("Look i: %d\n", i);
+      // CkPrintf("Look i: %d\n", i);
       unionFindVertex *src = &myVertices[arrIdx];
       unionFindVertex* tmp;
       // An infinite loop if this function is called on itself (a node which does not have itself as its parent)
