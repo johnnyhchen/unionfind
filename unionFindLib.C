@@ -168,6 +168,7 @@ anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx) {
               // Have to change the direction; so compress path for w
               unionFindVertex *path_base = &myVertices[path_base_arrIdx];
               // FIXME: what happens if w is not in this chare?
+              // TODO: why should local_path_compression() be done only if v is in this PE?
               local_path_compression(path_base, w->vertexID);
             }
             // start a new base since I am changing direction; can't carry the old one
