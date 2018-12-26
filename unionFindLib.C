@@ -252,9 +252,14 @@ local_path_compression(int64_t compressedParent) {
       // An infinite loop if this function is called on itself (a node which does not have itself as its parent)
       // can be because it ends up going to src->parent and the path is not defined from there; should add src->vertexID != compressedParent
       // should and must have the above clause too; else a node might end up declaring itself as the root!
-      while (src->vertexID != compressedParent && /* TODO: not needed? */ src->parent != compressedParent) {
+      // while (src->vertexID != compressedParent && /* TODO: not needed? */ src->parent != compressedParent) {
+      while (src->vertexID > compressedParent) {
         // CkPrintf("Stuck here\n");
-        tmp = &myVertices[getLocationFromID(src->parent).second];
+        std::pair<int64_t, int64_t> src_parent_loc = getLocationFromID(src->parent);
+        if (src_parent_loc.first != CkMyPe()) {
+          break;
+        }
+        tmp = &myVertices[src_parent_loc.second];
         src->parent = compressedParent;
         assert(src->vertexID > compressedParent);
         src = tmp;
