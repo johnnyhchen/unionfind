@@ -256,7 +256,7 @@ local_path_compression(int64_t compressedParent) {
         // CkPrintf("Stuck here\n");
         tmp = &myVertices[getLocationFromID(src->parent).second];
         src->parent = compressedParent;
-        assert(src->vertexID < compressedParent);
+        assert(src->vertexID > compressedParent);
         src = tmp;
       }
     }
