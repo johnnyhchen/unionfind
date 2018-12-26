@@ -14,7 +14,7 @@ registerGetLocationFromID(std::pair<int64_t, int64_t> (*gloc)(int64_t vid)) {
 
 void UnionFindLib::
 register_phase_one_cb(CkCallback cb) {
-    if (CkMyPe() != 0)
+    if (myPE != 0)
         CkAbort("[UnionFindLib] Phase 1 callback must be registered on first PE only!");
 
     CkStartQD(cb);
@@ -26,8 +26,8 @@ allocate_libVertices(int64_t numVertices, int64_t nPe)
 {
   // assert (myVertices.size() == 0);
   numCharesinPe = nPe;
-  if (CkMyPe() == 0) {
-    CkPrintf("Trying to allocate myVertices in library size: %lf GB myPE: %d elements: %ld numVertices in each chare: %ld numCharesinPe: %ld\n", (double)(sizeof(unionFindVertex) * numVertices * numCharesinPe) / (1024 * 1024 * 1024), CkMyPe(), (numVertices * numCharesinPe), numVertices, numCharesinPe);
+  if (myPE == 0) {
+    CkPrintf("Trying to allocate myVertices in library size: %lf GB myPE: %d elements: %ld numVertices in each chare: %ld numCharesinPe: %ld\n", (double)(sizeof(unionFindVertex) * numVertices * numCharesinPe) / (1024 * 1024 * 1024), myPE, (numVertices * numCharesinPe), numVertices, numCharesinPe);
   }   
   try {
     // myVertices = new unionFindVertex[numVertices * numCharesinPe];
@@ -39,7 +39,7 @@ allocate_libVertices(int64_t numVertices, int64_t nPe)
   }
   totalVerticesinPE = myVertices.size();
   assert(totalVerticesinPE == (numVertices * numCharesinPe));
-  // CkPrintf("PE: %d, calling allocate for: %ld\n", CkMyPe(), (numVertices * numCharesinPe));
+  // CkPrintf("PE: %d, calling allocate for: %ld\n", myPE, (numVertices * numCharesinPe));
 }
 
 // batchSize should be -1 if all the union_requests are to be handled at once
@@ -74,7 +74,7 @@ initialize_vertices(int64_t numVertices, unionFindVertex* &appVertices, int64_t 
 
 void UnionFindLib::
 register_batch_cb(CkCallback cb) {
-  if (CkMyPe() != 0) {
+  if (myPE != 0) {
     CkAbort("[UnionFindLib] Batch callback must be registered on first PE only!");
   }
   batchCb = cb;
@@ -106,7 +106,7 @@ recv_reqs_processed() {
 void UnionFindLib::
 union_request(int64_t v, int64_t w) {
     std::pair<int64_t, int64_t> w_loc = getLocationFromID(w);
-    if (w_loc.first == CkMyPe()) {
+    if (w_loc.first == myPE) {
       verticesToCompress[0] = w_loc.second;
       anchor(w_loc.second, v);
     }
@@ -141,7 +141,7 @@ anchor(int64_t w_arrIdx, int64_t v) {
     */
     /*
     std::pair<int64_t, int64_t> v_loc = getLocationFromID(v);
-    if (v_loc.first == CkMyPe()) {
+    if (v_loc.first == myPE) {
       local_path_compression(v);
     }
     else {
@@ -157,7 +157,7 @@ anchor(int64_t w_arrIdx, int64_t v) {
     // incorrect order, swap the vertices
     std::pair<int64_t, int64_t> v_loc = getLocationFromID(v);
     // if (v_loc.first == thisIndex) {
-    if (v_loc.first == CkMyPe()) {
+    if (v_loc.first == myPE) {
       // vertex available locally, avoid extra message
       /*
       if (path_base_arrIdx != -1) {
@@ -198,7 +198,7 @@ anchor(int64_t w_arrIdx, int64_t v) {
     */
     /*
     std::pair<int64_t, int64_t> v_loc = getLocationFromID(v);
-    if (v_loc.first == CkMyPe()) {
+    if (v_loc.first == myPE) {
       local_path_compression(v);
     }
     else {
@@ -212,7 +212,7 @@ anchor(int64_t w_arrIdx, int64_t v) {
   else {
     // call anchor for w's parent
     std::pair<int64_t, int64_t> w_parent_loc = getLocationFromID(w->parent);
-    if (w_parent_loc.first == CkMyPe()) {
+    if (w_parent_loc.first == myPE) {
       /*
       if (path_base_arrIdx == -1) {
         // Start from w; a wasted call if there is only one node and its child in the PE
@@ -264,7 +264,7 @@ local_path_compression(int64_t compressedParent) {
         std::pair<int64_t, int64_t> src_parent_loc = getLocationFromID(src->parent);
         src->parent = compressedParent;
         // assert(src->vertexID > compressedParent);
-        if (src_parent_loc.first != CkMyPe()) {
+        if (src_parent_loc.first != myPE) {
           break;
         }
         tmp = &myVertices[src_parent_loc.second];
@@ -312,7 +312,7 @@ start_component_labeling() {
       continue;
     }
     std::pair<int64_t, int64_t> parent_loc = getLocationFromID(v->parent);
-    if (parent_loc.first != CkMyPe()) {
+    if (parent_loc.first != myPE) {
       thisProxy[parent_loc.first].need_label(v->vertexID, parent_loc.second);
       reqs_sent++;
       // Can there be a case where reqs_sent == reqs_recv; and still this PE is in this for-loop?
@@ -320,17 +320,17 @@ start_component_labeling() {
   }
   // my PE is not sending any request
   if (reqs_sent == 0) {
-    CkPrintf("PE: %d is not sending any requests!\n", CkMyPe());
+    CkPrintf("PE: %d is not sending any requests!\n", myPE);
     for (int64_t i = 0; i < totalVerticesinPE; i++) {
       unionFindVertex *v = &myVertices[i];
       if (v->componentNumber == -1) {
         // I don't have my label; does my parent have it?
         std::pair<int64_t, int64_t> parent_loc = getLocationFromID(v->parent);
-        assert(parent_loc.first == CkMyPe());
+        assert(parent_loc.first == myPE);
         unionFindVertex *p = &myVertices[parent_loc.second];
         while (p->componentNumber == -1) {
           std::pair<int64_t, int64_t> gparent_loc = getLocationFromID(p->parent);
-          assert(gparent_loc.first == CkMyPe());
+          assert(gparent_loc.first == myPE);
           unionFindVertex *gp = &myVertices[gparent_loc.second];
           p = gp;
           // TODO: optimization possible here?
@@ -339,7 +339,7 @@ start_component_labeling() {
       }
     }
     CkCallback cb(CkReductionTarget(UnionFindLib, total_components), thisProxy[0]);
-    CkPrintf("PE: %d totalRoots: %lld\n", CkMyPe(), myLocalNumBosses);
+    CkPrintf("PE: %d totalRoots: %lld\n", myPE, myLocalNumBosses);
     contribute(sizeof(int64_t), &myLocalNumBosses, CkReduction::sum_long_long, cb);
   }
 
@@ -364,7 +364,7 @@ void UnionFindLib::need_label(int64_t req_vertex, int64_t parent_arrID)
       thisProxy[req_loc.first].recv_label(req_loc.second, p->componentNumber);
       break;
     }
-    else if (gparent_loc.first != CkMyPe()) {
+    else if (gparent_loc.first != myPE) {
       // parent's parent not in this PE; add it to the map, and do nothing
       assert(p->componentNumber == -1); // not yet received the componentID; would have already sent a request
       need_label_reqs[p->vertexID].push_back(req_vertex);
@@ -397,11 +397,11 @@ void UnionFindLib::recv_label(int64_t recv_vertex_arrID, int64_t labelID)
       if (v->componentNumber == -1) {
         // I don't have my label; does my parent have it?
         std::pair<int64_t, int64_t> parent_loc = getLocationFromID(v->parent);
-        assert(parent_loc.first == CkMyPe());
+        assert(parent_loc.first == myPE);
         unionFindVertex *p = &myVertices[parent_loc.second];
         while (p->componentNumber == -1) {
           std::pair<int64_t, int64_t> gparent_loc = getLocationFromID(p->parent);
-          assert(gparent_loc.first == CkMyPe());
+          assert(gparent_loc.first == myPE);
           unionFindVertex *gp = &myVertices[gparent_loc.second];
           p = gp;
           // TODO: optimization possible here?
@@ -410,7 +410,7 @@ void UnionFindLib::recv_label(int64_t recv_vertex_arrID, int64_t labelID)
       }
     }
     CkCallback cb(CkReductionTarget(UnionFindLib, total_components), thisProxy[0]);
-    CkPrintf("PE: %d totalRoots: %lld\n", CkMyPe(), myLocalNumBosses);
+    CkPrintf("PE: %d totalRoots: %lld\n", myPE, myLocalNumBosses);
     contribute(sizeof(int64_t), &myLocalNumBosses, CkReduction::sum_long_long, cb);
   }
 }
@@ -591,7 +591,7 @@ contribute_count() {
 
 void UnionFindLibGroup::
 done_profiling(int64_t total_count) {
-    if (CkMyPe() == 0) {
+    if (myPE == 0) {
         CkPrintf("Phase 1 profiling done. Total number of messages is : %ld\n", total_count);
         CkExit();
     }
