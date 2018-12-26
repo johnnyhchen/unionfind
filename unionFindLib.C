@@ -591,7 +591,7 @@ contribute_count() {
 
 void UnionFindLibGroup::
 done_profiling(int64_t total_count) {
-    if (myPE == 0) {
+    if (CkMyPe() == 0) {
         CkPrintf("Phase 1 profiling done. Total number of messages is : %ld\n", total_count);
         CkExit();
     }
