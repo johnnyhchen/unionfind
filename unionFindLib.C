@@ -152,7 +152,7 @@ anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx) {
       if (path_base_arrIdx != -1) {
         unionFindVertex *path_base = &myVertices[path_base_arrIdx];
         // TODO: all children are made to point to v; if it is not in this PE; wasted need_root() calls
-        local_path_compression(path_base, v);
+        // local_path_compression(path_base, v);
       }
       reqs_processed();
       return;
@@ -169,7 +169,7 @@ anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx) {
               unionFindVertex *path_base = &myVertices[path_base_arrIdx];
               // FIXME: what happens if w is not in this chare?
               // TODO: why should local_path_compression() be done only if v is in this PE?
-              local_path_compression(path_base, w->vertexID);
+              // local_path_compression(path_base, w->vertexID);
             }
             // start a new base since I am changing direction; can't carry the old one
             path_base_arrIdx = v_loc.second; 
@@ -217,7 +217,7 @@ anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx) {
         unionFindVertex *path_base = &myVertices[path_base_arrIdx];
         // Make all nodes point to this parent v
         // TODO: all children are made to point to v; if it is not in this PE; wasted need_root() calls
-        local_path_compression(path_base, v);
+        // local_path_compression(path_base, v);
       }
       w->parent = v;
       reqs_processed();
@@ -248,7 +248,7 @@ anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx) {
             unionFindVertex *path_base = &myVertices[path_base_arrIdx];
             // Make all nodes point to this parent w
             // assert (path_base->vertexID != w->vertexID);
-            local_path_compression(path_base, w->vertexID);
+            // local_path_compression(path_base, w->vertexID);
           }
           /*
           UnionFindLib *lc = thisProxy[w_parent_loc.first].ckLocal();
