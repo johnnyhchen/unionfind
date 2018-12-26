@@ -254,11 +254,17 @@ local_path_compression(int64_t compressedParent) {
           assert (otherArrIDx != -1);
           compressedParent = otherArrIDx;
         }
+        else {
+          compressedParent = pCP;
+        }
       }
       else {
         if (i == 0) {
           assert (otherArrIDx != -1);
           compressedParent = otherArrIDx;
+        }
+        else {
+          compressedParent = pCP;
         }
       }
       // CkPrintf("Look i: %d\n", i);
