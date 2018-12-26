@@ -105,26 +105,8 @@ recv_reqs_processed() {
 
 void UnionFindLib::
 union_request(int64_t v, int64_t w) {
-    /*
-    if (v < 0 || w < 0)
-      CkPrintf("v: %ld w: %ld\n", v, w);
-    */
-
     std::pair<int64_t, int64_t> w_loc = getLocationFromID(w);
-    
-    // std::pair<int, int> v_loc = getLocationFromID(v);
-    // CkPrintf("w_id: %ld v_id: %ld w: %d %d v: %d %d\n", w, v, w_loc.first, w_loc.second, v_loc.first, v_loc.second);
-    // message w to anchor to v
-    // assert(w_loc.first >= 0);
-    // assert(w_loc.first < CkNumPes());
-    // assert(w_loc.second >= 0 && w_loc.second < 64);
-    
-    /*
-    if (w_loc.first != 0)
-      CkPrintf("sending to PE: %d\n", w_loc.first);
-    */
     if (w_loc.first == CkMyPe()) {
-      // insertDataAnchor(d);
       anchor(w_loc.second, v, -1);
     }
     else {
