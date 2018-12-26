@@ -156,14 +156,16 @@ anchor(int64_t w_arrIdx, int64_t v) {
     // if (v_loc.first == thisIndex) {
     if (v_loc.first == CkMyPe()) {
       // vertex available locally, avoid extra message
+      /*
       if (path_base_arrIdx != -1) {
         // Have to change the direction; so compress path for w
         // unionFindVertex *path_base = &myVertices[path_base_arrIdx];
         // FIXME: what happens if w is not in this chare?
         // local_path_compression(path_base, w->vertexID);
       }
+      */
       // start a new base since I am changing direction; can't carry the old one
-      path_base_arrIdx = v_loc.second; 
+      // path_base_arrIdx = v_loc.second; 
       // anchor(v_loc.second, w->parent, path_base_arrIdx);
       // check if this is the first zig-zag that is happening?
       if (verticesToCompress[1] == -1) {
