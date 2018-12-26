@@ -250,7 +250,7 @@ local_path_compression(int64_t compressedParent) {
       // An infinite loop if this function is called on itself (a node which does not have itself as its parent)
       // can be because it ends up going to src->parent and the path is not defined from there; should add src->vertexID != compressedParent
       // should and must have the above clause too; else a node might end up declaring itself as the root!
-      while (src->parent != compressedParent) {
+      while (src->vertexID != compressedParent && /* TODO: not needed? */ src->parent != compressedParent) {
         // CkPrintf("Stuck here\n");
         tmp = &myVertices[getLocationFromID(src->parent).second];
         src->parent = compressedParent;
