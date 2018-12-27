@@ -24,6 +24,16 @@ struct anchorData {
 };
 #endif
 
+struct needRootData {
+  int64_t req_vertex;
+  int64_t parent_arrID;
+
+  void pup(PUP::er &p) {
+    p|req_vertex;
+    p|parent_arrID;
+  }
+};
+
 struct shortCircuitData {
     uint64_t arrIdx;
     uint64_t grandparentID;

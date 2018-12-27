@@ -53,7 +53,8 @@ class UnionFindLib : public CBase_UnionFindLib {
     uint64_t reqs_recv;
     std::map<int64_t, std::vector<int64_t> > need_label_reqs;
   public:
-    void need_label(int64_t req_vertex, int64_t parent_arrID);
+    //void need_label(int64_t req_vertex, int64_t parent_arrID);
+    void need_label(needRootData data);
     void recv_label(int64_t recv_vertex_arrID, int64_t labelID);
     void total_components(int64_t nComponents);
 

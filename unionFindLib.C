@@ -275,7 +275,11 @@ start_component_labeling() {
     }
     std::pair<int64_t, int64_t> parent_loc = getLocationFromID(v->parent);
     if (parent_loc.first != CkMyPe()) {
-      thisProxy[parent_loc.first].need_label(v->vertexID, parent_loc.second);
+      //thisProxy[parent_loc.first].need_label(v->vertexID, parent_loc.second);
+      needRootData d;
+      d.req_vertex = v->vertexID;
+      d.parent_arrID = parent_loc.second;
+      thisProxy[parent_loc.first].need_label(d);
       reqs_sent++;
       // Can there be a case where reqs_sent == reqs_recv; and still this PE is in this for-loop?
     }
@@ -312,10 +316,13 @@ start_component_labeling() {
   // }
 }
 
-void UnionFindLib::need_label(int64_t req_vertex, int64_t parent_arrID)
+//void UnionFindLib::need_label(int64_t req_vertex, int64_t parent_arrID)
+void UnionFindLib::need_label(needRootData data)
 {
   // Traverse through the path and add it to the map of the vertex whose parent is not in this PE
   // TODO: opportunity to do local path compression here
+  int64_t req_vertex = data.req_vertex;
+  int64_t parent_arrID = data.parent_arrID;
   while (1) {
     unionFindVertex *p = &myVertices[parent_arrID];
     std::pair<int64_t, int64_t> gparent_loc = getLocationFromID(p->parent);
