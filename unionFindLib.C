@@ -152,7 +152,13 @@ anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx) {
       if (path_base_arrIdx != -1) {
         unionFindVertex *path_base = &myVertices[path_base_arrIdx];
         // TODO: all children are made to point to v; if it is not in this PE; wasted need_root() calls
-        local_path_compression(path_base, v);
+        std::pair<int64_t, int64_t> v_loc = getLocationFromID(v);
+        if (v_loc.first == CkMyPe()) {
+          local_path_compression(path_base, v);
+        }
+        else {
+          local_path_compression(path_base, w->vertexID);
+        }
       }
       reqs_processed();
       return;
@@ -167,7 +173,6 @@ anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx) {
             if (path_base_arrIdx != -1) {
               // Have to change the direction; so compress path for w
               unionFindVertex *path_base = &myVertices[path_base_arrIdx];
-              // FIXME: what happens if w is not in this chare?
               // TODO: why should local_path_compression() be done only if v is in this PE?
               local_path_compression(path_base, w->vertexID);
             }
@@ -176,33 +181,6 @@ anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx) {
             // anchor(v_loc.second, w->parent, path_base_arrIdx);
             anchor(v_loc.second, w->parent, -1);
             return;
-        }
-        /*
-        else {
-          UnionFindLib *lc = thisProxy[v_loc.first].ckLocal();
-          if (lc != nullptr) {
-            // Moving away from this chare; see if local_path_compression should be done
-            // FIXME: still should be able to do local_compression within node, but across chares
-            if (path_base_arrIdx != -1) {
-              unionFindVertex *path_base = &myVertices[path_base_arrIdx];
-              local_path_compression(path_base, w->vertexID);
-            }
-            lc->anchor(v_loc.second, w->parent, -1);
-            return;
-          }
-        }
-        */
-        // assert(v_loc.first >= 0);
-        // assert(v_loc.first < CkNumPes());
-
-        /*
-        if (v_loc.first != 0)
-          CkPrintf("sending to PE: %d\n", v_loc.first);
-        */
-        // assert(v_loc.second >= 0 && v_loc.second < 64);
-        if (v_loc.first == CkMyPe()) {
-          anchor(v_loc.second, w->parent, -1);
-          // insertDataAnchor(d);
         }
         else {
           anchorData d;
@@ -217,7 +195,12 @@ anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx) {
         unionFindVertex *path_base = &myVertices[path_base_arrIdx];
         // Make all nodes point to this parent v
         // TODO: all children are made to point to v; if it is not in this PE; wasted need_root() calls
-        local_path_compression(path_base, v);
+        if (v_loc.first == CkMyPe()) {
+          local_path_compression(path_base, v);
+        }
+        else {
+          local_path_compression(path_base, w->vertexID);
+        }
       }
       w->parent = v;
       reqs_processed();
@@ -243,6 +226,10 @@ anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx) {
             return;
         }
         else {
+          anchorData d;
+          d.arrIdx = w_parent_loc.second;
+          d.v = v;
+          thisProxy[w_parent_loc.first].insertDataAnchor(d);
           // Moving away from this node; see if local_path_compression should be done
           if (path_base_arrIdx != -1) {
             unionFindVertex *path_base = &myVertices[path_base_arrIdx];
@@ -250,32 +237,6 @@ anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx) {
             // assert (path_base->vertexID != w->vertexID);
             local_path_compression(path_base, w->vertexID);
           }
-          /*
-          UnionFindLib *lc = thisProxy[w_parent_loc.first].ckLocal();
-          if (lc != nullptr) {
-            // FIXME: still should be able to do local_compression within node, but across chares
-            lc->anchor(w_parent_loc.second, v, -1);
-            return;
-          }
-          */
-        }
-        // assert(w_parent_loc.first >= 0);
-        // assert(w_parent_loc.first < CkNumPes());
-
-         // assert(w_parent_loc.second >= 0 && w_parent_loc.second < 64);
-        /*
-        if (w_parent_loc.first != 0)
-          CkPrintf("sending to PE: %d\n", w_parent_loc.first);
-        */
-        if (w_parent_loc.first == CkMyPe()) {
-          anchor(w_parent_loc.second, v, -1);
-          // insertDataAnchor(d);
-        }
-        else {
-          anchorData d;
-          d.arrIdx = w_parent_loc.second;
-          d.v = v;
-          thisProxy[w_parent_loc.first].insertDataAnchor(d);
         }
     }
 }
