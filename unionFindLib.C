@@ -195,6 +195,7 @@ anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx) {
         unionFindVertex *path_base = &myVertices[path_base_arrIdx];
         // Make all nodes point to this parent v
         // TODO: all children are made to point to v; if it is not in this PE; wasted need_root() calls
+        std::pair<int64_t, int64_t> v_loc = getLocationFromID(v);
         if (v_loc.first == CkMyPe()) {
           local_path_compression(path_base, v);
         }
