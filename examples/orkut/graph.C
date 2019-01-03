@@ -49,7 +49,7 @@ class Main : public CBase_Main {
         libProxy = UnionFindLib::unionFindInit();
         CkCallback cb(CkIndex_Main::done(), thisProxy);
         libProxy[0].register_phase_one_cb(cb);
-        tpProxy = CProxy_TreePiece::ckNew(inputFileName, num_treepieces);
+        tpProxy = CProxy_TreePiece::ckNew(inputFileName);
         // find first vertex ID on last chare
         // create a callback for library to inform application after
         // completing inverted tree construction
@@ -111,7 +111,7 @@ class TreePiece : public CBase_TreePiece {
         if (myID == (num_treepieces - 1)) {
           numMyVertices += num_vertices % num_treepieces;
         }
-        libPtr = libProxy[thisIndex].ckLocal();
+        libPtr = libProxy.ckLocalBranch();
         // only 1 chare in PE (group)
         libPtr->allocate_libVertices(numMyVertices, 1);
 
@@ -128,7 +128,8 @@ class TreePiece : public CBase_TreePiece {
             for (int i = 0; i < numMyVertices; i++)
                 CkPrintf("myVertices[%d] = id: %ld\n", i, myVertices[i].id);
         }*/
-        libPtr->initialize_vertices(numMyVertices, libVertices, 0 /*offset*/, 999999999 /*batchSize - need to turn off*/);
+        int64_t dummy = 0;
+        libPtr->initialize_vertices(numMyVertices, libVertices, dummy /*offset*/, 999999999 /*batchSize - need to turn off*/);
         int64_t offset = myID * (num_vertices / num_treepieces); /*the last PE might have different number of vertices*/;
         for (int64_t i = 0; i < numMyVertices; i++) {
           libVertices[i].vertexID = libVertices[i].parent = offset + i;
@@ -160,7 +161,7 @@ class TreePiece : public CBase_TreePiece {
     }
 
     void requestVertices() {
-        unionFindVertex *finalVertices = libPtr->return_vertices();
+        // unionFindVertex *finalVertices = libPtr->return_vertices();
         for (int i = 0; i < numMyVertices; i++) {
             //CkPrintf("[tp%d] myVertices[%d] - vertexID: %ld, parent: %ld, component: %d\n", thisIndex, i, finalVertices[i].vertexID, finalVertices[i].parent, finalVertices[i].componentNumber);
 #ifndef ANCHOR_ALGO

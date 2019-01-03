@@ -17,7 +17,6 @@ mainmodule graph {
 
     group TreePiece {
         entry TreePiece(std::string);
-        entry void initializeLibVertices();
         entry void doWork();
         entry void requestVertices();
         entry void getConnectedComponents();
