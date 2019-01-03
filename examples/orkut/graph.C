@@ -46,7 +46,7 @@ class Main : public CBase_Main {
             CkExit();
         }
         // TODO: need to remove passing tpProxy
-        libProxy = UnionFindLib::unionFindInit(tpProxy, num_treepieces);
+        libProxy = UnionFindLib::unionFindInit();
         CkCallback cb(CkIndex_Main::done(), thisProxy);
         libProxy[0].register_phase_one_cb(cb);
         tpProxy = CProxy_TreePiece::ckNew(inputFileName, num_treepieces);

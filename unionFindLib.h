@@ -65,6 +65,7 @@ class UnionFindLib : public CBase_UnionFindLib {
     }
     UnionFindLib(CkMigrateMessage *m) { }
     static CProxy_UnionFindLib unionFindInit(CkArrayID clientArray, int64_t n);
+    static CProxy_UnionFindLib unionFindInit();
     void register_phase_one_cb(CkCallback cb);
     // void initialize_vertices(unionFindVertex *appVertices, int numVertices);
     void allocate_libVertices(int64_t numVertices, int64_t nPe);

@@ -587,4 +587,17 @@ unionFindInit(CkArrayID clientArray, int64_t n) {
     return _UfLibProxy;
 }
 
+// library initialization function for group
+CProxy_UnionFindLib UnionFindLib::
+unionFindInit() {
+    /*  
+    CkArrayOptions opts(n);
+    opts.bindTo(clientArray);
+    */
+    _UfLibProxy = CProxy_UnionFindLib::ckNew();
+
+    // create prefix library array here, prefix library is used in Phase 1B
+    // Binding order: prefix -> unionFind -> app array
+    return _UfLibProxy;
+}
 #include "unionFindLib.def.h"
