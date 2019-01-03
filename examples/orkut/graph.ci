@@ -1,0 +1,29 @@
+mainmodule graph {
+    extern module unionFindLib;
+   
+    readonly CProxy_UnionFindLib libProxy;
+    readonly CProxy_Main mainProxy;
+    readonly int64_t num_vertices;
+    readonly int64_t num_edges;
+    readonly int64_t num_treepieces;
+
+    mainchare Main {
+        entry Main(CkArgMsg *m);
+        entry [reductiontarget] void startWork();
+        entry void done();
+        entry void doneFindComponents();
+        entry [reductiontarget] void donePrinting();
+    }
+
+    group TreePiece {
+        entry TreePiece(std::string);
+        entry void initializeLibVertices();
+        entry void doWork();
+        entry void requestVertices();
+        entry void getConnectedComponents();
+        entry void test();
+    }
+
+    //array[1D] UnionFindLib;
+
+}
