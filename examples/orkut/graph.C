@@ -164,13 +164,6 @@ class TreePiece : public CBase_TreePiece {
         // unionFindVertex *finalVertices = libPtr->return_vertices();
         for (int i = 0; i < numMyVertices; i++) {
             //CkPrintf("[tp%d] myVertices[%d] - vertexID: %ld, parent: %ld, component: %d\n", thisIndex, i, finalVertices[i].vertexID, finalVertices[i].parent, finalVertices[i].componentNumber);
-#ifndef ANCHOR_ALGO
-            if (finalVertices[i].parent != -1 && finalVertices[i].componentNumber == -1) {
-#else
-            if (finalVertices[i].parent != finalVertices[i].vertexID && finalVertices[i].componentNumber == -1) {
-#endif
-                CkAbort("Something wrong in inverted-tree construction!\n");
-            }
         }
         contribute(CkCallback(CkReductionTarget(Main, donePrinting), mainProxy));
     }
