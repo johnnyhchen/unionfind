@@ -111,6 +111,7 @@ union_request(int64_t v, int64_t w) {
     */
 
     std::pair<int64_t, int64_t> w_loc = getLocationFromID(w);
+    // assert ((w_loc.first * (3072441 / 4) + w_loc.second) == w);
     
     // std::pair<int, int> v_loc = getLocationFromID(v);
     // CkPrintf("w_id: %ld v_id: %ld w: %d %d v: %d %d\n", w, v, w_loc.first, w_loc.second, v_loc.first, v_loc.second);
@@ -131,6 +132,7 @@ union_request(int64_t v, int64_t w) {
       anchorData d;
       d.arrIdx = w_loc.second;
       d.v = v;
+      // CkPrintf("Sending message to PE: %d\n", w_loc.first);
       thisProxy[w_loc.first].insertDataAnchor(d);
     }
 }
@@ -201,6 +203,12 @@ anchor(int64_t w_arrIdx, int64_t v, int64_t path_base_arrIdx) {
             if (path_base_arrIdx == -1) {
               // Start from w; a wasted call if there is only one node and its child in the PE
               std::pair<int64_t, int64_t> w_loc = getLocationFromID(w->vertexID);
+              /*
+              if (w_loc.second != w_arrIdx) {
+                CkPrintf("myPE: %d vertexID: %ld w_loc.first: %ld w_loc.second: %ld w_arrIdx: %ld\n", CkMyPe(), w->vertexID, w_loc.first, w_loc.second, w_arrIdx);
+              }
+              */
+              assert(w_loc.second == w_arrIdx); 
               path_base_arrIdx = w_loc.second;
               assert(path_base_arrIdx == w_arrIdx); 
             }
@@ -326,7 +334,7 @@ void UnionFindLib::need_label(needRootData data)
   while (1) {
     unionFindVertex *p = &myVertices[parent_arrID];
     std::pair<int64_t, int64_t> gparent_loc = getLocationFromID(p->parent);
-    if (p->parent == p->vertexID) {
+    if (p->parent == p->vertexID || p->componentNumber != -1 /* I already have my componentNumber? TODO: check*/) {
       // found the component number; reply back to the requestor
       assert(p->componentNumber != -1);
       std::pair<int64_t, int64_t> req_loc = getLocationFromID(req_vertex);

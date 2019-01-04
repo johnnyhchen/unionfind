@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <iostream>
 #include "unionFindLib.h"
 #include "graph.decl.h"
@@ -16,7 +17,7 @@ class Main : public CBase_Main {
     double startTime;
     public:
     Main(CkArgMsg *m) {
-        if (m->argc != 3) {
+        if (m->argc != 2) {
             CkPrintf("Usage: ./graph <input_file>\n");
             CkExit();
         }
@@ -24,17 +25,23 @@ class Main : public CBase_Main {
         FILE *fp = fopen(inputFileName.c_str(), "r");
         char line[256];
         fgets(line, sizeof(line), fp);
+        fgets(line, sizeof(line), fp);
+        fgets(line, sizeof(line), fp);
         line[strcspn(line, "\n")] = 0;
 
         std::vector<std::string> params;
         split(line, ' ', &params);
 
-        if (params.size() != 3) {
+        if (params.size() != 5) {
             CkAbort("Insufficient number of params provided in .g file\n");
         }
 
-        num_vertices = std::stoi(params[0].substr(strlen("Vertices:")));
-        num_edges = std::stoi(params[1].substr(strlen("Edges:")));
+        //num_vertices = std::stoi(params[0].substr(strlen("Nodes:")));
+        //num_edges = std::stoi(params[1].substr(strlen("Edges:")));
+        num_vertices = std::stoi(params[2]);
+        num_edges = std::stoi(params[4]);
+        CkPrintf("num_vertices: %ld num_edges: %ld\n", num_vertices, num_edges);
+        // CkExit();
         //num_treepieces = std::stoi(params[2].substr(strlen("Treepieces:")));
         num_treepieces = CkNumPes();
         num_local_vertices = num_vertices / num_treepieces;
@@ -76,6 +83,7 @@ class Main : public CBase_Main {
         CkPrintf("[Main] Components identified, prune unecessary ones now\n");
         CkPrintf("[Main] Components detection time: %f\n", CkWallTimer()-startTime);
         // callback for library to report to after pruning
+        CkExit();
         CkCallback cb(CkIndex_TreePiece::requestVertices(), tpProxy);
         libProxy.prune_components(1, cb);
     }
@@ -133,7 +141,10 @@ class TreePiece : public CBase_TreePiece {
         int64_t offset = myID * (num_vertices / num_treepieces); /*the last PE might have different number of vertices*/;
         for (int64_t i = 0; i < numMyVertices; i++) {
           libVertices[i].vertexID = libVertices[i].parent = offset + i;
-        }
+          std::pair<int64_t, int64_t> w_id = getLocationFromID(libVertices[i].vertexID);
+          assert (w_id.first == myID);
+          assert (w_id.second == i);
+       }
 
 
         // reset input_file pointer
@@ -156,6 +167,7 @@ class TreePiece : public CBase_TreePiece {
         // vertices and edges populated, now fire union requests
         for (int i = 0; i < library_requests.size(); i++) {
             std::pair<int64_t, int64_t> req = library_requests[i];
+            // CkPrintf("PE: %d union(%ld %ld)\n", CkMyPe(), req.first, req.second);
             libPtr->union_request(req.first, req.second);
         }
     }
@@ -197,14 +209,31 @@ TreePiece::getLocationFromID(long int vid) {
 
 std::pair<int64_t, int64_t>
 TreePiece::getLocationFromID(int64_t vid) {
-  int64_t chareIdx = vid / num_treepieces;
-  int64_t arrIdx = vid % num_treepieces;
+  // int64_t vRatio = num_vertices / num_treepieces;
+  // CkPrintf("Req for vid: %ld num_local_vertices: %ld\n", vid, num_local_vertices);
+  int64_t chareIdx = vid / num_local_vertices;
+  int64_t arrIdx = vid % num_local_vertices;
+  /*
   if (chareIdx == num_treepieces) {
     chareIdx--;
     if (vid >= num_local_vertices * num_treepieces) {
       arrIdx += num_local_vertices;
     }
   }
+  */
+  if (vid >= num_local_vertices * num_treepieces) {
+    arrIdx = vid - (num_local_vertices * (num_treepieces - 1));
+    // arrIdx += num_local_vertices;
+    chareIdx = num_treepieces - 1;
+  }
+  // CkPrintf("vid: %ld chareIdx: %ld arrIdx: %ld\n", vid, chareIdx, arrIdx);
+  /*
+  if (arrIdx > 768111) {
+    // CkPrintf("", CkMyPe(), chareIdx, arrIdx);
+    CkPrintf("PE: %d vid: %ld chareIdx: %ld arrIdx: %ld\n", CkMyPe(), vid, chareIdx, arrIdx);
+    CkExit();
+  }
+  */
   return std::make_pair(chareIdx, arrIdx);
 }
 

@@ -25,7 +25,7 @@ struct proteinVertex {
 void seekToLine(FILE *fp, long int lineNum);
 std::pair<long int, long int> ReadEdge(FILE *fp); 
 proteinVertex ReadVertex(FILE *fp);
-
+// int64_t max = -1;
 
 void populateMyVertices(std::vector<proteinVertex>& myVertices, int nVertices, int nChares, int chareIdx, FILE *fp) {
     int startVid = chareIdx + 1;
@@ -48,20 +48,19 @@ void populateMyVertices(std::vector<proteinVertex>& myVertices, int nVertices, i
     }
 }
 
-void populateMyEdges(std::vector< std::pair<long int, long int> > *myEdges, int nMyEdges, int eRatio, int chareIdx, FILE *fp, int totalNVertices) {
+void populateMyEdges(std::vector< std::pair<int64_t, int64_t> > *myEdges, int64_t nMyEdges, int64_t eRatio, int chareIdx, FILE *fp, int64_t totalNVertices) {
    int startEid = (eRatio * chareIdx) + 1;
-#ifdef USE_PROTEIN   
-   long int lineNum = startEid + totalNVertices + 3; //3 starting lines
-#endif
-#ifdef USE_SAMPLE
-   long int lineNum = startEid + totalNVertices + 20 + 1;
-#endif
+   int64_t lineNum = startEid + 4; // 4 starting lines
    //printf("[%d]lineNum : %ld\n", chareIdx, lineNum);
    seekToLine(fp, lineNum);
    for (int i = 0; i < nMyEdges; i++) {
-       std::pair<long int, long int> edge = ReadEdge(fp);
+       std::pair<int64_t, int64_t> edge = ReadEdge(fp);
+       edge.first--;
+       edge.second--;
+       // CkPrintf("id: %d, <%ld %ld>\n", chareIdx, edge.first, edge.second);
        myEdges->push_back(edge);
    }
+   // CkPrintf("PE: %ld max: %ld\n", chareIdx, max);
 }
 
 void seekToLine(FILE *fp, long int lineNum) {
@@ -146,21 +145,26 @@ std::pair<long int, long int> ReadEdge(FILE *fp) {
     line[strcspn(line, "\n")] = 0;
 
     std::vector<std::string> edgeFields;
-    split(line, ' ', &edgeFields);
+    split(line, '\t', &edgeFields);
 
     // error check for protein files
     /*if (edgeFields.size() != 4 || edgeFields[0] != "u") {
         printf("Error in edge format\nObtained edge: %s\n", line);
         exit(0);
     }*/
+    /*
     if (edgeFields.size() != 4 || (edgeFields[0] != "e" && edgeFields[0] != "u")) {
         printf("Error in edge format\nObtained edge: %s\n", line);
         exit(0);
     }
+    */
 
-    std::pair<long int,long int> newEdge;
-    newEdge.first = stol(edgeFields[1]);
-    newEdge.second = stol(edgeFields[2]);
+    // printf("Error in edge format\nObtained edge: %s <%s %s> params.size: %d\n", line, edgeFields[0].c_str(), edgeFields[1].c_str(), edgeFields.size());
+    std::pair<int64_t, int64_t> newEdge;
+    newEdge.first = stol(edgeFields[0]);
+    newEdge.second = stol(edgeFields[1]);
+    // if (newEdge.first > max) max = newEdge.first;
+    // if (newEdge.second > max) max = newEdge.second;
 
     return newEdge;
 }

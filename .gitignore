@@ -1,3 +1,4 @@
+*.log
 #Ignore objects and archives
 *.[oad]
 
