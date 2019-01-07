@@ -21,6 +21,7 @@ class Main : public CBase_Main {
             CkPrintf("Usage: ./graph <input_file>\n");
             CkExit();
         }
+        assert(0);
         std::string inputFileName(m->argv[1]);
         FILE *fp = fopen(inputFileName.c_str(), "r");
         char line[256];
