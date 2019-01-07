@@ -374,7 +374,7 @@ void UnionFindLib::need_label(int64_t req_vertex, int64_t parent_arrID)
   while (1) {
     unionFindVertex *p = &myVertices[parent_arrID];
     std::pair<int64_t, int64_t> gparent_loc = getLocationFromID(p->parent);
-    if (p->parent == p->vertexID) {
+    if (p->parent == p->vertexID || p->componentNumber != -1 /* I already have my componentNumber? TODO: check*/) {
       // found the component number; reply back to the requestor
       assert(p->componentNumber != -1);
       std::pair<int64_t, int64_t> req_loc = getLocationFromID(req_vertex);
@@ -634,5 +634,17 @@ unionFindInit(CkArrayID clientArray, int64_t n) {
     libGroupID = CProxy_UnionFindLibGroup::ckNew();
     return _UfLibProxy;
 }
+// library initialization function for group
+CProxy_UnionFindLib UnionFindLib::
+unionFindInit() {
+  /*
+   *     CkArrayOptions opts(n);
+   *         opts.bindTo(clientArray);
+   *             */
+  _UfLibProxy = CProxy_UnionFindLib::ckNew();
 
+  // create prefix library array here, prefix library is used in Phase 1B
+  //     // Binding order: prefix -> unionFind -> app array
+  return _UfLibProxy;
+}
 #include "unionFindLib.def.h"
