@@ -15,4 +15,6 @@ charmrun
 
 #ignore old and backup files
 old_charm/
+traces/
+traces_stride/
 *.bkp

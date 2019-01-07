@@ -21,7 +21,7 @@ class Main : public CBase_Main {
             CkPrintf("Usage: ./graph <input_file>\n");
             CkExit();
         }
-        assert(0);
+        // assert(0);
         std::string inputFileName(m->argv[1]);
         FILE *fp = fopen(inputFileName.c_str(), "r");
         char line[256];
@@ -117,8 +117,13 @@ class TreePiece : public CBase_TreePiece {
         input_file = fopen(filename.c_str(), "r");
         myID = CkMyPe();
         numMyVertices = num_vertices / num_treepieces;
+        /*
         if (myID == (num_treepieces - 1)) {
           numMyVertices += num_vertices % num_treepieces;
+        }
+        */
+        if ((myID + 1) <= (num_vertices % num_treepieces)) {
+          numMyVertices++;
         }
         libPtr = libProxy.ckLocalBranch();
         // only 1 chare in PE (group)
@@ -140,10 +145,13 @@ class TreePiece : public CBase_TreePiece {
         int64_t dummy = 0;
         libPtr->initialize_vertices(numMyVertices, libVertices, dummy /*offset*/, 999999999 /*batchSize - need to turn off*/);
         int64_t offset = myID * (num_vertices / num_treepieces); /*the last PE might have different number of vertices*/;
+        int64_t startID = myID;
         for (int64_t i = 0; i < numMyVertices; i++) {
-          libVertices[i].vertexID = libVertices[i].parent = offset + i;
+          libVertices[i].vertexID = libVertices[i].parent = startID;
+          startID += num_treepieces;
           std::pair<int64_t, int64_t> w_id = getLocationFromID(libVertices[i].vertexID);
-          assert (w_id.first == myID);
+          // assert (w_id.first == myID);
+          // CkPrintf("vertexID: %ld i: %ld w_id.second: %ld\n", libVertices[i].vertexID, i, w_id.second);
           assert (w_id.second == i);
        }
 
@@ -212,8 +220,8 @@ std::pair<int64_t, int64_t>
 TreePiece::getLocationFromID(int64_t vid) {
   // int64_t vRatio = num_vertices / num_treepieces;
   // CkPrintf("Req for vid: %ld num_local_vertices: %ld\n", vid, num_local_vertices);
-  int64_t chareIdx = vid / num_local_vertices;
-  int64_t arrIdx = vid % num_local_vertices;
+  int64_t chareIdx = vid % num_treepieces;
+  int64_t arrIdx = vid / num_treepieces;
   /*
   if (chareIdx == num_treepieces) {
     chareIdx--;
@@ -222,11 +230,13 @@ TreePiece::getLocationFromID(int64_t vid) {
     }
   }
   */
+  /*
   if (vid >= num_local_vertices * num_treepieces) {
     arrIdx = vid - (num_local_vertices * (num_treepieces - 1));
     // arrIdx += num_local_vertices;
     chareIdx = num_treepieces - 1;
   }
+  */
   // CkPrintf("vid: %ld chareIdx: %ld arrIdx: %ld\n", vid, chareIdx, arrIdx);
   /*
   if (arrIdx > 768111) {

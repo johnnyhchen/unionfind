@@ -6,9 +6,9 @@ PREFIX_LIB_DIR = $(UNION_FIND_DIR)/prefixLib
 #charmc options
 ANCHOR= -DANCHOR_ALGO
 #ANCHOR= 
-PROFILE= -DPROFILING -DNDEBUG
-CHARMC = $(CHARM_DIR)/bin/charmc $(ANCHOR) $(PROFILE)
-OPTS = -std=c++11 -O0 -g -DNDEBUG
+PROFILE= -DPROFILING
+CHARMC = $(CHARM_DIR)/bin/charmc -tracemode projections $(ANCHOR) $(PROFILE)
+OPTS = -std=c++11 -O0 -g -tracemode projections
 LD_OPTS =
 
 #options for building union-find library and prefix library
