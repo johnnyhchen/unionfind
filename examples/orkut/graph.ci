@@ -7,6 +7,7 @@ mainmodule graph {
     readonly int64_t num_edges;
     readonly int64_t num_treepieces;
     readonly int64_t num_local_vertices;
+    readonly int64_t edge_batch_size;
 
     mainchare Main {
         entry Main(CkArgMsg *m);
@@ -14,6 +15,7 @@ mainmodule graph {
         entry void done();
         entry void doneFindComponents();
         entry [reductiontarget] void donePrinting();
+        entry void donePrepareFindComponents();
     }
 
     group TreePiece {

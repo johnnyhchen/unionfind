@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <iostream>
+#include <math.h>
 #include "unionFindLib.h"
 #include "graph.decl.h"
 #include "graph-io.h"
@@ -11,18 +12,23 @@
 /*readonly*/ int64_t num_edges;
 /*readonly*/ int64_t num_treepieces;
 /*readonly*/ int64_t num_local_vertices;
+/*readonly*/ int64_t edge_batch_size;
 
 class Main : public CBase_Main {
     CProxy_TreePiece tpProxy;
     double startTime;
+    int64_t max_local_edges;
+    int64_t ebatchNo;
+    int64_t num_edge_batches;
     public:
     Main(CkArgMsg *m) {
-        if (m->argc != 2) {
-            CkPrintf("Usage: ./graph <input_file>\n");
+        if (m->argc != 3) {
+            CkPrintf("Usage: ./graph <input_file> <edge_batch_size> \n");
             CkExit();
         }
         // assert(0);
         std::string inputFileName(m->argv[1]);
+        edge_batch_size = atol(m->argv[2]);
         FILE *fp = fopen(inputFileName.c_str(), "r");
         char line[256];
         fgets(line, sizeof(line), fp);
@@ -46,6 +52,8 @@ class Main : public CBase_Main {
         //num_treepieces = std::stoi(params[2].substr(strlen("Treepieces:")));
         num_treepieces = CkNumPes();
         num_local_vertices = num_vertices / num_treepieces;
+        max_local_edges = (int64_t) ceil(num_edges / num_treepieces);
+        num_edge_batches = (int64_t) ceil(max_local_edges / edge_batch_size);
 
         fclose(fp);
 
@@ -64,29 +72,45 @@ class Main : public CBase_Main {
     }
 
     void startWork() {
-        CkPrintf("[Main] Library array with %d chares created and proxy obtained\n", num_treepieces);
+        CkPrintf("[Main] Library array with %d chares created and proxy obtained max_local_edges: %ld num_edge_batches: %ld\n", num_treepieces, max_local_edges, num_edge_batches);
         startTime = CkWallTimer();
+        ebatchNo = 1;
         tpProxy.doWork();
     }
 
     void done() {
-        CkPrintf("[Main] Inverted trees constructed. Notify library to perform components detection\n");
-        CkPrintf("[Main] Tree construction time: %f\n", CkWallTimer()-startTime);
+        // CkPrintf("[Main] Inverted trees constructed. Notify library to perform components detection\n");
+        // CkPrintf("[Main] Tree construction time: %f\n", CkWallTimer()-startTime);
         // callback for library to inform application after completing
         // connected components detection
-        CkCallback cb(CkIndex_Main::doneFindComponents(), thisProxy);
+        CkPrintf("Done tree construction batchNo: %ld\n", ebatchNo);
+        CkCallback cb(CkIndex_Main::donePrepareFindComponents(), thisProxy);
         //CkCallback cb(CkIndex_TreePiece::requestVertices(), tpProxy); //tmp, for debugging
-        startTime = CkWallTimer();
-        libProxy.find_components(cb);
+        //startTime = CkWallTimer();
+        libProxy.prepare_for_component_labeling(cb);
+    }
+
+    void donePrepareFindComponents() {
+        CkPrintf("Done prepare for component labeling batchNo: %ld\n", ebatchNo);
+        CkCallback cb(CkIndex_Main::doneFindComponents(), thisProxy);
+        libProxy.inter_start_component_labeling(cb);
     }
 
     void doneFindComponents() {
+      if (ebatchNo <= num_edge_batches) {
+        CkPrintf("Done component labeling batchNo: %ld\n", ebatchNo);
+        ebatchNo++;
+        CkCallback cb(CkIndex_Main::done(), thisProxy);
+        libProxy[0].register_phase_one_cb(cb);
+        tpProxy.doWork();
+      }
+      else {
         CkPrintf("[Main] Components identified, prune unecessary ones now\n");
-        CkPrintf("[Main] Components detection time: %f\n", CkWallTimer()-startTime);
-        // callback for library to report to after pruning
+        CkPrintf("[Main] Tree construction + components detection time: %f\n", CkWallTimer() - startTime);
         CkExit();
         CkCallback cb(CkIndex_TreePiece::requestVertices(), tpProxy);
         libProxy.prune_components(1, cb);
+      }
     }
 
     void donePrinting() {
@@ -106,6 +130,7 @@ class TreePiece : public CBase_TreePiece {
     FILE *input_file;
     UnionFindLib *libPtr;
     unionFindVertex *libVertices;
+    int64_t edgesProcessed;
 
     public:
     // function that must be always defined by application
@@ -114,6 +139,7 @@ class TreePiece : public CBase_TreePiece {
     static std::pair<int64_t, int64_t> getLocationFromID(int64_t vid);
     
     TreePiece(std::string filename) {
+        edgesProcessed = 0;
         input_file = fopen(filename.c_str(), "r");
         myID = CkMyPe();
         numMyVertices = num_vertices / num_treepieces;
@@ -165,6 +191,7 @@ class TreePiece : public CBase_TreePiece {
         }
         populateMyEdges(&library_requests, numMyEdges, (num_edges/num_treepieces), thisIndex, input_file, num_vertices);
         libPtr->registerGetLocationFromID(getLocationFromID);
+        CkPrintf("Finished reading my part of the file: %d\n", CkMyPe());
         contribute(CkCallback(CkReductionTarget(Main, startWork), mainProxy));
     }
 
@@ -173,12 +200,15 @@ class TreePiece : public CBase_TreePiece {
 
 
     void doWork() {
-        // vertices and edges populated, now fire union requests
-        for (int i = 0; i < library_requests.size(); i++) {
-            std::pair<int64_t, int64_t> req = library_requests[i];
-            // CkPrintf("PE: %d union(%ld %ld)\n", CkMyPe(), req.first, req.second);
-            libPtr->union_request(req.first, req.second);
+      // vertices and edges populated, now fire union requests
+      for (int64_t i = 0; edgesProcessed < library_requests.size(); edgesProcessed++, i++) {
+        if (i == edge_batch_size) {
+          break;
         }
+        std::pair<int64_t, int64_t> req = library_requests[edgesProcessed];
+        // CkPrintf("PE: %d union(%ld %ld)\n", CkMyPe(), req.first, req.second);
+        libPtr->union_request(req.first, req.second);
+      }
     }
 
     void requestVertices() {
