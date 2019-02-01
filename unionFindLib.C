@@ -111,6 +111,13 @@ union_request(int64_t v, int64_t w) {
     */
 
     std::pair<int64_t, int64_t> w_loc = getLocationFromID(w);
+    std::pair<int64_t, int64_t> v_loc = getLocationFromID(v);
+
+    if(myVertices[w_loc.second].componentNumber != -1 && myVertices[v_loc.second].componentNumber != -1 && (myVertices[w_loc.second].componentNumber == myVertices[v_loc.second].componentNumber)) {
+      // the edge can be safely dropped
+      return;
+    }
+
     // assert ((w_loc.first * (3072441 / 4) + w_loc.second) == w);
     
     // std::pair<int, int> v_loc = getLocationFromID(v);
