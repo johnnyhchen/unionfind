@@ -5,6 +5,26 @@
 /*readonly*/ CProxy_UnionFindLib _UfLibProxy;
 /*readonly*/ CProxy_Prefix prefixLibArray;
 /*readonly*/ CkGroupID libGroupID;
+/*readonly*/ CProxy_UnionFindLibCache _UfLibProxyCache;
+/*readonly*/ CkCallback initDoneCacheCb;
+
+UnionFindLib::
+UnionFindLib() {
+      reqs_sent = 0;
+      reqs_recv = 0;
+      resetData = false;
+      CkPrintf("PE: %d myVertices.size(): %d myVerticesAddress: %p address from cache: %p cache proxy id: %d x_address: %p nodeId: %d\n", CkMyPe(), myVertices.size(), &myVertices, _UfLibProxyCache.ckLocalBranch()->myVertices, _UfLibProxyCache, &(_UfLibProxyCache.ckLocalBranch()->x), CmiPhysicalNodeID(CkMyPe()));
+      // myVertices =  (_UfLibProxyCache.ckLocalBranch()->myVertices);
+      contribute(CkCallback(CkReductionTarget(UnionFindLib, doneProxyCreation), thisProxy[0]));
+      // contribute();
+}
+
+std::vector<unionFindVertex>& UnionFindLib::
+ret_NodeMyVertices() 
+{
+  // CkPrintf("PE: %d myVerticesAddress from cache pointer: %p\n", CkMyPe(), myVertices.size(), _UfLibProxyCache.ckLocalBranch()->myVertices);
+  return _UfLibProxyCache.ckLocalBranch()->myVertices;
+}
 
 // class function implementations
 void UnionFindLib::
@@ -25,7 +45,13 @@ void UnionFindLib::
 allocate_libVertices(int64_t numVertices, int64_t nPe)
 {
   // assert (myVertices.size() == 0);
+  // _UfLibProxyCache.ckLocalBranch()->nPesinNode = _nPesinNode;
+  //CkPrintf("PE: %d, calling allocate numVertices: %ld nPe: %ld\n", CkMyPe(), numVertices, nPe);
   numCharesinPe = nPe;
+  //CkPrintf("PE: %d, calling allocate for: %ld\n", CkMyPe(), (numVertices * numCharesinPe));
+  //CkPrintf("PE: %d, calling allocate for: %ld myVertices address from cache: %p\n", CkMyPe(), (numVertices * numCharesinPe), _UfLibProxyCache.ckLocalBranch()->myVertices);
+  //CkPrintf("PE: %d, calling allocate for: %ld myVertices address: %p\n", CkMyPe(), (numVertices * numCharesinPe), &myVertices);
+  //CkPrintf("PE: %d, calling allocate for: %ld myVertices.size(): %ld\n", CkMyPe(), (numVertices * numCharesinPe), myVertices.size());
   if (CkMyPe() == 0) {
     CkPrintf("Trying to allocate myVertices in library size: %lf GB myPE: %d elements: %ld numVertices in each chare: %ld numCharesinPe: %ld\n", (double)(sizeof(unionFindVertex) * numVertices * numCharesinPe) / (1024 * 1024 * 1024), CkMyPe(), (numVertices * numCharesinPe), numVertices, numCharesinPe);
   }   
@@ -39,12 +65,41 @@ allocate_libVertices(int64_t numVertices, int64_t nPe)
   }
   totalVerticesinPE = myVertices.size();
   assert(totalVerticesinPE == (numVertices * numCharesinPe));
-  // CkPrintf("PE: %d, calling allocate for: %ld\n", CkMyPe(), (numVertices * numCharesinPe));
+  //CkPrintf("PE: %d, calling allocate for: %ld myVertices.size(): %ld\n", CkMyPe(), (numVertices * numCharesinPe), myVertices.size());
 }
 
+// Called only by rank-0 PE in the node
+/*
+void UnionFindLib::
+allocate_libVertices_perNode(int64_t numVertices, int64_t nPe)
+{
+  // assert (myVertices.size() == 0);
+  // numCharesinPe = nPe;
+  numPEsinNode = nPe;
+  if (CkMyPe() == 0) {
+    CkPrintf("Trying to allocate myVertices in library size: %lf GB myPE: %d elements: %ld numVertices in each chare: %ld numPEsinNode: %ld\n", (double)(sizeof(unionFindVertex) * numVertices * numPEsinNode) / (1024 * 1024 * 1024), CkMyPe(), (numVertices * numPEsinNode), numVertices, numPEsinNode);
+  }
+  
+  try {
+    // myVertices = new unionFindVertex[numVertices * numCharesinPe];
+    myVertices.resize((numVertices * numPEsinNode));
+  }
+  catch (const std::bad_alloc& ba) {
+    ckout << "mem alloc error in library: " << ba.what() << endl;
+    CkExit();
+  }
+  totalVerticesinNode = myVertices.size();
+  assert(totalVerticesinNode == (numVertices * numPEsinNode));
+  // CkPrintf("PE: %d, calling allocate for: %ld\n", CkMyPe(), (numVertices * numCharesinPe));
+}
+*/
 // batchSize should be -1 if all the union_requests are to be handled at once
+// offset should be according to the rank of the PE in the node
 void UnionFindLib::
 initialize_vertices(int64_t numVertices, unionFindVertex* &appVertices, int64_t &offset, int64_t bs) {
+    CkPrintf("PE: %d initialize_vertices()\n", CkMyPe());
+    CkPrintf("PE: %d initialize_vertices() myVertices.size() from cache proxy: %d\n", CkMyPe(), _UfLibProxyCache.ckLocalBranch()->myVertices.size());
+    CkPrintf("PE: %d initialize_vertices() myVertices.size(): %d\n", CkMyPe(), myVertices.size());
     batchSize = bs;
     totalReqsPerBatch = batchSize * numCharesinPe;
     thresholdReqs = totalReqsPerBatch / CkNumPes();
@@ -61,15 +116,18 @@ initialize_vertices(int64_t numVertices, unionFindVertex* &appVertices, int64_t 
     }
     else {
       // The application provides the offset; application's main chare has already called allocate_libVertices()
-      /*
+      
       if ((offset + numMyVertices) > myVertices.size()) {
         CkPrintf("offset: %ld numMyVertices: %ld myVertices.size(): %d\n", offset, numMyVertices, myVertices.size());
       }
+      /*
       CkPrintf("offset: %ld numMyVertices: %ld myVertices.size(): %d\n", offset, numMyVertices, myVertices.size());
       */
+      
       assert ((offset + numMyVertices) <= myVertices.size());
       appVertices = &myVertices[offset];
     }
+    _UfLibProxyCache.ckLocalBranch()->offsets[CkMyPe()] = offset;
 }
 
 void UnionFindLib::
@@ -93,10 +151,12 @@ reqs_processed() {
 // Only on node 0
 void UnionFindLib::
 recv_reqs_processed() {
+  // FIXME: disabling batching temporarily
+  return;
   totalReqsProcessed += thresholdReqs;
   double th = 0.5 * totalReqsPerBatch * batchNo; // How many requests should have been processed till now
   if (totalReqsProcessed > th) {
-    // CkPrintf("Batch: %ld done totalReqsProcessed: %ld\n", batchNo, totalReqsProcessed);
+    CkPrintf("Batch: %ld done totalReqsProcessed: %ld th: %lf thresholdReqs: %ld\n", batchNo, totalReqsProcessed, th, thresholdReqs);
     batchNo++;
     // Broadcast a message to all application PEs using a callback
     batchCb.send();
@@ -113,10 +173,13 @@ union_request(int64_t v, int64_t w) {
     std::pair<int64_t, int64_t> w_loc = getLocationFromID(w);
     std::pair<int64_t, int64_t> v_loc = getLocationFromID(v);
 
+    // FIXME: bug - need to poll v & w if they are in same PE
+    /*
     if(myVertices[w_loc.second].componentNumber != -1 && myVertices[v_loc.second].componentNumber != -1 && (myVertices[w_loc.second].componentNumber == myVertices[v_loc.second].componentNumber)) {
       // the edge can be safely dropped
       return;
     }
+    */
 
     // assert ((w_loc.first * (3072441 / 4) + w_loc.second) == w);
     
@@ -131,6 +194,7 @@ union_request(int64_t v, int64_t w) {
     if (w_loc.first != 0)
       CkPrintf("sending to PE: %d\n", w_loc.first);
     */
+    CkPrintf("Union request v: %ld w: %ld CkMyPe(): %d w_loc.first: %ld\n", v, w, CkMyPe(), w_loc.first);
     if (w_loc.first == CkMyPe()) {
       // insertDataAnchor(d);
       anchor(w_loc.second, v, -1);
@@ -785,28 +849,89 @@ done_profiling(int64_t total_count) {
 
 // library initialization function
 CProxy_UnionFindLib UnionFindLib::
-unionFindInit(CkArrayID clientArray, int64_t n) {
+unionFindInit(CkArrayID clientArray, int64_t n, CkCallback _cb) {
+    libProxyDoneCb = _cb;
     /*  
     CkArrayOptions opts(n);
     opts.bindTo(clientArray);
     */
+    
     _UfLibProxy = CProxy_UnionFindLib::ckNew();
 
     // create prefix library array here, prefix library is used in Phase 1B
     // Binding order: prefix -> unionFind -> app array
     
-    CkArrayOptions prefix_opts(n);
-    prefix_opts.bindTo(clientArray);
-    prefixLibArray = CProxy_Prefix::ckNew(n, prefix_opts);
-   
+    //CkArrayOptions prefix_opts(n);
+    //prefix_opts.bindTo(clientArray);
+    //prefixLibArray = CProxy_Prefix::ckNew(n, prefix_opts);
 
-    libGroupID = CProxy_UnionFindLibGroup::ckNew();
+    // libGroupID = CProxy_UnionFindLibGroup::ckNew();
     return _UfLibProxy;
 }
 
+void UnionFindLib::
+doneProxyCreation() {
+  libProxyDoneCb.send();
+}
+
+// library cache initialization function
+CProxy_UnionFindLibCache UnionFindLibCache::
+UnionFindLibCacheInit(CkCallback cb) {
+    initDoneCacheCb = cb;
+    _UfLibProxyCache = CProxy_UnionFindLibCache::ckNew();
+    return _UfLibProxyCache;
+}
+
+
+UnionFindLibCache::
+UnionFindLibCache() {
+  /*
+  int nPesinNode = 0;
+  for (int pe = 0; pe < CkNumPes(); pe++) {
+    if (CmiNodeOf(pe) == CmiMyNode()) {
+      nPesinNode++;
+    }
+  }
+  offsets.resize(nPesinNode);
+  CkPrintf("UnionFindLibCache() CmiMyNode(): %d nPesinNode: %d\n", CmiMyNode(), nPesinNode);
+  */
+  // Each nodegroup has the offset information for all PEs
+  offsets.resize(CkNumPes(), 0);
+  contribute(CkCallback(CkReductionTarget(UnionFindLibCache, initDoneCache), thisProxy[0]));
+}
+
+// library cache initialization function
+void UnionFindLibCache::
+initDoneCache() {
+  CkPrintf("Node group creation done\n");
+  initDoneCacheCb.send();
+}
+
+void UnionFindLibCache::
+initOffsets(CkCallback _libcb) {
+  // CkCallback cb(CkIndex_doneOffsets(), thisProxy[0]);
+  callWorkCb = _libcb;
+  CkCallback cb(CkReductionTarget(UnionFindLibCache, doneOffsets), thisProxy);
+  contribute(offsets, CkReduction::sum_long_long, cb);
+}
+
+void UnionFindLibCache::
+doneOffsets(std::vector<int64_t> result) {
+  //doneOffsets(int64_t *result, int n) {
+  offsets = result;
+  contribute(CkCallback(CkReductionTarget(UnionFindLibCache, callWork), thisProxy[0]));
+}
+
+void UnionFindLibCache::
+callWork() {
+  callWorkCb.send();
+}
+
+
 // library initialization function for group
 CProxy_UnionFindLib UnionFindLib::
-unionFindInit() {
+unionFindInit(CkCallback _cb) {
+  UnionFindLib::libProxyDoneCb = _cb;
     /*  
     CkArrayOptions opts(n);
     opts.bindTo(clientArray);

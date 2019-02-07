@@ -6,6 +6,17 @@ module unionFindLib {
     readonly CProxy_UnionFindLib _UfLibProxy;
     readonly CProxy_Prefix prefixLibArray;
     readonly CkGroupID libGroupID;
+    readonly CProxy_UnionFindLibCache _UfLibProxyCache;
+    readonly CkCallback initDoneCacheCb;
+
+    nodegroup UnionFindLibCache {
+      entry void UnionFindLibCacheInit(CkCallback cb);
+      entry [reductiontarget] void initDoneCache();
+      entry UnionFindLibCache();
+      entry void initOffsets(CkCallback _libcb);
+      entry [reductiontarget] void doneOffsets(std::vector<int64_t> result);
+      entry [reductiontarget] void callWork();
+    }
 
     group UnionFindLib {
         entry UnionFindLib();
@@ -48,6 +59,8 @@ module unionFindLib {
         entry [reductiontarget] void inter_total_components(int64_t nComponents);
         entry [reductiontarget] void done_prepare_for_component_labeling();
         entry void prepare_for_component_labeling(CkCallback cb);
+
+        entry [reductiontarget] void doneProxyCreation();
 
     }
 

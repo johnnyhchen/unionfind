@@ -6,20 +6,24 @@
 #include "graph-io.h"
 
 
-/*readonly*/ CProxy_UnionFindLib libProxy;
+///*readonly*/ CProxy_UnionFindLib libProxy;
+/*readonly*/ CProxy_UnionFindLibCache libCacheProxy;
 /*readonly*/ CProxy_Main mainProxy;
 /*readonly*/ int64_t num_vertices;
 /*readonly*/ int64_t num_edges;
 /*readonly*/ int64_t num_treepieces;
 /*readonly*/ int64_t num_local_vertices;
 /*readonly*/ int64_t edge_batch_size;
+/*readonly*/ int64_t num_nodes;
 
 class Main : public CBase_Main {
+    CProxy_UnionFindLib libProxy;
     CProxy_TreePiece tpProxy;
     double startTime;
     int64_t max_local_edges;
     int64_t ebatchNo;
     int64_t num_edge_batches;
+    std::string inputFileName;
     public:
     Main(CkArgMsg *m) {
         if (m->argc != 3) {
@@ -27,7 +31,7 @@ class Main : public CBase_Main {
             CkExit();
         }
         // assert(0);
-        std::string inputFileName(m->argv[1]);
+        inputFileName = m->argv[1];
         edge_batch_size = atol(m->argv[2]);
         FILE *fp = fopen(inputFileName.c_str(), "r");
         char line[256];
@@ -50,6 +54,8 @@ class Main : public CBase_Main {
         CkPrintf("num_vertices: %ld num_edges: %ld\n", num_vertices, num_edges);
         // CkExit();
         //num_treepieces = std::stoi(params[2].substr(strlen("Treepieces:")));
+        num_nodes = CmiNumNodes();
+        CkPrintf("num_nodes: %d\n", num_nodes);
         num_treepieces = CkNumPes();
         num_local_vertices = num_vertices / num_treepieces;
         max_local_edges = (int64_t) ceil(num_edges / num_treepieces);
@@ -62,13 +68,28 @@ class Main : public CBase_Main {
             CkExit();
         }
         // TODO: need to remove passing tpProxy
-        libProxy = UnionFindLib::unionFindInit();
+        CkCallback cb(CkIndex_Main::doneCacheInit(), thisProxy);
+        libCacheProxy = UnionFindLibCache::UnionFindLibCacheInit(cb);
+    }
+
+    void doneCacheInit() {
+        CkCallback cb(CkIndex_Main::prCrDone(), thisProxy);
+        libProxy = UnionFindLib::unionFindInit(cb);
+    }
+
+    void prCrDone() {
         CkCallback cb(CkIndex_Main::done(), thisProxy);
         libProxy[0].register_phase_one_cb(cb);
-        tpProxy = CProxy_TreePiece::ckNew(inputFileName);
+        tpProxy = CProxy_TreePiece::ckNew(inputFileName, libProxy);
         // find first vertex ID on last chare
         // create a callback for library to inform application after
         // completing inverted tree construction
+    }
+
+    void dontInitVertices() {
+      // Initialize offsets in each nodegroup
+      CkCallback cb(CkIndex_Main::startWork(), thisProxy);
+      libCacheProxy.initOffsets(cb);
     }
 
     void startWork() {
@@ -129,8 +150,11 @@ class TreePiece : public CBase_TreePiece {
     int64_t myID;
     FILE *input_file;
     UnionFindLib *libPtr;
+    //UnionFindLibCache *libPtrCache;
     unionFindVertex *libVertices;
     int64_t edgesProcessed;
+    int64_t offset;
+    int myNode;
 
     public:
     // function that must be always defined by application
@@ -138,8 +162,9 @@ class TreePiece : public CBase_TreePiece {
     // this specific logic assumes equal distribution of vertices across all tps
     static std::pair<int64_t, int64_t> getLocationFromID(int64_t vid);
     
-    TreePiece(std::string filename) {
+    TreePiece(std::string filename, CProxy_UnionFindLib libProxy) {
         edgesProcessed = 0;
+        offset = 0;
         input_file = fopen(filename.c_str(), "r");
         myID = CkMyPe();
         numMyVertices = num_vertices / num_treepieces;
@@ -151,9 +176,42 @@ class TreePiece : public CBase_TreePiece {
         if ((myID + 1) <= (num_vertices % num_treepieces)) {
           numMyVertices++;
         }
+        
+        // myRank = CmiPhysicalRank(CkMyPe());
+        myNode = CmiMyNode();
+        // int *nodePeList;
+        // int numpes;
+        int64_t totVerticesinNode = 0;
+        // CmiGetPesOnPhysicalNode(CmiPhysicalNodeID(CkMyPe()), &nodePeList, &numpes);
+        std::vector<int> nodePeList;
+        for (int pe = 0; pe < CkNumPes(); pe++) {
+          if (CmiNodeOf(pe) == myNode) {
+            nodePeList.push_back(pe);
+          }
+        }
+        int numpes = nodePeList.size();
+
+        for (int i = 0; i < numpes; i++) {
+
+          totVerticesinNode += (num_vertices / num_treepieces);
+          if ((nodePeList[i] + 1) <= (num_vertices % num_treepieces)) {
+            totVerticesinNode++;
+          }
+          
+          // For offset calculation
+          if (nodePeList[i] < CkMyPe()) {
+            offset += (num_vertices / num_treepieces);
+            if ((nodePeList[i] + 1) <= (num_vertices % num_treepieces)) {
+              offset++;
+            }
+          }
+        }
+
         libPtr = libProxy.ckLocalBranch();
-        // only 1 chare in PE (group)
-        libPtr->allocate_libVertices(numMyVertices, 1);
+        // only the first PE in the node calls for allocation
+        if (nodePeList[0] == CkMyPe()) {
+          libPtr->allocate_libVertices(totVerticesinNode, 1);
+        }
 
         /*numMyVertices = num_vertices / num_treepieces;
         if (thisIndex == num_treepieces - 1) {
@@ -168,17 +226,34 @@ class TreePiece : public CBase_TreePiece {
             for (int i = 0; i < numMyVertices; i++)
                 CkPrintf("myVertices[%d] = id: %ld\n", i, myVertices[i].id);
         }*/
-        int64_t dummy = 0;
-        libPtr->initialize_vertices(numMyVertices, libVertices, dummy /*offset*/, 999999999 /*batchSize - need to turn off*/);
-        int64_t offset = myID * (num_vertices / num_treepieces); /*the last PE might have different number of vertices*/;
+        CkPrintf("PE: %d myNode: %d offset: %ld\n", CkMyPe(), myNode, offset);
+        if (CkMyPe() == 0) {
+          for (int i = 0; i < numpes; i++) {
+            CkPrintf("%d ", nodePeList[i]);
+          }
+          CkPrintf("\n\n");
+        }
+        // Rank-0 on this node has allocated memory for the vertices; now initialize the vertices of all the treepieces
+        // if (CmiPhysicalRank(CkMyPe()) == 0) {
+        // Do a contribute from all PEs to initialize their vertices
+        //
+        contribute(CkCallback(CkReductionTarget(TreePiece, init_vertices), thisProxy));
+          // thisProxy.init_vertices();
+        // }
+    }
+
+    void init_vertices() {
+        // int64_t dummy = 0;
+        libPtr->initialize_vertices(numMyVertices, libVertices, offset /*offset*/, 999999999 /*batchSize - need to turn off*/);
+        // int64_t offset = myID * (num_vertices / num_treepieces); /*the last PE might have different number of vertices*/;
         int64_t startID = myID;
         for (int64_t i = 0; i < numMyVertices; i++) {
           libVertices[i].vertexID = libVertices[i].parent = startID;
           startID += num_treepieces;
-          std::pair<int64_t, int64_t> w_id = getLocationFromID(libVertices[i].vertexID);
+          // std::pair<int64_t, int64_t> w_id = getLocationFromID(libVertices[i].vertexID);
           // assert (w_id.first == myID);
           // CkPrintf("vertexID: %ld i: %ld w_id.second: %ld\n", libVertices[i].vertexID, i, w_id.second);
-          assert (w_id.second == i);
+          // assert (w_id.second == i);
        }
 
 
@@ -192,7 +267,7 @@ class TreePiece : public CBase_TreePiece {
         populateMyEdges(&library_requests, numMyEdges, (num_edges/num_treepieces), thisIndex, input_file, num_vertices);
         libPtr->registerGetLocationFromID(getLocationFromID);
         CkPrintf("Finished reading my part of the file: %d\n", CkMyPe());
-        contribute(CkCallback(CkReductionTarget(Main, startWork), mainProxy));
+        contribute(CkCallback(CkReductionTarget(Main, dontInitVertices), mainProxy));
     }
 
     TreePiece(CkMigrateMessage *msg) { }
@@ -206,8 +281,9 @@ class TreePiece : public CBase_TreePiece {
           break;
         }
         std::pair<int64_t, int64_t> req = library_requests[edgesProcessed];
-        // CkPrintf("PE: %d union(%ld %ld)\n", CkMyPe(), req.first, req.second);
+        CkPrintf("PE: %d union(%ld %ld) library_requests.size(): %d\n", CkMyPe(), req.first, req.second, library_requests.size());
         libPtr->union_request(req.first, req.second);
+        CkPrintf("PE: %d union(%ld %ld) request done library_requests.size(): %d\n", CkMyPe(), req.first, req.second, library_requests.size());
       }
     }
 
@@ -250,8 +326,17 @@ std::pair<int64_t, int64_t>
 TreePiece::getLocationFromID(int64_t vid) {
   // int64_t vRatio = num_vertices / num_treepieces;
   // CkPrintf("Req for vid: %ld num_local_vertices: %ld\n", vid, num_local_vertices);
+
+  UnionFindLibCache *libPtrCache;
+  libPtrCache = libCacheProxy.ckLocalBranch();
   int64_t chareIdx = vid % num_treepieces;
-  int64_t arrIdx = vid / num_treepieces;
+  int64_t arrIdx = (vid / num_treepieces);
+  int64_t off = libPtrCache->get_offset(chareIdx);
+  /*
+  if (chareIdx != 0)
+    assert (off != 0);
+  */
+  arrIdx += off;
   /*
   if (chareIdx == num_treepieces) {
     chareIdx--;
@@ -275,6 +360,8 @@ TreePiece::getLocationFromID(int64_t vid) {
     CkExit();
   }
   */
+  CkPrintf("PE: %d vid: %ld chareIdx: %ld arrIdx: %ld\n", CkMyPe(), vid, chareIdx, arrIdx);
+
   return std::make_pair(chareIdx, arrIdx);
 }
 

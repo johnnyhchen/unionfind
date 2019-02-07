@@ -23,9 +23,27 @@ struct unionFindVertex {
 /* global variables */
 /*readonly*/ extern CkGroupID libGroupID;
 
+class UnionFindLibCache : public CBase_UnionFindLibCache {
+  public:
+    static CProxy_UnionFindLibCache UnionFindLibCacheInit(CkCallback cb);
+    UnionFindLibCache();
+    void initDoneCache();
+    std::vector<unionFindVertex> myVertices;
+    std::vector<int64_t> offsets;
+    void initOffsets(CkCallback _libcb);
+    void doneOffsets(std::vector<int64_t> result);
+    void callWork();
+    CkCallback callWorkCb;
+    int64_t get_offset(int64_t peNo) {
+      return offsets[peNo];
+    }
+    int x;
+};
+
+
 // class definition for library chares
 class UnionFindLib : public CBase_UnionFindLib {
-    std::vector<unionFindVertex> myVertices;
+    std::vector<unionFindVertex> &myVertices = ret_NodeMyVertices();
     int64_t numMyVertices;
     int64_t pathCompressionThreshold = 5;
     int componentPruneThreshold;
@@ -57,6 +75,10 @@ class UnionFindLib : public CBase_UnionFindLib {
     bool resetData;
     CkCallback postInterComponentLabelingCb;
 
+    // within logical node optimization
+  public:
+    void doneProxyCreation();
+
   public:
     //void need_label(int64_t req_vertex, int64_t parent_arrID);
     void need_label(needRootData data);
@@ -73,14 +95,12 @@ class UnionFindLib : public CBase_UnionFindLib {
 
 
     public:
-    UnionFindLib() {
-      reqs_sent = 0;
-      reqs_recv = 0;
-      resetData = false;
-    }
+    std::vector<unionFindVertex>& ret_NodeMyVertices();
+    UnionFindLib();
     UnionFindLib(CkMigrateMessage *m) { }
-    static CProxy_UnionFindLib unionFindInit(CkArrayID clientArray, int64_t n);
-    static CProxy_UnionFindLib unionFindInit();
+    static CkCallback libProxyDoneCb;
+    static CProxy_UnionFindLib unionFindInit(CkArrayID clientArray, int64_t n, CkCallback cb);
+    static CProxy_UnionFindLib unionFindInit(CkCallback cb);
     void register_phase_one_cb(CkCallback cb);
     // void initialize_vertices(unionFindVertex *appVertices, int numVertices);
     void allocate_libVertices(int64_t numVertices, int64_t nPe);
