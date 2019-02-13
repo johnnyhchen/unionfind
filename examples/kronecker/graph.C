@@ -9,7 +9,6 @@
 /*readonly*/ int64_t num_vertices;
 /*readonly*/ int64_t num_edges;
 /*readonly*/ int64_t num_treepieces;
-/*readonly*/ int64_t num_local_vertices;
 
 class Main : public CBase_Main {
   CProxy_TreePiece tpProxy;
@@ -19,6 +18,7 @@ class Main : public CBase_Main {
   uint8_t scale;
   uint8_t edgeFactor;
   std::vector<std::pair<int64_t, int64_t>> edgeList;
+  std::vector<std::vector<std::pair<int64_t, int64_t>>> splitEdgeList;
 
   public:
   Main(CkArgMsg *m) {
@@ -37,9 +37,20 @@ class Main : public CBase_Main {
       CkPrintf("Fewer vertices than treepieces\n");
       CkExit();
     }
-    num_local_vertices = num_vertices / num_treepieces;
 
-    // Generate kronecker graph
+    // TODO: need to remove passing tpProxy
+    libProxy = UnionFindLib::unionFindInit();
+    CkCallback cb(CkIndex_Main::done(), thisProxy);
+    libProxy[0].register_phase_one_cb(cb);
+    tpProxy = CProxy_TreePiece::ckNew();
+    // find first vertex ID on last chare
+    // create a callback for library to inform application after
+    // completing inverted tree construction
+
+    // Start timing, include graph generation time
+    startTime = CkWallTimer();
+
+    // Generate kronecker graph (parallelized with MPI)
     int64_t seeds[2] = {1, 2};
     const double initiator[4] = {.57, .19, .19, .05};
     int64_t created_num_edges;
@@ -54,29 +65,38 @@ class Main : public CBase_Main {
       if ((src >= 0) && (dest >= 0)) {
         // Valid edge
         edgeList.emplace_back(src, dest);
-        edgeList.emplace_back(dest, src); // Add reverse edge if mode is undirected
+        // Add reverse edge if mode is undirected
+        // FIXME Need this? Otherwise remove this & update number of vertices accordingly
+        edgeList.emplace_back(dest, src);
       }
+    }
+
+    if (num_vertices != edgeList.size()) {
+      num_vertices = edgeList.size();
+      CkPrintf("Updating num_vertices to %ld after graph generation\n", num_vertices);
     }
 
     // Free temporary memory used in graph generation
     free(edges);
 
-    // TODO Invoke edge population separately, with respective parts of the edge list
-
-    // TODO: need to remove passing tpProxy
-    libProxy = UnionFindLib::unionFindInit();
-    CkCallback cb(CkIndex_Main::done(), thisProxy);
-    libProxy[0].register_phase_one_cb(cb);
-    tpProxy = CProxy_TreePiece::ckNew();
-    // find first vertex ID on last chare
-    // create a callback for library to inform application after
-    // completing inverted tree construction
+    // Split edge list for distribution to treepieces
+    std::size_t const num_edges_tp = edgeList.size() / num_treepieces;
+    for (int i = 0; i < num_treepieces-1; i++) {
+      splitEdgeList.emplace_back(edgeList.begin() + num_edges_tp * i,
+                                 edgeList.begin() + num_edges_tp * (i+1));
+    }
+    // Remaining edges go into last treepiece
+    splitEdgeList.emplace_back(edgeList.begin() + num_edges_tp * (num_treepieces-1), edgeList.end());
   }
 
   void startWork() {
     CkPrintf("[Main] Library array with %d chares created and proxy obtained\n", num_treepieces);
-    startTime = CkWallTimer();
-    tpProxy.doWork();
+
+    // Send edges to treepieces and start union-find algorithm
+    // TODO Use scatter instead of point-to-point messages
+    for (int i = 0; i < num_treepieces; i++) {
+      tpProxy[i].doWork(splitEdgeList[i]);
+    }
   }
 
   void done() {
@@ -103,7 +123,6 @@ class Main : public CBase_Main {
     CkPrintf("[Main] Final runtime: %f\n", CkWallTimer()-startTime);
     CkExit();
   }
-
 };
 
 class TreePiece : public CBase_TreePiece {
@@ -125,9 +144,6 @@ class TreePiece : public CBase_TreePiece {
   TreePiece() {
     myID = CkMyPe();
     numMyVertices = num_vertices / num_treepieces;
-    if ((myID + 1) <= (num_vertices % num_treepieces)) {
-      numMyVertices++;
-    }
 
     libPtr = libProxy.ckLocalBranch();
     // only 1 chare in PE (group)
@@ -151,7 +167,6 @@ class TreePiece : public CBase_TreePiece {
       // last chare should get all remaining edges if not equal division
       numMyEdges += num_edges % num_treepieces;
     }
-    // TODO
     populateMyEdges(&library_requests, numMyEdges, (num_edges/num_treepieces), thisIndex, num_vertices);
     libPtr->registerGetLocationFromID(getLocationFromID);
     contribute(CkCallback(CkReductionTarget(Main, startWork), mainProxy));
@@ -159,7 +174,9 @@ class TreePiece : public CBase_TreePiece {
 
   TreePiece(CkMigrateMessage *msg) { }
 
-  void doWork() {
+  void doWork(std::vector<std::pair<int64_t, int64_t>> edgeList) {
+    // TODO Populate vertices and edges (move code from constructor)
+
     // vertices and edges populated, now fire union requests
     for (int i = 0; i < library_requests.size(); i++) {
       std::pair<int64_t, int64_t> req = library_requests[i];
