@@ -3,7 +3,7 @@
 #include "unionFindLib.h"
 #include "graph.decl.h"
 #include "vtype.h"
-#include "graph500-gen/make-graph.h"
+#include "graph500-gen/make_graph.h"
 
 /*readonly*/ CProxy_UnionFindLib libProxy;
 /*readonly*/ CProxy_Main mainProxy;
