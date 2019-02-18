@@ -7,28 +7,63 @@
 /*  Authors: Jeremiah Willcock                                             */
 /*           Andrew Lumsdaine                                              */
 
-#ifndef SCRAMBLE_EDGES_H
-#define SCRAMBLE_EDGES_H
-
-#include <mpi.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdint.h>
-
 #ifndef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS
 #endif
-
 #include "splittable_mrg.h"
 #include "graph_generator.h"
 #include "permutation_gen.h"
 #include "apply_permutation_mpi.h"
+#include "scramble_edges.h"
+#include "utils.h"
+#include <stdint.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#ifdef __MTA__
+#include <sys/mta_task.h>
+#endif
+#ifdef GRAPH_GENERATOR_MPI
+#include <mpi.h>
+#endif
+#ifdef GRAPH_GENERATOR_OMP
+#include <omp.h>
+#endif
 
+/* This version is for sequential machines, OpenMP, and the XMT. */
+void scramble_edges_shared(uint64_t userseed1, uint64_t userseed2, int64_t nedges, int64_t* result /* Input and output array of edges (size = 2 * nedges) */) {
+  mrg_state st;
+  uint_fast32_t seed[5];
+  int64_t* new_result;
+  int64_t i;
+  int64_t* perm = (int64_t*)xmalloc(nedges * sizeof(int64_t));
+  make_mrg_seed(userseed1, userseed2, seed);
+  mrg_seed(&st, seed);
+  mrg_skip(&st, 5, 0, 0); /* To make offset different from other PRNG uses */
+  rand_sort_shared(&st, nedges, perm);
+  new_result = (int64_t*)xmalloc(nedges * 2 * sizeof(int64_t));
+  
+#ifdef __MTA__
+#pragma mta assert parallel
+#pragma mta block schedule
+#endif
+#ifdef GRAPH_GENERATOR_OMP
+#pragma omp parallel for
+#endif
+  for (i = 0; i < nedges; ++i) {
+    int64_t p = perm[i];
+    new_result[i * 2 + 0] = result[p * 2 + 0];
+    new_result[i * 2 + 1] = result[p * 2 + 1];
+  }
+  free(perm);
+  memcpy(result, new_result, nedges * 2 * sizeof(int64_t));
+  free(new_result);
+}
 
-
+#ifdef GRAPH_GENERATOR_MPI
 /* For MPI distributed memory. */
-inline void scramble_edges_mpi(MPI_Comm comm,
+void scramble_edges_mpi(MPI_Comm comm,
                         const uint64_t userseed1, const uint64_t userseed2,
                         const int64_t local_nedges_in,
                         const int64_t* const local_edges_in,
@@ -163,6 +198,4 @@ inline void scramble_edges_mpi(MPI_Comm comm,
   free(reply_loc_buf); reply_loc_buf = NULL;
   free(reply_edges); reply_edges = NULL;
 }
-
-
-#endif /* SCRAMBLE_EDGES_H */
+#endif

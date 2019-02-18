@@ -7,31 +7,26 @@
 /*  Authors: Jeremiah Willcock                                             */
 /*           Andrew Lumsdaine                                              */
 
-#ifndef APPLY_PERMUTATION_MPI_H
-#define APPLY_PERMUTATION_MPI_H
+/* MPI code to apply a distributed permutation.  The versions for sequential,
+ * XMT, and OpenMP are trivial and so are in the corresponding versions of
+ * make_graph() (make_graph.c), but the MPI one is long and so it is in a
+ * separate file. */
 
-
-#include <stdint.h>
-#include "splittable_mrg.h"
-#include "graph_generator.h"
-#include <mpi.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
 #include <assert.h>
 #include <math.h>
+#include <mpi.h>
 
-//Own includes
 #include "graph_generator.h"
 #include "permutation_gen.h"
 #include "apply_permutation_mpi.h"
 #include "utils.h"
 
-
-/* Internal function to get various information about an uneven block
- * distribution of some data. */
-inline void gather_block_distribution_info(MPI_Comm comm, const int64_t local_perm_size, const int64_t global_perm_size, int64_t* perm_displs /* size = MPI comm size + 1 */, int** perm_owner_table_ptr /* malloc'ed in here */, int64_t** perm_owner_cutoff_ptr /* malloc'ed in here */, int* lg_minpermsize_ptr, int64_t* maxpermsize_ptr) {
+void gather_block_distribution_info(MPI_Comm comm, const int64_t local_perm_size, const int64_t global_perm_size, int64_t* perm_displs /* size = MPI comm size + 1 */, int** perm_owner_table_ptr /* malloc'ed in here */, int64_t** perm_owner_cutoff_ptr /* malloc'ed in here */, int* lg_minpermsize_ptr, int64_t* maxpermsize_ptr) {
   int rank, size;
 
   MPI_Comm_rank(comm, &rank);
@@ -82,7 +77,7 @@ inline void gather_block_distribution_info(MPI_Comm comm, const int64_t local_pe
   int64_t* perm_owner_cutoff = (int64_t*)xmalloc(perm_owner_table_size * sizeof(int64_t));
   *perm_owner_cutoff_ptr = perm_owner_cutoff;
   int cur_owner = 0;
-  for (i = 0; i < (int64_t)perm_owner_table_size; ++i) {
+  for (i = 0; i < perm_owner_table_size; ++i) {
     assert (cur_owner < size);
     while ((i << lg_minpermsize) >= perm_displs[cur_owner + 1]) {
       ++cur_owner;
@@ -96,9 +91,7 @@ inline void gather_block_distribution_info(MPI_Comm comm, const int64_t local_pe
 
 }
 
-/* Internal function to apply a distributed permutation to a distributed set of
- * edges. */
-inline void apply_permutation_mpi(MPI_Comm comm, const int64_t local_perm_size, const int64_t* const local_vertex_perm, const int64_t N, const int64_t nedges, int64_t* result) {
+void apply_permutation_mpi(MPI_Comm comm, const int64_t local_perm_size, const int64_t* const local_vertex_perm, const int64_t N, const int64_t nedges, int64_t* result) {
   int rank, size;
 
   MPI_Comm_rank(comm, &rank);
@@ -228,7 +221,7 @@ inline void apply_permutation_mpi(MPI_Comm comm, const int64_t local_perm_size, 
          * array of individual vertex indices. */
         const unsigned long* bm = needed_element_bitmap + (delta - offset) * needed_element_bitmap_size;
         int64_t block;
-        for (block = 0; block < (int64_t)needed_element_bitmap_size; ++block) {
+        for (block = 0; block < needed_element_bitmap_size; ++block) {
           unsigned long val = bm[block];
           if (!val) continue;
           int bit;
@@ -270,7 +263,7 @@ inline void apply_permutation_mpi(MPI_Comm comm, const int64_t local_perm_size, 
          * of destinations, update any with endpoints that belong to the
          * current destination. */
         int64_t block;
-        for (block = 0; block < (int64_t)rescan_bitmap_size; ++block) {
+        for (block = 0; block < rescan_bitmap_size; ++block) {
           unsigned long val = rescan_bitmap[block];
           if (val == 0) continue;
           int bit;
@@ -319,7 +312,3 @@ inline void apply_permutation_mpi(MPI_Comm comm, const int64_t local_perm_size, 
   free(send_bitmap); send_bitmap = NULL;
   free(owner_bitmap); owner_bitmap = NULL;
 }
-
-
-
-#endif /* APPLY_PERMUTATION_MPI_H */

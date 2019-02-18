@@ -7,18 +7,10 @@
 /*  Authors: Jeremiah Willcock                                             */
 /*           Andrew Lumsdaine                                              */
 
-#ifndef BTRD_BINOMIAL_H
-#define BTRD_BINOMIAL_H
-
-/* BTRD algorithm from pages 6--7 of "The Generation of Binomial Random */
-/* Variates" (Wolfgang Hoermann) --                                     */
-/* http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.47.8407      */
-
+#include "btrd_binomial_distribution.h"
 #include <math.h>
 #include <stddef.h>
-
 #include "splittable_mrg.h"
-#include "btrd_binomial_distribution.h"
 
 static double f_c(unsigned int k) {
   static const double one_over_12 = 1./12;
@@ -44,7 +36,11 @@ static double f_c(unsigned int k) {
   }
 }
 
-inline size_t btrd_binomial_distribution(size_t n_orig, double p, mrg_state* state) {
+#ifdef __MTA__
+#pragma mta expect parallel context
+#pragma mta serial
+#endif
+size_t btrd_binomial_distribution(size_t n_orig, double p, mrg_state* state) {
   /* BTRD algorithm from pages 6--7 of "The Generation of Binomial Random
    * Variates" (Wolfgang Hoermann) --
    * http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.47.8407 */
@@ -77,7 +73,7 @@ inline size_t btrd_binomial_distribution(size_t n_orig, double p, mrg_state* sta
        * (geometric variate generator). */
       sum += (int)ceil(log(mrg_get_double_orig(state)) * recip_log_1_minus_p);
       ++x;
-    } while (sum <= (int)n_orig);
+    } while (sum <= n_orig);
     return x - 1;
   }
   if (n_orig > 1000000000) {
@@ -156,5 +152,3 @@ inline size_t btrd_binomial_distribution(size_t n_orig, double p, mrg_state* sta
     }
   }
 }
-
-#endif /* BTRD_BINOMIAL_H */

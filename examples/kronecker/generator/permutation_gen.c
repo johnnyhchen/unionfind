@@ -7,23 +7,27 @@
 /*  Authors: Jeremiah Willcock                                             */
 /*           Andrew Lumsdaine                                              */
 
-#ifndef PERMUTATION_GEN_H
-#define PERMUTATION_GEN_H
-
 #ifndef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS
 #endif
-#include <stdint.h>
-#include <mpi.h>
-#include <assert.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
 #include "splittable_mrg.h"
 #include "graph_generator.h"
 #include "permutation_gen.h"
 #include "utils.h"
+#include <stdint.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#ifdef __MTA__
+#include <sys/mta_task.h>
+#endif
+#ifdef GRAPH_GENERATOR_MPI
+#include <mpi.h>
+#endif
+#ifdef GRAPH_GENERATOR_OMP
+#include <omp.h>
+#endif
 
 typedef struct slot_data {
   int64_t index, value;
@@ -33,6 +37,9 @@ typedef struct slot_data {
  * up the rand_sort algorithm given below.  Elements with -1 as index are
  * unused; others are used. */
 
+#ifdef __MTA__
+#pragma mta inline
+#endif
 static inline void hashtable_insert(slot_data* ht, int64_t ht_size, int64_t index, int64_t value, int64_t hashval) {
   int64_t i;
   for (i = hashval; i < ht_size; ++i) {
@@ -50,6 +57,9 @@ static inline void hashtable_insert(slot_data* ht, int64_t ht_size, int64_t inde
   assert (!"Should not happen: overflow in hash table");
 }
 
+#ifdef __MTA__
+#pragma mta inline
+#endif
 static inline int hashtable_count_key(const slot_data* ht, int64_t ht_size, int64_t index, int64_t hashval) {
   int c = 0;
   int64_t i;
@@ -64,6 +74,11 @@ static inline int hashtable_count_key(const slot_data* ht, int64_t ht_size, int6
   return c;
 }
 
+/* Return all values with the given index value into result array; return value
+ * of function is element count. */
+#ifdef __MTA__
+#pragma mta inline
+#endif
 static inline int hashtable_get_values(const slot_data* ht, int64_t ht_size, int64_t index, int64_t hashval, int64_t* result) {
   int x = 0;
   int64_t i;
@@ -82,6 +97,9 @@ static inline int hashtable_get_values(const slot_data* ht, int64_t ht_size, int
   return x;
 }
 
+#ifdef __MTA__
+#pragma mta inline
+#endif
 static inline void selection_sort(int64_t* a, int64_t n) {
   int64_t i, j;
   if (n <= 1) return;
@@ -98,6 +116,10 @@ static inline void selection_sort(int64_t* a, int64_t n) {
   }
 }
 
+/* Fisher-Yates shuffle */
+#ifdef __MTA__
+#pragma mta inline
+#endif
 static inline void randomly_permute(int64_t* a, int64_t n, mrg_state* st) {
   int64_t i, j;
   if (n <= 1) return;
@@ -120,8 +142,105 @@ static inline int int_prefix_sum(int* out, const int* in, size_t n) {
   return out[n - 1] + in[n - 1];
 }
 
-/* For MPI distributed memory. */
-inline void rand_sort_mpi(MPI_Comm comm, mrg_state* st, int64_t n,
+/* A variant of the rand_sort algorithm from Cong and Bader ("An Empirical
+ * Analysis of Parallel Random Permutation Algorithms on SMPs", Georgia Tech TR
+ * GT-CSE-06-06.pdf,
+ * <URL:http://smartech.gatech.edu/bitstream/1853/14385/1/GT-CSE-06-06.pdf>).
+ * Sorting here is done using a hash table to effectively act as a bucket sort.
+ * The rand_sort algorithm was chosen instead of the other algorithms in order
+ * to get reproducibility across architectures and processor counts.  That is
+ * also the reason for the extra sort immediately before scrambling all
+ * elements with the same key, as well as the expensive PRNG operations. */
+
+/* This version is for sequential machines, OpenMP, and the XMT. */
+void rand_sort_shared(mrg_state* st, int64_t n, int64_t* result /* Array of size n */) {
+  int64_t hash_table_size = 2 * n + 128; /* Must be >n, preferably larger for performance */
+  slot_data* ht = (slot_data*)xmalloc(hash_table_size * sizeof(slot_data));
+  int64_t i;
+  int64_t index;
+  int64_t* bucket_counts;
+  int64_t* bucket_starts_in_result;
+  int64_t running_sum;
+  int64_t old_running_sum;
+  int64_t result_start_idx;
+  int64_t* temp;
+  int64_t bi;
+  mrg_state new_st;
+#ifdef __MTA__
+#pragma mta block schedule
+#endif
+#ifdef GRAPH_GENERATOR_OMP
+#pragma omp parallel for
+#endif
+  for (i = 0; i < hash_table_size; ++i) ht[i].index = (int64_t)(-1); /* Unused */
+#ifdef __MTA__
+#pragma mta assert parallel
+#pragma mta block schedule
+#endif
+#ifdef GRAPH_GENERATOR_OMP
+#pragma omp parallel for
+#endif
+  /* Put elements into the hash table with random keys. */
+  for (i = 0; i < n; ++i) {
+    mrg_state new_st = *st;
+    mrg_skip(&new_st, 1, i, 0);
+    index = (int64_t)random_up_to(&new_st, hash_table_size);
+    hashtable_insert(ht, hash_table_size, index, i, index);
+  }
+  /* Count elements with each key in order to sort them by key. */
+  bucket_counts = (int64_t*)xcalloc(hash_table_size, sizeof(int64_t)); /* Uses zero-initialization */
+#ifdef __MTA__
+#pragma mta assert parallel
+#pragma mta block schedule
+#endif
+#ifdef GRAPH_GENERATOR_OMP
+#pragma omp parallel for
+#endif
+  for (i = 0; i < hash_table_size; ++i) {
+    /* Count all elements with same index. */
+    bucket_counts[i] = hashtable_count_key(ht, hash_table_size, i, i);
+  }
+  /* bucket_counts replaced by its prefix sum (start of each bucket in output array) */
+  bucket_starts_in_result = bucket_counts;
+  running_sum = 0;
+#ifdef __MTA__
+#pragma mta block schedule
+#endif
+  /* FIXME: parallelize this on OpenMP */
+  for (i = 0; i < hash_table_size; ++i) {
+    old_running_sum = running_sum;
+    running_sum += bucket_counts[i];
+    bucket_counts[i] = old_running_sum;
+  }
+  assert (running_sum == n);
+  bucket_counts = NULL;
+#ifdef __MTA__
+#pragma mta assert parallel
+#pragma mta block schedule
+#endif
+#ifdef GRAPH_GENERATOR_OMP
+#pragma omp parallel for
+#endif
+  for (i = 0; i < hash_table_size; ++i) {
+    result_start_idx = bucket_starts_in_result[i];
+     temp = result + result_start_idx;
+    /* Gather up all elements with same key. */
+    bi = (int64_t)hashtable_get_values(ht, hash_table_size, i, i, temp);
+    if (bi > 1) {
+      /* Selection sort them (for consistency in parallel implementations). */
+      selection_sort(temp, bi);
+      /* Randomly permute them. */
+      new_st = *st;
+      mrg_skip(&new_st, 1, i, 100);
+      randomly_permute(temp, bi, &new_st);
+    }
+  }
+  free(ht); ht = NULL;
+  free(bucket_starts_in_result); bucket_starts_in_result = NULL;
+}
+
+#ifdef GRAPH_GENERATOR_MPI
+void rand_sort_mpi(MPI_Comm comm, mrg_state* st, int64_t n,
                    int64_t* result_size_ptr,
                    int64_t** result_ptr /* Allocated using xmalloc() by
                    rand_sort_mpi */) {
@@ -141,7 +260,7 @@ inline void rand_sort_mpi(MPI_Comm comm, mrg_state* st, int64_t n,
     indices[0] -= temp_base;
     indices[1] -= temp_base;
     MPI_Datatype old_types[] = {INT64_T_MPI_TYPE, INT64_T_MPI_TYPE};
-    MPI_Type_create_struct(2, blocklens, indices, old_types, &slot_data_type);
+    MPI_Type_struct(2, blocklens, indices, old_types, &slot_data_type);
     MPI_Type_commit(&slot_data_type);
   }
 
@@ -282,6 +401,80 @@ inline void rand_sort_mpi(MPI_Comm comm, mrg_state* st, int64_t n,
 }
 #undef HT_OWNER
 #undef HT_LOCAL
+#endif /* GRAPH_GENERATOR_MPI */
 
+/* Code below this is used for testing the permutation generators. */
 
-#endif /* PERMUTATION_GEN_H */
+#if 0
+int main(int argc, char** argv) {
+  MPI_Init(&argc, &argv);
+  const int64_t n = 200000;
+  int64_t* result = NULL;
+  int64_t result_size;
+  mrg_state st;
+  uint_fast32_t seed[5] = {1, 2, 3, 4, 5};
+  mrg_seed(&st, seed);
+  MPI_Barrier(MPI_COMM_WORLD);
+  double start = MPI_Wtime();
+  rand_sort_mpi(MPI_COMM_WORLD, &st, n, &result_size, &result);
+  MPI_Barrier(MPI_COMM_WORLD);
+  double time = MPI_Wtime() - start;
+#if 0
+  int64_t i;
+  printf("My count = %" PRId64 "\n", result_size);
+  for (i = 0; i < result_size; ++i) printf("%" PRId64 "\n", result[i]);
+#endif
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  if (rank == 0) {
+    printf("Shuffle of %" PRId64 " element(s) took %f second(s).\n", n, time);
+  }
+  free(result); result = NULL;
+  MPI_Finalize();
+  return 0;
+}
+#endif
+
+#if 0
+int main(int argc, char** argv) {
+  const int64_t n = 5000000;
+  int64_t* result = (int64_t*)xmalloc(n * sizeof(int64_t));
+  mrg_state st;
+  uint_fast32_t seed[5] = {1, 2, 3, 4, 5};
+  mrg_seed(&st, seed);
+  unsigned long time;
+#pragma mta fence
+  time = mta_get_clock(0);
+  rand_sort_shared(&st, n, result);
+#pragma mta fence
+  time = mta_get_clock(time);
+#if 0
+  int64_t i;
+  for (i = 0; i < n; ++i) printf("%" PRId64 "\n", result[i]);
+#endif
+  printf("Shuffle of %" PRId64 " element(s) took %f second(s).\n", n, time * mta_clock_period());
+  free(result); result = NULL;
+  return 0;
+}
+#endif
+
+#if 0
+int main(int argc, char** argv) {
+  const int64_t n = 5000000;
+  int64_t* result = (int64_t*)xmalloc(n * sizeof(int64_t));
+  mrg_state st;
+  uint_fast32_t seed[5] = {1, 2, 3, 4, 5};
+  mrg_seed(&st, seed);
+  double time;
+  time = omp_get_wtime();
+  rand_sort_shared(&st, n, result);
+  time = omp_get_wtime() - time;
+#if 0
+  int64_t i;
+  for (i = 0; i < n; ++i) printf("%" PRId64 "\n", result[i]);
+#endif
+  printf("Shuffle of %" PRId64 " element(s) took %f second(s).\n", n, time);
+  free(result); result = NULL;
+  return 0;
+}
+#endif
