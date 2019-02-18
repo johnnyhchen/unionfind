@@ -57,6 +57,7 @@ class Main : public CBase_Main {
     int64_t created_num_edges;
     int64_t* edges;
 
+    CkPrintf("Generating kronecker graph...\n");
     make_graph(scale, desired_num_edges, seeds[0], seeds[1], initiator, &num_edges, &edges);
 
     for (int i = 0; i < num_edges; i++) {
@@ -69,9 +70,9 @@ class Main : public CBase_Main {
       }
     }
 
-    if (num_vertices != edgeList.size()) {
-      num_vertices = edgeList.size();
-      CkPrintf("Updating num_vertices to %ld after graph generation\n", num_vertices);
+    if (num_edges != edgeList.size()) {
+      num_edges = edgeList.size();
+      CkPrintf("Updating num_edges to %ld after graph generation\n", num_edges);
     }
 
     // Free temporary memory used in graph generation
@@ -85,6 +86,8 @@ class Main : public CBase_Main {
     }
     // Remaining edges go into last treepiece
     splitEdgeList.emplace_back(edgeList.begin() + num_edges_tp * (num_treepieces-1), edgeList.end());
+
+    CkPrintf("Edge lists ready for distribution\n");
   }
 
   void startWork() {
