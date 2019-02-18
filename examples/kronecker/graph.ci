@@ -16,7 +16,7 @@ mainmodule graph {
     }
 
     group TreePiece {
-        entry TreePiece(std::string);
+        entry TreePiece();
         entry void doWork(std::vector<std::pair<int64_t, int64_t>>);
         entry void requestVertices();
         entry void getConnectedComponents();

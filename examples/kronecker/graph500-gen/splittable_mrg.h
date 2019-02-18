@@ -6237,7 +6237,7 @@ const mrg_transition_matrix mrg_skip_matrices[][256] = {
 #ifdef _MSC_VER
 static void mrg_update_cache(mrg_transition_matrix* __restrict p) { /* Set a, b, c, and d */
 #else
-static void mrg_update_cache(mrg_transition_matrix* restrict p) { /* Set a, b, c, and d */
+static void mrg_update_cache(mrg_transition_matrix* p) { /* Set a, b, c, and d */
 #endif
   p->a = mod_add(mod_mul_x(p->s), p->t);
   p->b = mod_add(mod_mul_x(p->a), p->u);
@@ -6261,7 +6261,7 @@ static void mrg_make_A(mrg_transition_matrix* result) { /* Initial RNG transitio
 #ifdef _MSC_VER
 static void mrg_multiply(const mrg_transition_matrix* __restrict m, const mrg_transition_matrix* __restrict n, mrg_transition_matrix* result) {
 #else
-static void mrg_multiply(const mrg_transition_matrix* restrict m, const mrg_transition_matrix* restrict n, mrg_transition_matrix* result) {
+static void mrg_multiply(const mrg_transition_matrix* m, const mrg_transition_matrix* n, mrg_transition_matrix* result) {
 #endif
   uint_least32_t rs = mod_mac(mod_mac(mod_mac(mod_mac(mod_mul(m->s, n->d), m->t, n->c), m->u, n->b), m->v, n->a), m->w, n->s);
   uint_least32_t rt = mod_mac(mod_mac(mod_mac(mod_mac(mod_mul_y(mod_mul(m->s, n->s)), m->t, n->w), m->u, n->v), m->v, n->u), m->w, n->t);
@@ -6280,7 +6280,7 @@ static void mrg_multiply(const mrg_transition_matrix* restrict m, const mrg_tran
 #ifdef _MSC_VER
 static void mrg_power(const mrg_transition_matrix* __restrict m, unsigned int exponent, mrg_transition_matrix* __restrict result) {
 #else
-static void mrg_power(const mrg_transition_matrix* restrict m, unsigned int exponent, mrg_transition_matrix* restrict result) {
+static void mrg_power(const mrg_transition_matrix* m, unsigned int exponent, mrg_transition_matrix* result) {
 #endif
   mrg_transition_matrix current_power_of_2 = *m;
   mrg_make_identity(result);
@@ -6298,7 +6298,7 @@ static void mrg_power(const mrg_transition_matrix* restrict m, unsigned int expo
 #ifdef _MSC_VER
 static void mrg_apply_transition(const mrg_transition_matrix* __restrict mat, const mrg_state* __restrict st, mrg_state* r) {
 #else
-static void mrg_apply_transition(const mrg_transition_matrix* restrict mat, const mrg_state* restrict st, mrg_state* r) {
+static void mrg_apply_transition(const mrg_transition_matrix* mat, const mrg_state* st, mrg_state* r) {
 #endif
 #ifdef __MTA__
   uint_fast64_t s = mat->s;

@@ -6,7 +6,7 @@ graph: graph.o
 	$(CHARMC) ${LD_OPTS} -o $@ graph.o ${UNION_FIND_LIBS}
 
 graph.o : graph.C graph.decl.h graph.def.h vtype.h
-	$(CHARMC) -c ${OPTS} ${UNION_FIND_INC} -I./graph500-gen graph.C -I$(MPI_ROOT)/include
+	$(CHARMC) -c ${OPTS} ${UNION_FIND_INC} -I./graph500-gen -DGRAPH_GENERATOR_MPI graph.C -I$(MPI_ROOT)/include
 
 graph.decl.h graph.def.h : graph.ci
 	$(CHARMC) -E graph.ci
