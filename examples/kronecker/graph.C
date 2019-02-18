@@ -41,7 +41,7 @@ class Main : public CBase_Main {
 
     // TODO: need to remove passing tpProxy
     libProxy = UnionFindLib::unionFindInit();
-    CkCallback cb(CkIndex_Main::done(), thisProxy);
+    CkCallback cb(CkIndex_Main::doneTreeGeneration(), thisProxy);
     libProxy[0].register_phase_one_cb(cb);
     tpProxy = CProxy_TreePiece::ckNew();
     // find first vertex ID on last chare
@@ -57,8 +57,10 @@ class Main : public CBase_Main {
     int64_t created_num_edges;
     int64_t* edges;
 
-    CkPrintf("Generating kronecker graph...\n");
+    double gen_start_time = CkWallTimer();
+    CkPrintf("[Main] Generating kronecker graph...\n");
     make_graph(scale, desired_num_edges, seeds[0], seeds[1], initiator, &num_edges, &edges);
+    CkPrintf("[Main] Graph generation time: %lf\n", CkWallTimer() - gen_start_time);
 
     for (int i = 0; i < num_edges; i++) {
       int64_t src = edges[2*i];
@@ -72,7 +74,7 @@ class Main : public CBase_Main {
 
     if (num_edges != edgeList.size()) {
       num_edges = edgeList.size();
-      CkPrintf("Updating num_edges to %ld after graph generation\n", num_edges);
+      CkPrintf("[Main] Updating num_edges to %ld after graph generation\n", num_edges);
     }
 
     // Free temporary memory used in graph generation
@@ -86,8 +88,6 @@ class Main : public CBase_Main {
     }
     // Remaining edges go into last treepiece
     splitEdgeList.emplace_back(edgeList.begin() + num_edges_tp * (num_treepieces-1), edgeList.end());
-
-    CkPrintf("Edge lists ready for distribution\n");
   }
 
   void startWork() {
@@ -100,9 +100,9 @@ class Main : public CBase_Main {
     }
   }
 
-  void done() {
+  void doneTreeGeneration() {
     CkPrintf("[Main] Inverted trees constructed. Notify library to perform components detection\n");
-    CkPrintf("[Main] Tree construction time: %f\n", CkWallTimer()-startTime);
+    CkPrintf("[Main] Tree construction time: %lf\n", CkWallTimer() - startTime);
     // callback for library to inform application after completing
     // connected components detection
     CkCallback cb(CkIndex_Main::doneFindComponents(), thisProxy);
@@ -113,7 +113,7 @@ class Main : public CBase_Main {
 
   void doneFindComponents() {
     CkPrintf("[Main] Components identified, prune unecessary ones now\n");
-    CkPrintf("[Main] Components detection time: %f\n", CkWallTimer()-startTime);
+    CkPrintf("[Main] Components detection time: %lf\n", CkWallTimer() - startTime);
     // callback for library to report to after pruning
     CkExit();
     CkCallback cb(CkIndex_TreePiece::requestVertices(), tpProxy);
@@ -121,7 +121,7 @@ class Main : public CBase_Main {
   }
 
   void donePrinting() {
-    CkPrintf("[Main] Final runtime: %f\n", CkWallTimer()-startTime);
+    CkPrintf("[Main] Final runtime: %lf\n", CkWallTimer() - startTime);
     CkExit();
   }
 };

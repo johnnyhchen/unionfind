@@ -10,7 +10,7 @@ mainmodule graph {
     mainchare Main {
         entry Main(CkArgMsg *m);
         entry [reductiontarget] void startWork();
-        entry void done();
+        entry void doneTreeGeneration();
         entry void doneFindComponents();
         entry [reductiontarget] void donePrinting();
     }
