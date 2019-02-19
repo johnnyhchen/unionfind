@@ -15,7 +15,7 @@ class Main : public CBase_Main {
   CProxy_TreePiece tpProxy;
   double startTime;
 
-  int desired_num_edges;
+  int64_t desired_num_edges;
   uint8_t scale;
   uint8_t edgeFactor;
   std::vector<std::pair<int64_t, int64_t>> edgeList;

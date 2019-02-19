@@ -38,7 +38,7 @@ void make_graph(int log_numverts, int64_t desired_nedges, uint64_t userseed1, ui
 /* Spread the two 64-bit numbers into five nonzero values in the correct
    * range. */
   uint_fast32_t seed[5];
-  #ifdef GRAPHGEN_KEEP_MULTIPLICITIES
+#ifdef GRAPHGEN_KEEP_MULTIPLICITIES
   generated_edge* edges;
 #else
   int64_t* edges;
@@ -61,7 +61,16 @@ void make_graph(int log_numverts, int64_t desired_nedges, uint64_t userseed1, ui
 #ifdef GRAPHGEN_KEEP_MULTIPLICITIES
   edges = (generated_edge*)xcalloc(nedges, sizeof(generated_edge)); /* multiplicity set to 0 for unused edges */
 #else
-  edges = (int64_t*)xmalloc(2 * nedges * sizeof(int64_t));
+  size_t mem_size = 2 * nedges * sizeof(int64_t);
+  printf("Allocating %zu bytes for edges in kronecker graph\n", mem_size);
+  edges = (int64_t*)xmalloc(mem_size);
+  if (edges != NULL) {
+    printf("Successfully allocated memory for edges\n");
+  }
+  else {
+    printf("Failed to allocate memory for edges\n");
+    abort();
+  }
 #endif
 
   generate_kronecker(0, 1, seed, log_numverts, M, initiator, edges);
