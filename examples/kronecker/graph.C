@@ -1,8 +1,11 @@
 #include <assert.h>
+#include <unistd.h>
 #include <iostream>
+#include <string>
 #include "unionFindLib.h"
 #include "graph.decl.h"
 #include "vtype.h"
+#include "graph_io.h"
 #include "make_graph.h"
 
 /*readonly*/ CProxy_UnionFindLib libProxy;
@@ -17,26 +20,112 @@ class Main : public CBase_Main {
 
   int64_t desired_num_edges;
   uint8_t scale;
-  uint8_t edgeFactor;
+  uint8_t edge_factor;
   std::vector<std::pair<int64_t, int64_t>> edgeList;
   std::vector<std::vector<std::pair<int64_t, int64_t>>> splitEdgeList;
 
   public:
   Main(CkArgMsg *m) {
-    if (m->argc != 3) {
-      CkPrintf("Usage: ./graph <scale> <edgefactor>\n");
-      CkExit();
+    // Default parameters
+    scale = 10; // 1M vertices
+    edge_factor = 4; // 4M edges
+    std::string input_file_name("");
+    std::string output_file_name("");
+    bool generate_graph = false;
+
+    // Command line parsing
+    int c;
+    while ((c = getopt(m->argc, m->argv, "s:e:i:o:gh")) != -1) {
+      switch (c) {
+        case 's':
+          scale = atoi(optarg);
+          break;
+        case 'e':
+          edge_factor = atoi(optarg);
+          break;
+        case 'i':
+          input_file_name = optarg;
+          break;
+        case 'o':
+          output_file_name = optarg;
+          break;
+        case 'g':
+          generate_graph = true;
+          break;
+        case 'h':
+          CkPrintf("Usage: ./graph -s [scale] -e [edge factor] -i [input file name]"
+              " -o [output file name] -g (generate graph)");
+          CkExit();
+        case '?':
+          if (optopt == 'c')
+            CkError("Option -%c requires an argument.\n", optopt);
+          else if (isprint(optopt))
+            CkError("Unknown option '-%c'.\n", optopt);
+          else
+            CkError("Unknown option character '\\x%x'.\n", optopt);
+          CkExit();
+        default:
+          CkAbort("Command line parsing error");
+      }
     }
-    scale = atoi(m->argv[1]);
+
     num_vertices = 1UL << scale;
-    edgeFactor = atoi(m->argv[2]);
-    desired_num_edges = edgeFactor * num_vertices;
+    desired_num_edges = edge_factor * num_vertices;
     CkPrintf("num_vertices: %ld, desired_num_edges: %ld\n", num_vertices, desired_num_edges);
 
     num_treepieces = CkNumPes();
     if (num_vertices < num_treepieces) {
       CkPrintf("Fewer vertices than treepieces\n");
       CkExit();
+    }
+
+    // Generate kronecker graph (sequentially or with OpenMP, depends on library)
+    if (generate_graph) {
+      int64_t seeds[2] = {1, 2};
+      const double initiator[4] = {.57, .19, .19, .05};
+      int64_t created_num_edges;
+      int64_t* edges;
+
+      double gen_start_time = CkWallTimer();
+      CkPrintf("[Main] Generating kronecker graph...\n");
+      make_graph(scale, desired_num_edges, seeds[0], seeds[1], initiator, &num_edges, &edges);
+      CkPrintf("[Main] Graph generation time: %lf\n", CkWallTimer() - gen_start_time);
+
+      // Open file
+      if (output_file_name.length() == 0) {
+        CkPrintf("Graph output file name not specified, using graph.dat\n");
+        output_file_name = "graph.dat";
+      }
+      std::ofstream out_fs(output_file_name);
+      CkPrintf("Writing graph to %s...\n", output_file_name.c_str());
+
+      // Write metadata
+      writeMetadata(out_fs, num_vertices, num_edges);
+
+      // Write edges
+      for (int i = 0; i < num_edges; i++) {
+        int64_t src = edges[2*i];
+        int64_t dest = edges[2*i+1];
+
+        if ((src >= 0) && (dest >= 0)) {
+          // Valid edge
+          out_fs << src << " " << dest << std::endl;
+        }
+      }
+
+      // Free temporary memory used in graph generation
+      free(edges);
+
+      // Output graph to file
+
+      CkExit();
+    }
+
+    CkExit();
+
+    if (num_edges != edgeList.size()) {
+      num_edges = edgeList.size();
+      CkPrintf("[Main] Updating num_edges to %ld after graph generation\n", num_edges);
     }
 
     // TODO: need to remove passing tpProxy
@@ -50,35 +139,6 @@ class Main : public CBase_Main {
 
     // Start timing, include graph generation time
     startTime = CkWallTimer();
-
-    // Generate kronecker graph (parallelized with MPI)
-    int64_t seeds[2] = {1, 2};
-    const double initiator[4] = {.57, .19, .19, .05};
-    int64_t created_num_edges;
-    int64_t* edges;
-
-    double gen_start_time = CkWallTimer();
-    CkPrintf("[Main] Generating kronecker graph...\n");
-    make_graph(scale, desired_num_edges, seeds[0], seeds[1], initiator, &num_edges, &edges);
-    CkPrintf("[Main] Graph generation time: %lf\n", CkWallTimer() - gen_start_time);
-
-    for (int i = 0; i < num_edges; i++) {
-      int64_t src = edges[2*i];
-      int64_t dest = edges[2*i+1];
-
-      if ((src >= 0) && (dest >= 0)) {
-        // Valid edge
-        edgeList.emplace_back(src, dest);
-      }
-    }
-
-    if (num_edges != edgeList.size()) {
-      num_edges = edgeList.size();
-      CkPrintf("[Main] Updating num_edges to %ld after graph generation\n", num_edges);
-    }
-
-    // Free temporary memory used in graph generation
-    free(edges);
 
     // Split edge list for distribution to treepieces
     std::size_t const num_edges_tp = edgeList.size() / num_treepieces;
