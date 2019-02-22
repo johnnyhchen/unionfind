@@ -17,7 +17,7 @@ mainmodule graph {
 
     group TreePiece {
         entry TreePiece();
-        entry void doWork(std::vector<std::pair<int64_t, int64_t>>);
+        entry void doWork(int64_t edges[n], int64_t n);
         entry void requestVertices();
         entry void getConnectedComponents();
         entry void test();

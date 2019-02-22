@@ -21,8 +21,7 @@ class Main : public CBase_Main {
   int64_t desired_num_edges;
   uint8_t scale;
   uint8_t edge_factor;
-  std::vector<std::pair<int64_t, int64_t>> edgeList;
-  std::vector<std::vector<std::pair<int64_t, int64_t>>> splitEdgeList;
+  int64_t* edges;
 
   public:
   Main(CkArgMsg *m) {
@@ -31,11 +30,10 @@ class Main : public CBase_Main {
     edge_factor = 4; // 4M edges
     std::string input_file_name("");
     std::string output_file_name("");
-    bool generate_graph = false;
 
     // Command line parsing
     int c;
-    while ((c = getopt(m->argc, m->argv, "s:e:i:o:gh")) != -1) {
+    while ((c = getopt(m->argc, m->argv, "s:e:i:o:h")) != -1) {
       switch (c) {
         case 's':
           scale = atoi(optarg);
@@ -49,12 +47,9 @@ class Main : public CBase_Main {
         case 'o':
           output_file_name = optarg;
           break;
-        case 'g':
-          generate_graph = true;
-          break;
         case 'h':
           CkPrintf("Usage: ./graph -s [scale] -e [edge factor] -i [input file name]"
-              " -o [output file name] -g (generate graph)");
+              " -o [output file name]");
           CkExit();
         case '?':
           if (optopt == 'c')
@@ -79,53 +74,43 @@ class Main : public CBase_Main {
       CkExit();
     }
 
-    // Generate kronecker graph (sequentially or with OpenMP, depends on library)
-    if (generate_graph) {
+    // Generate kronecker graph if input file is not given
+    // (sequentially or with OpenMP, depends on linked library)
+    if (input_file_name.length() == 0) {
       int64_t seeds[2] = {1, 2};
       const double initiator[4] = {.57, .19, .19, .05};
-      int64_t created_num_edges;
-      int64_t* edges;
 
       double gen_start_time = CkWallTimer();
-      CkPrintf("[Main] Generating kronecker graph...\n");
+      CkPrintf("[Main] Input file not provided, generating kronecker graph...\n");
       make_graph(scale, desired_num_edges, seeds[0], seeds[1], initiator, &num_edges, &edges);
       CkPrintf("[Main] Graph generation time: %lf\n", CkWallTimer() - gen_start_time);
 
-      // Open file
-      if (output_file_name.length() == 0) {
-        CkPrintf("Graph output file name not specified, using graph.dat\n");
-        output_file_name = "graph.dat";
-      }
-      std::ofstream out_fs(output_file_name);
-      CkPrintf("Writing graph to %s...\n", output_file_name.c_str());
+      if (output_file_name.length() > 0) {
+        // TODO Write graph to file
+        std::ofstream out_fs(output_file_name);
+        CkPrintf("[Main] Writing graph to %s...\n", output_file_name.c_str());
 
-      // Write metadata
-      writeMetadata(out_fs, num_vertices, num_edges);
+        // Write metadata
+        writeMetadata(out_fs, num_vertices, num_edges);
 
-      // Write edges
-      for (int i = 0; i < num_edges; i++) {
-        int64_t src = edges[2*i];
-        int64_t dest = edges[2*i+1];
+        // Write edges
+        for (int64_t i = 0; i < num_edges; i++) {
+          int64_t src = edges[2*i];
+          int64_t dest = edges[2*i+1];
 
-        if ((src >= 0) && (dest >= 0)) {
-          // Valid edge
-          out_fs << src << " " << dest << std::endl;
+          if ((src >= 0) && (dest >= 0)) {
+            out_fs << src << " " << dest << std::endl;
+          }
         }
+
+        // Free temporary memory used in graph generation
+        free(edges);
+
+        CkExit();
       }
-
-      // Free temporary memory used in graph generation
-      free(edges);
-
-      // Output graph to file
-
-      CkExit();
     }
-
-    CkExit();
-
-    if (num_edges != edgeList.size()) {
-      num_edges = edgeList.size();
-      CkPrintf("[Main] Updating num_edges to %ld after graph generation\n", num_edges);
+    else {
+      // TODO Process input graph and store them in edges
     }
 
     // TODO: need to remove passing tpProxy
@@ -136,28 +121,21 @@ class Main : public CBase_Main {
     // find first vertex ID on last chare
     // create a callback for library to inform application after
     // completing inverted tree construction
-
-    // Start timing, include graph generation time
-    startTime = CkWallTimer();
-
-    // Split edge list for distribution to treepieces
-    std::size_t const num_edges_tp = edgeList.size() / num_treepieces;
-    for (int i = 0; i < num_treepieces-1; i++) {
-      splitEdgeList.emplace_back(edgeList.begin() + num_edges_tp * i,
-                                 edgeList.begin() + num_edges_tp * (i+1));
-    }
-    // Remaining edges go into last treepiece
-    splitEdgeList.emplace_back(edgeList.begin() + num_edges_tp * (num_treepieces-1), edgeList.end());
   }
 
   void startWork() {
     CkPrintf("[Main] Library array with %d chares created and proxy obtained\n", num_treepieces);
+    startTime = CkWallTimer();
 
     // Send edges to treepieces and start union-find algorithm
-    // TODO Use scatter instead of point-to-point messages
-    for (int i = 0; i < num_treepieces; i++) {
-      tpProxy[i].doWork(splitEdgeList[i]);
+    // FIXME Use scatter instead of point-to-point messages
+    const int64_t num_edges_tp = num_edges / num_treepieces;
+    const int64_t num_edges_last_tp = num_edges_tp + (num_edges % num_treepieces);
+    for (int i = 0; i < num_treepieces-1; i++) {
+      tpProxy[i].doWork(edges + num_edges_tp * i * 2, num_edges_tp * 2);
     }
+    // Remaining edges go to last treepiece
+    tpProxy[num_treepieces-1].doWork(edges + num_edges_tp * (num_treepieces-1) * 2, num_edges_last_tp * 2);
   }
 
   void doneTreeGeneration() {
@@ -227,10 +205,12 @@ class TreePiece : public CBase_TreePiece {
 
   TreePiece(CkMigrateMessage *msg) { }
 
-  void doWork(std::vector<std::pair<int64_t, int64_t>> edgeList) {
-    // Fire union requests with the received edges
-    for (auto edge : edgeList) {
-      libPtr->union_request(edge.first, edge.second);
+  void doWork(int64_t* e, int64_t nv) {
+    for (int64_t i = 0; i < nv / 2; i++) {
+      int64_t src = e[2*i];
+      int64_t dest = e[2*i+1];
+      if ((src >= 0 && src < num_vertices) && (dest >= 0 && dest < num_vertices))
+        libPtr->union_request(src, dest);
     }
   }
 
