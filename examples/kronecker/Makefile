@@ -1,6 +1,6 @@
 include ../../Makefile.common
 
-all: graph-seq
+all: graph-omp
 
 graph-seq: graph.o
 	$(CHARMC) ${LD_OPTS} -o $@ graph.o ${UNION_FIND_LIBS} -lgraph_generator_seq -L./generator
