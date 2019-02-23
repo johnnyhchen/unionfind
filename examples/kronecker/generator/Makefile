@@ -1,1 +1,1 @@
-Makefile.seq
+Makefile.omp
