@@ -31,8 +31,9 @@
 
 void* xmalloc(size_t n) {
   void* p = malloc(n);
+  prtinf("xmalloc: allocated %zu bytes\n", n);
   if (!p) {
-    fprintf(stderr, "Out of memory trying to allocate %zu byte(s)\n", n);
+    fprintf(stderr, "xmalloc: out of memory trying to allocate %zu byte(s)\n", n);
     abort();
   }
   return p;

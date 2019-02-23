@@ -229,7 +229,6 @@ void make_graph(int log_numverts, int64_t desired_nedges, uint64_t userseed1, ui
   generated_edge* edges = (generated_edge*)xcalloc(nedges, sizeof(generated_edge)); /* multiplicity set to 0 for unused edges */
 #else
   size_t mem_size = 2 * nedges * sizeof(int64_t);
-  printf("Allocating %zu bytes for edges in kronecker graph\n", mem_size);
   int64_t* edges = (int64_t*)xmalloc(mem_size);
   if (edges != NULL) {
     printf("Successfully allocated memory for edges\n");
