@@ -1,0 +1,35 @@
+Sat Feb 23 22:25:03 CST 2019
+TACC:  Starting up job 2996071 
+TACC:  Starting parallel tasks... 
+Charm++>ofi> provider: psm2
+Charm++>ofi> control progress: 2
+Charm++>ofi> data progress: 2
+Charm++>ofi> maximum inject message size: 64
+Charm++>ofi> eager maximum message size: 65536 (maximum header size: 40)
+Charm++>ofi> cq entries count: 8
+Charm++>ofi> use inject: 1
+Charm++>ofi> maximum rma size: 4294967295
+Charm++>ofi> mr mode: 0x2
+Charm++>ofi> use memory pool: 0
+Charm++>ofi> use request cache: 0
+Charm++>ofi> number of pre-allocated recvs: 8
+Charm++>ofi> exchanging addresses over OFI
+Charm++> Running in SMP mode: 16 processes, 16 worker threads (PEs) + 1 comm threads per process, 256 PEs total
+Charm++> The comm. thread both sends and receives messages
+Converse/Charm++ Commit ID: v6.9.0-124-gb61a6e7
+Warning> Randomization of virtual memory (ASLR) is turned on in the kernel, thread migration may not work! Run 'echo 0 > /proc/sys/kernel/randomize_va_space' as root to disable it, or try running with '+isomalloc_sync'.
+CharmLB> Load balancer assumes all CPUs are same.
+CharmLB> Load balancing instrumentation is off.
+Charm++> cpu affinity enabled. 
+Charm++> cpuaffinity PE-core map : 0-63
+Charm++> Running on 4 hosts (1 sockets x 68 cores x 4 PUs = 272-way SMP)
+Charm++> cpu topology info is gathered in 0.067 seconds.
+num_vertices: 33554432, desired_num_edges: 536870912
+[Main] Input file not provided, generating kronecker graph...
+Allocating 8589934592 bytes for edges in kronecker graph
+xmalloc: allocated 8589934592 bytes
+Successfully allocated memory for edges
+xmalloc: allocated 268435456 bytes
+xmalloc: allocated 1073743872 bytes
+xmalloc: allocated 4294967296 bytes
+xmalloc: allocated 17179871232 bytes

@@ -1,0 +1,167 @@
+Sat Feb 23 22:24:51 CST 2019
+TACC:  Starting up job 2996070 
+TACC:  Starting parallel tasks... 
+Charm++>ofi> provider: psm2
+Charm++>ofi> control progress: 2
+Charm++>ofi> data progress: 2
+Charm++>ofi> maximum inject message size: 64
+Charm++>ofi> eager maximum message size: 65536 (maximum header size: 40)
+Charm++>ofi> cq entries count: 8
+Charm++>ofi> use inject: 1
+Charm++>ofi> maximum rma size: 4294967295
+Charm++>ofi> mr mode: 0x2
+Charm++>ofi> use memory pool: 0
+Charm++>ofi> use request cache: 0
+Charm++>ofi> number of pre-allocated recvs: 8
+Charm++>ofi> exchanging addresses over OFI
+Charm++> Running in SMP mode: 8 processes, 16 worker threads (PEs) + 1 comm threads per process, 128 PEs total
+Charm++> The comm. thread both sends and receives messages
+Converse/Charm++ Commit ID: v6.9.0-124-gb61a6e7
+Warning> Randomization of virtual memory (ASLR) is turned on in the kernel, thread migration may not work! Run 'echo 0 > /proc/sys/kernel/randomize_va_space' as root to disable it, or try running with '+isomalloc_sync'.
+CharmLB> Load balancer assumes all CPUs are same.
+CharmLB> Load balancing instrumentation is off.
+Charm++> cpu affinity enabled. 
+Charm++> cpuaffinity PE-core map : 0-63
+Charm++> Running on 2 hosts (1 sockets x 68 cores x 4 PUs = 272-way SMP)
+Charm++> cpu topology info is gathered in 0.110 seconds.
+num_vertices: 33554432, desired_num_edges: 536870912
+[Main] Input file not provided, generating kronecker graph...
+Allocating 8589934592 bytes for edges in kronecker graph
+xmalloc: allocated 8589934592 bytes
+Successfully allocated memory for edges
+xmalloc: allocated 268435456 bytes
+xmalloc: allocated 1073743872 bytes
+xmalloc: allocated 4294967296 bytes
+xmalloc: allocated 17179871232 bytes
+xmalloc: allocated 8589934592 bytes
+[Main] Graph generation time: 2480.525041
+Trying to allocate myVertices in library size: 0.013672 GB myPE: 0 elements: 262144 numVertices in each chare: 262144 numCharesinPe: 1
+[Main] Library array with 128 chares created and proxy obtained
+posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12[22] Stack Traceback:
+  [22:0] _Z14CmiAbortHelperPKcS0_S0_ii+0x4f  [0x5c6d0f]
+  [22:1]   [0x5c6d7b]
+  [22:2] LrtsAlloc+0x6a  [0x5cce0a]
+  [22:3] CmiRdmaAlloc+0x12  [0x5d1f52]
+  [22:4] CkAllocMsg+0x31  [0x531a91]
+  [22:5] _ZN12MeshStreamerI10anchorData16SimpleMeshRouterE12storeMessageEiRK5RoutePKvb+0x2cf  [0x4f6c5f]
+  [22:6] _ZN26CProxyElement_UnionFindLib16insertDataAnchorERK10anchorData+0x168  [0x4e5d88]
+  [22:7] _ZN12UnionFindLib6anchorElll+0x102  [0x4e5f42]
+  [22:8] _ZN20CkIndex_UnionFindLib41_callmarshall_insertDataAnchor_marshall11EPcPv+0x88  [0x4e64a8]
+  [22:9] _ZN12MeshStreamerI10anchorData16SimpleMeshRouterE17receiveAlongRouteEP19MeshStreamerMessageIS0_E+0x5fd  [0x4fc77d]
+  [22:10] CkDeliverMessageFree+0x1f  [0x5275ff]
+  [22:11] _Z15_processHandlerPvP11CkCoreState+0xb24  [0x52ed54]
+  [22:12] CsdScheduleForever+0x85  [0x5d0685]
+  [22:13] CsdScheduler+0x2d  [0x5d09fd]
+  [22:14]   [0x5cd66b]
+  [22:15]   [0x5cde96]
+  [22:16] +0x7e25  [0x2b87ecacde25]
+  [22:17] clone+0x6d  [0x2b87edddd34d]
+posix_memalign: ret 12[16] Stack Traceback:
+  [16:0] _Z14CmiAbortHelperPKcS0_S0_ii+0x4f  [0x5c6d0f]
+  [16:1]   [0x5c6d7b]
+  [16:2] LrtsAlloc+0x6a  [0x5cce0a]
+  [16:3] CmiRdmaAlloc+0x12  [0x5d1f52]
+  [16:4] CkAllocMsg+0x31  [0x531a91]
+  [16:5] _ZN12MeshStreamerI10anchorData16SimpleMeshRouterE12storeMessageEiRK5RoutePKvb+0x2cf  [0x4f6c5f]
+  [16:6] _ZN26CProxyElement_UnionFindLib16insertDataAnchorERK10anchorData+0x168  [0x4e5d88]
+  [16:7] _ZN12UnionFindLib6anchorElll+0x1ef  [0x4e602f]
+  [16:8] _ZN20CkIndex_UnionFindLib41_callmarshall_insertDataAnchor_marshall11EPcPv+0x88  [0x4e64a8]
+  [16:9] _ZN12MeshStreamerI10anchorData16SimpleMeshRouterE17receiveAlongRouteEP19MeshStreamerMessageIS0_E+0x5fd  [0x4fc77d]
+  [16:10] CkDeliverMessageFree+0x1f  [0x5275ff]
+  [16:11] _Z15_processHandlerPvP11CkCoreState+0xb24  [0x52ed54]
+  [16:12] CsdScheduleForever+0x85  [0x5d0685]
+  [16:13] CsdScheduler+0x2d  [0x5d09fd]
+  [16:14]   [0x5cd66b]
+  [16:15] ConverseInit+0x3c1  [0x5cda81]
+  [16:16] charm_main+0x27  [0x51de37]
+  [16:17] __libc_start_main+0xf5  [0x2b87edd06c05]
+  [16:18]   [0x4ce929]
+[63] Stack Traceback:
+  [63:0] _Z14CmiAbortHelperPKcS0_S0_ii+0x4f  [0x5c6d0f]
+  [63:1]   [0x5c6d7b]
+  [63:2] LrtsAlloc+0x6a  [0x5cce0a]
+  [63:3] CmiRdmaAlloc+0x12  [0x5d1f52]
+  [63:4] CkAllocMsg+0x31  [0x531a91]
+  [63:5] _ZN12MeshStreamerI10anchorData16SimpleMeshRouterE12storeMessageEiRK5RoutePKvb+0x2cf  [0x4f6c5f]
+  [63:6] _ZN26CProxyElement_UnionFindLib16insertDataAnchorERK10anchorData+0x168  [0x4e5d88]
+  [63:7] _ZN12UnionFindLib6anchorElll+0x1ef  [0x4e602f]
+  [63:8] _ZN20CkIndex_UnionFindLib41_callmarshall_insertDataAnchor_marshall11EPcPv+0x88  [0x4e64a8]
+  [63:9] _ZN12MeshStreamerI10anchorData16SimpleMeshRouterE17receiveAlongRouteEP19MeshStreamerMessageIS0_E+0x5fd  [0x4fc77d]
+  [63:10] CkDeliverMessageFree+0x1f  [0x5275ff]
+  [63:11] _Z15_processHandlerPvP11CkCoreState+0xb24  [0x52ed54]
+  [63:12] CsdScheduleForever+0x85  [0x5d0685]
+  [63:13] CsdScheduler+0x2d  [0x5d09fd]
+  [63:14]   [0x5cd66b]
+  [63:15]   [0x5cde96]
+  [63:16] +0x7e25  [0x2b99c6845e25]
+  [63:17] clone+0x6d  [0x2b99c7b5534d]
+posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12posix_memalign: ret 12[6] Stack Traceback:
+  [6:0] _Z14CmiAbortHelperPKcS0_S0_ii+0x4f  [0x5c6d0f]
+  [6:1]   [0x5c6d7b]
+  [6:2] LrtsAlloc+0x6a  [0x5cce0a]
+  [6:3] CmiRdmaAlloc+0x12  [0x5d1f52]
+  [6:4] CkAllocMsg+0x31  [0x531a91]
+  [6:5] _ZN12MeshStreamerI10anchorData16SimpleMeshRouterE12storeMessageEiRK5RoutePKvb+0x2cf  [0x4f6c5f]
+  [6:6] _ZN26CProxyElement_UnionFindLib16insertDataAnchorERK10anchorData+0x168  [0x4e5d88]
+  [6:7] _ZN12UnionFindLib6anchorElll+0x102  [0x4e5f42]
+  [6:8] _ZN20CkIndex_UnionFindLib41_callmarshall_insertDataAnchor_marshall11EPcPv+0x88  [0x4e64a8]
+  [6:9] _ZN12MeshStreamerI10anchorData16SimpleMeshRouterE17receiveAlongRouteEP19MeshStreamerMessageIS0_E+0x5fd  [0x4fc77d]
+  [6:10] CkDeliverMessageFree+0x1f  [0x5275ff]
+  [6:11] _Z15_processHandlerPvP11CkCoreState+0xb24  [0x52ed54]
+  [6:12] CsdScheduleForever+0x85  [0x5d0685]
+  [6:13] CsdScheduler+0x2d  [0x5d09fd]
+  [6:14]   [0x5cd66b]
+  [6:15]   [0x5cde96]
+  [6:16] +0x7e25  [0x2af31b528e25]
+  [6:17] clone+0x6d  [0x2af31c83834d]
+[36] Stack Traceback:
+  [36:0] _Z14CmiAbortHelperPKcS0_S0_ii+0x4f  [0x5c6d0f]
+  [36:1]   [0x5c6d7b]
+  [36:2] LrtsAlloc+0x6a  [0x5cce0a]
+  [36:3] CmiRdmaAlloc+0x12  [0x5d1f52]
+  [36:4] CkAllocMsg+0x31  [0x531a91]
+  [36:5] _ZN12MeshStreamerI10anchorData16SimpleMeshRouterE12storeMessageEiRK5RoutePKvb+0x2cf  [0x4f6c5f]
+  [36:6] _ZN26CProxyElement_UnionFindLib16insertDataAnchorERK10anchorData+0x168  [0x4e5d88]
+  [36:7] _ZN12UnionFindLib6anchorElll+0x1ef  [0x4e602f]
+  [36:8] _ZN20CkIndex_UnionFindLib41_callmarshall_insertDataAnchor_marshall11EPcPv+0x88  [0x4e64a8]
+  [36:9] _ZN12MeshStreamerI10anchorData16SimpleMeshRouterE17receiveAlongRouteEP19MeshStreamerMessageIS0_E+0x5fd  [0x4fc77d]
+  [36:10] CkDeliverMessageFree+0x1f  [0x5275ff]
+  [36:11] _Z15_processHandlerPvP11CkCoreState+0xb24  [0x52ed54]
+  [36:12] CsdScheduleForever+0x85  [0x5d0685]
+  [36:13] CsdScheduler+0x2d  [0x5d09fd]
+  [36:14]   [0x5cd66b]
+  [36:15]   [0x5cde96]
+  [36:16] +0x7e25  [0x2b422aba1e25]
+  [36:17] clone+0x6d  [0x2b422beb134d]
+[38] Stack Traceback:
+  [38:0] _Z14CmiAbortHelperPKcS0_S0_ii+0x4f  [0x5c6d0f]
+  [38:1]   [0x5c6d7b]
+  [38:2] LrtsAlloc+0x6a  [0x5cce0a]
+  [38:3] CmiRdmaAlloc+0x12  [0x5d1f52]
+  [38:4] CkAllocMsg+0x31  [0x531a91]
+  [38:5] _ZN12MeshStreamerI10anchorData16SimpleMeshRouterE12storeMessageEiRK5RoutePKvb+0x2cf  [0x4f6c5f]
+  [38:6] _ZN26CProxyElement_UnionFindLib16insertDataAnchorERK10anchorData+0x168  [0x4e5d88]
+  [38:7] _ZN12UnionFindLib6anchorElll+0x102  [0x4e5f42]
+[37] Stack Traceback:
+  [37:0] _Z14CmiAbortHelperPKcS0_S0_ii+0x4f  [0x5c6d0f]
+  [37:1]   [0x5c6d7b]
+  [38:8] _ZN20CkIndex_UnionFindLib41_callmarshall_insertDataAnchor_marshall11EPcPv+0x88  [0x4e64a8]
+  [38:9] _ZN12MeshStreamerI10anchorData16SimpleMeshRouterE17receiveAlongRouteEP19MeshStreamerMessageIS0_E+0x5fd  [0x4fc77d]
+  [38:10] CkDeliverMessageFree+0x1f  [0x5275ff]
+  [37:2] LrtsAlloc+0x6a  [0x5cce0a]
+  [37:3] CmiRdmaAlloc+0x12  [0x5d1f52]
+  [37:4] CkAllocMsg+0x31  [0x531a91]
+  [37:5] _ZN12MeshStreamerI10anchorData16SimpleMeshRouterE12storeMessageEiRK5RoutePKvb+0x2cf  [0x4f6c5f]
+  [37:6] _ZN26CProxyElement_UnionFindLib16insertDataAnchorERK10anchorData+0x168  [0x4e5d88]
+  [37:7] _ZN12UnionFindLib6anchorElll+0x1ef  [0x4e602f]
+  [37:8] _ZN20CkIndex_UnionFindLib41_callmarshall_insertDataAnchor_marshall11EPcPv+0x88  [0x4e64a8]
+  [37:9] _ZN12MeshStreamerI10anchorData16SimpleMeshRouterE17receiveAlongRouteEP19MeshStreamerMessageIS0_E+0x5fd  [0x4fc77d]
+  [37:10] CkDeliverMessageFree+0x1f  [0x5275ff]
+  [37:11] _Z15_processHandlerPvP11CkCoreState+0xb24  [0x52ed54]
+  [37:12] CsdScheduleForever+0x85  [0x5d0685]
+  [37:13] CsdScheduler+0x2d  [0x5d09fd]
+  [37:14]   [0x5cd66b]
+  [37:15]   [0x5cde96]
+  [37:16] +0x7e25  [0x2b422aba1e25]
+  [37:17] clone+0x6d  [0x2b422beb134d]
+  [38:11] _Z15_processHandlerPvP11CkCoreState+0xb24  [0x52ed54]

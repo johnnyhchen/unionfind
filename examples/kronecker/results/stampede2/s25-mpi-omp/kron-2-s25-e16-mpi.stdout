@@ -1,0 +1,163 @@
+Sat Feb 23 23:36:17 CST 2019
+TACC:  Starting up job 2996294 
+TACC:  Starting parallel tasks... 
+Charm++> Running on MPI version: 3.1
+Charm++> level of thread support used: MPI_THREAD_FUNNELED (desired: MPI_THREAD_FUNNELED)
+Charm++> Running in SMP mode: 8 processes, 16 worker threads (PEs) + 1 comm threads per process, 128 PEs total
+Charm++> The comm. thread both sends and receives messages
+Converse/Charm++ Commit ID: v6.9.0-124-gb61a6e7
+Warning> Randomization of virtual memory (ASLR) is turned on in the kernel, thread migration may not work! Run 'echo 0 > /proc/sys/kernel/randomize_va_space' as root to disable it, or try running with '+isomalloc_sync'.
+CharmLB> Load balancer assumes all CPUs are same.
+CharmLB> Load balancing instrumentation is off.
+Charm++> cpu affinity enabled. 
+Charm++> cpuaffinity PE-core map : 0-63
+Charm++> Running on 2 hosts (1 sockets x 68 cores x 4 PUs = 272-way SMP)
+Charm++> cpu topology info is gathered in 0.101 seconds.
+num_vertices: 33554432, desired_num_edges: 536870912
+[Main] Input file not provided, generating kronecker graph...
+xmalloc: allocated 8589934592 bytes
+Successfully allocated memory for edges
+xmalloc: allocated 268435456 bytes
+xmalloc: allocated 1073743872 bytes
+xmalloc: allocated 4294967296 bytes
+xmalloc: allocated 17179871232 bytes
+xmalloc: allocated 8589934592 bytes
+[Main] Graph generation time: 2455.808177
+Trying to allocate myVertices in library size: 0.013672 GB myPE: 0 elements: 262144 numVertices in each chare: 262144 numCharesinPe: 1
+[Main] Library array with 128 chares created and proxy obtained
+[Main] Inverted trees constructed. Notify library to perform components detection
+[Main] Tree construction time: 251.523400
+PE: 63 totalRoots: 127225
+PE: 54 totalRoots: 127356
+PE: 52 totalRoots: 127448
+PE: 51 totalRoots: 127341
+PE: 49 totalRoots: 127713
+PE: 56 totalRoots: 127389
+PE: 59 totalRoots: 127919
+PE: 57 totalRoots: 127383
+PE: 66 totalRoots: 127810
+PE: 72 totalRoots: 127382
+PE: 4 totalRoots: 127806
+PE: 39 totalRoots: 127567
+PE: 23 totalRoots: 127764
+PE: 62 totalRoots: 127612
+PE: 48 totalRoots: 127318
+PE: 55 totalRoots: 127499
+PE: 83 totalRoots: 127127
+PE: 6 totalRoots: 127872
+PE: 109 totalRoots: 127879
+PE: 17 totalRoots: 127266
+PE: 73 totalRoots: 127511
+PE: 78 totalRoots: 127365
+PE: 71 totalRoots: 127364
+PE: 60 totalRoots: 127629
+PE: 88 totalRoots: 127571
+PE: 92 totalRoots: 127631
+PE: 85 totalRoots: 127609
+PE: 94 totalRoots: 127625
+PE: 38 totalRoots: 127675
+PE: 46 totalRoots: 127541
+PE: 97 totalRoots: 127482
+PE: 100 totalRoots: 127297
+PE: 101 totalRoots: 127787
+PE: 10 totalRoots: 127693
+PE: 117 totalRoots: 127621
+PE: 126 totalRoots: 127389
+PE: 127 totalRoots: 127343
+PE: 120 totalRoots: 127363
+PE: 25 totalRoots: 127613
+PE: 24 totalRoots: 127093
+PE: 68 totalRoots: 127301
+PE: 65 totalRoots: 127961
+PE: 67 totalRoots: 127460
+PE: 77 totalRoots: 127454
+PE: 42 totalRoots: 127447
+PE: 37 totalRoots: 127109
+PE: 91 totalRoots: 127869
+PE: 80 totalRoots: 127368
+PE: 87 totalRoots: 128030
+PE: 93 totalRoots: 127227
+PE: 81 totalRoots: 127214
+PE: 82 totalRoots: 127659
+PE: 86 totalRoots: 127339
+PE: 1 totalRoots: 127796
+PE: 5 totalRoots: 127959
+PE: 108 totalRoots: 127798
+PE: 96 totalRoots: 127335
+PE: 110 totalRoots: 127604
+PE: 106 totalRoots: 127369
+PE: 111 totalRoots: 127755
+PE: 104 totalRoots: 127642
+PE: 22 totalRoots: 127401
+PE: 123 totalRoots: 127544
+PE: 114 totalRoots: 126850
+PE: 119 totalRoots: 127789
+PE: 122 totalRoots: 127183
+PE: 116 totalRoots: 126920
+PE: 115 totalRoots: 127785
+PE: 15 totalRoots: 127554
+PE: 79 totalRoots: 127415
+PE: 74 totalRoots: 127206
+PE: 76 totalRoots: 127331
+PE: 69 totalRoots: 127839
+PE: 64 totalRoots: 127192
+PE: 58 totalRoots: 127592
+PE: 53 totalRoots: 127826
+PE: 84 totalRoots: 127388
+PE: 90 totalRoots: 127289
+PE: 95 totalRoots: 127092
+PE: 31 totalRoots: 127638
+PE: 21 totalRoots: 127433
+PE: 98 totalRoots: 127516
+PE: 102 totalRoots: 127486
+PE: 103 totalRoots: 127396
+PE: 99 totalRoots: 127475
+PE: 47 totalRoots: 127608
+PE: 34 totalRoots: 127226
+PE: 33 totalRoots: 127955
+PE: 125 totalRoots: 127546
+PE: 121 totalRoots: 127715
+PE: 112 totalRoots: 127889
+PE: 113 totalRoots: 127198
+PE: 124 totalRoots: 127336
+PE: 9 totalRoots: 127680
+PE: 8 totalRoots: 127346
+PE: 14 totalRoots: 127626
+PE: 3 totalRoots: 127223
+PE: 70 totalRoots: 127808
+PE: 75 totalRoots: 127450
+PE: 20 totalRoots: 127463
+PE: 27 totalRoots: 127627
+PE: 19 totalRoots: 126963
+PE: 89 totalRoots: 127620
+PE: 44 totalRoots: 127732
+PE: 36 totalRoots: 127153
+PE: 43 totalRoots: 127141
+PE: 35 totalRoots: 127575
+PE: 40 totalRoots: 127854
+PE: 107 totalRoots: 127251
+PE: 105 totalRoots: 127243
+PE: 13 totalRoots: 127266
+PE: 2 totalRoots: 127670
+PE: 7 totalRoots: 127504
+PE: 12 totalRoots: 127814
+PE: 11 totalRoots: 127494
+PE: 118 totalRoots: 127726
+PE: 26 totalRoots: 127667
+PE: 28 totalRoots: 127065
+PE: 16 totalRoots: 127497
+PE: 18 totalRoots: 127429
+PE: 30 totalRoots: 127863
+PE: 41 totalRoots: 127502
+PE: 45 totalRoots: 127974
+PE: 61 totalRoots: 127454
+PE: 29 totalRoots: 127055
+PE: 32 totalRoots: 127363
+PE: 50 totalRoots: 127504
+PE: 0 totalRoots: 127747
+Total components: 16320536
+[Main] Components identified, prune unecessary ones now
+[Main] Components detection time: 32.073846
+[Partition 0][Node 0] End of program
+TACC:  Shutdown complete. Exiting. 
+Sun Feb 24 00:22:12 CST 2019

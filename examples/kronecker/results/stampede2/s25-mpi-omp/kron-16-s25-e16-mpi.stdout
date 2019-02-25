@@ -1,0 +1,42 @@
+Sun Feb 24 21:34:38 CST 2019
+TACC:  Starting up job 2999712 
+TACC:  Starting parallel tasks... 
+Charm++> Running on MPI version: 3.1
+Charm++> level of thread support used: MPI_THREAD_FUNNELED (desired: MPI_THREAD_FUNNELED)
+Charm++> Running in SMP mode: 64 processes, 16 worker threads (PEs) + 1 comm threads per process, 1024 PEs total
+Charm++> The comm. thread both sends and receives messages
+Converse/Charm++ Commit ID: v6.9.0-124-gb61a6e7
+Warning> Randomization of virtual memory (ASLR) is turned on in the kernel, thread migration may not work! Run 'echo 0 > /proc/sys/kernel/randomize_va_space' as root to disable it, or try running with '+isomalloc_sync'.
+CharmLB> Load balancer assumes all CPUs are same.
+CharmLB> Load balancing instrumentation is off.
+Charm++> cpu affinity enabled. 
+Charm++> cpuaffinity PE-core map : 0-63
+Charm++> Running on 16 hosts (1 sockets x 68 cores x 4 PUs = 272-way SMP)
+Charm++> cpu topology info is gathered in 0.142 seconds.
+num_vertices: 33554432, desired_num_edges: 536870912
+[Main] Input file not provided, generating kronecker graph...
+xmalloc: allocated 8589934592 bytes
+Successfully allocated memory for edges
+xmalloc: allocated 268435456 bytes
+xmalloc: allocated 1073743872 bytes
+xmalloc: allocated 4294967296 bytes
+xmalloc: allocated 17179871232 bytes
+xmalloc: allocated 8589934592 bytes
+[Main] Graph generation time: 2458.599098
+Trying to allocate myVertices in library size: 0.001709 GB myPE: 0 elements: 32768 numVertices in each chare: 32768 numCharesinPe: 1
+[Main] Library array with 1024 chares created and proxy obtained
+[51] Stack Traceback:
+  [51:0] CmiOutOfMemory+0x92  [0x721842]
+  [51:1] CmiAlloc+0x3e  [0x74521e]
+  [51:2] CkAllocMsg+0x30  [0x575aa0]
+  [51:3] _ZN20CkIndex_MeshStreamerI10anchorData16SimpleMeshRouterE43_call_receiveAlongRoute_MeshStreamerMessageEPvS3_+0x1cd  [0x50459d]
+  [51:4] _Z15_processHandlerPvP11CkCoreState+0x56d  [0x549dcd]
+  [51:5] CsdScheduleForever+0x13d  [0x73e93d]
+  [51:6] CsdScheduler+0x259  [0x73e7f9]
+  [51:7]   [0x727938]
+  [51:8]   [0x7249a2]
+  [51:9] +0x7e25  [0x2ab3c09ffe25]
+  [51:10] clone+0x6d  [0x2ab3c2f5334d]
+TACC:  MPI job exited with code: 1 
+TACC:  Shutdown complete. Exiting. 
+Sun Feb 24 22:16:26 CST 2019
