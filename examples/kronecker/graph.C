@@ -8,11 +8,12 @@
 #include "graph_io.h"
 #include "make_graph.h"
 
-/*readonly*/ CProxy_UnionFindLib libProxy;
-/*readonly*/ CProxy_Main mainProxy;
-/*readonly*/ int64_t num_vertices;
-/*readonly*/ int64_t num_edges;
-/*readonly*/ int64_t num_treepieces;
+/* readonly */ CProxy_UnionFindLib libProxy;
+/* readonly */ CProxy_Main mainProxy;
+/* readonly */ int64_t num_vertices;
+/* readonly */ int64_t num_edges;
+/* readonly */ int64_t num_treepieces;
+/* readonly */ int64_t batch_size;
 
 class Main : public CBase_Main {
   CProxy_TreePiece tpProxy;
@@ -30,16 +31,20 @@ class Main : public CBase_Main {
     edge_factor = 4; // 4M edges
     std::string input_file_name("");
     std::string output_file_name("");
+    batch_size = 15000;
 
     // Command line parsing
     int c;
-    while ((c = getopt(m->argc, m->argv, "s:e:i:o:h")) != -1) {
+    while ((c = getopt(m->argc, m->argv, "s:e:b:i:o:h")) != -1) {
       switch (c) {
         case 's':
           scale = atoi(optarg);
           break;
         case 'e':
           edge_factor = atoi(optarg);
+          break;
+        case 'b':
+          batch_size = atoi(optarg);
           break;
         case 'i':
           input_file_name = optarg;
@@ -118,12 +123,14 @@ class Main : public CBase_Main {
     CkCallback cb(CkIndex_Main::doneTreeGeneration(), thisProxy);
     libProxy[0].register_phase_one_cb(cb);
     tpProxy = CProxy_TreePiece::ckNew();
+    CkCallback batch_cb(CkIndex_TreePiece::nextBatch(), tpProxy);
+    libProxy[0].register_batch_cb(batch_cb);
     // find first vertex ID on last chare
     // create a callback for library to inform application after
     // completing inverted tree construction
   }
 
-  void startWork() {
+  void charesCreated() {
     CkPrintf("[Main] Library array with %d chares created and proxy obtained\n", num_treepieces);
     startTime = CkWallTimer();
 
@@ -132,10 +139,17 @@ class Main : public CBase_Main {
     const int64_t num_edges_tp = num_edges / num_treepieces;
     const int64_t num_edges_last_tp = num_edges_tp + (num_edges % num_treepieces);
     for (int i = 0; i < num_treepieces-1; i++) {
-      tpProxy[i].doWork(edges + num_edges_tp * i * 2, num_edges_tp * 2);
+      tpProxy[i].receiveEdges(edges + num_edges_tp * i * 2, num_edges_tp * 2);
     }
     // Remaining edges go to last treepiece
-    tpProxy[num_treepieces-1].doWork(edges + num_edges_tp * (num_treepieces-1) * 2, num_edges_last_tp * 2);
+    tpProxy[num_treepieces-1].receiveEdges(edges + num_edges_tp * (num_treepieces-1) * 2, num_edges_last_tp * 2);
+  }
+
+  void edgesReceived() {
+    CkPrintf("[Main] All chares have received their edges\n");
+
+    // Begin connected components detection
+    tpProxy.sendRequests();
   }
 
   void doneTreeGeneration() {
@@ -170,6 +184,12 @@ class TreePiece : public CBase_TreePiece {
   int64_t myID;
   UnionFindLib *libPtr;
   unionFindVertex *libVertices;
+  int64_t* my_edges;
+  int64_t num_my_edges;
+  int64_t work_iter;
+  int64_t num_requests;
+  bool allow_batch;
+  bool blocked_batch;
 
   public:
   // function that must be always defined by application
@@ -180,6 +200,8 @@ class TreePiece : public CBase_TreePiece {
   TreePiece() {
     myID = CkMyPe();
     numMyVertices = num_vertices / num_treepieces;
+    work_iter = 0;
+    blocked_batch = true;
 
     int64_t dummy = 0;
     int64_t offset = myID * numMyVertices; // The last PE might have different number of vertices
@@ -188,7 +210,7 @@ class TreePiece : public CBase_TreePiece {
     libPtr = libProxy.ckLocalBranch();
     libPtr->allocate_libVertices(numMyVertices, 1);
     libPtr->initialize_vertices(numMyVertices, libVertices, dummy /* offset */,
-                                999999999 /* batchSize - need to turn off */);
+                                batch_size);
 
     for (int64_t i = 0; i < numMyVertices; i++) {
       libVertices[i].vertexID = libVertices[i].parent = startID;
@@ -200,17 +222,48 @@ class TreePiece : public CBase_TreePiece {
     }
     libPtr->registerGetLocationFromID(getLocationFromID);
 
-    contribute(CkCallback(CkReductionTarget(Main, startWork), mainProxy));
+    contribute(CkCallback(CkReductionTarget(Main, charesCreated), mainProxy));
   }
 
   TreePiece(CkMigrateMessage *msg) { }
 
-  void doWork(int64_t* e, int64_t nv) {
-    for (int64_t i = 0; i < nv / 2; i++) {
-      int64_t src = e[2*i];
-      int64_t dest = e[2*i+1];
-      if ((src >= 0 && src < num_vertices) && (dest >= 0 && dest < num_vertices))
+  void receiveEdges(int64_t* e, int64_t nv) {
+    my_edges = (int64_t*)malloc(nv * sizeof(int64_t));
+    memcpy(my_edges, e, nv * sizeof(int64_t));
+    num_my_edges = nv / 2;
+
+    contribute(CkCallback(CkReductionTarget(Main, edgesReceived), mainProxy));
+  }
+
+  void sendRequests() {
+    allow_batch = false;
+    num_requests = 0;
+
+    for (; work_iter < num_my_edges; work_iter++) {
+      int64_t src = my_edges[2*work_iter];
+      int64_t dest = my_edges[2*work_iter+1];
+      if ((src >= 0 && src < num_vertices) && (dest >= 0 && dest < num_vertices)) {
         libPtr->union_request(src, dest);
+        num_requests++;
+      }
+
+      if (num_requests >= batch_size) {
+        if (allow_batch == false) {
+          blocked_batch = true;
+          break;
+        }
+      }
+    }
+
+    if (work_iter == num_my_edges) {
+      blocked_batch = false;
+    }
+  }
+
+  void nextBatch() {
+    allow_batch = true;
+    if (blocked_batch) {
+      sendRequests();
     }
   }
 

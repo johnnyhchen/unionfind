@@ -6,10 +6,12 @@ mainmodule graph {
     readonly int64_t num_vertices;
     readonly int64_t num_edges;
     readonly int64_t num_treepieces;
+    readonly int64_t batch_size;
 
     mainchare Main {
         entry Main(CkArgMsg *m);
-        entry [reductiontarget] void startWork();
+        entry [reductiontarget] void charesCreated();
+        entry [reductiontarget] void edgesReceived();
         entry void doneTreeGeneration();
         entry void doneFindComponents();
         entry [reductiontarget] void donePrinting();
@@ -17,7 +19,9 @@ mainmodule graph {
 
     group TreePiece {
         entry TreePiece();
-        entry void doWork(int64_t edges[n], int64_t n);
+        entry void receiveEdges(int64_t edges[n], int64_t n);
+        entry void sendRequests();
+        entry void nextBatch();
         entry void requestVertices();
         entry void getConnectedComponents();
         entry void test();
