@@ -70,6 +70,7 @@ class Main : public CBase_Main {
         // TODO: need to remove passing tpProxy
         CkCallback cb(CkIndex_Main::doneCacheInit(), thisProxy);
         libCacheProxy = UnionFindLibCache::UnionFindLibCacheInit(cb);
+        CkPrintf("PE: %d libCacheProxy.id: %d\n", CkMyPe(), libCacheProxy.ckGetGroupID().idx);
     }
 
     void doneCacheInit() {
@@ -78,8 +79,7 @@ class Main : public CBase_Main {
     }
 
     void prCrDone() {
-        CkCallback cb(CkIndex_Main::done(), thisProxy);
-        libProxy[0].register_phase_one_cb(cb);
+        CkPrintf("In prCrDone()\n");
         tpProxy = CProxy_TreePiece::ckNew(inputFileName, libProxy);
         // find first vertex ID on last chare
         // create a callback for library to inform application after
@@ -88,8 +88,14 @@ class Main : public CBase_Main {
 
     void dontInitVertices() {
       // Initialize offsets in each nodegroup
-      CkCallback cb(CkIndex_Main::startWork(), thisProxy);
-      libCacheProxy.initOffsets(cb);
+      CkPrintf("In dontInitVertices()\n");
+      CkCallback cb(CkIndex_Main::done(), thisProxy);
+      libProxy[0].register_phase_one_cb(cb);
+      startWork();
+      /*
+      CkCallback cb1(CkIndex_Main::startWork(), thisProxy);
+      libCacheProxy.initOffsets(cb1);
+      */
     }
 
     void startWork() {
@@ -237,6 +243,9 @@ class TreePiece : public CBase_TreePiece {
         // if (CmiPhysicalRank(CkMyPe()) == 0) {
         // Do a contribute from all PEs to initialize their vertices
         //
+        CkPrintf("PE: %d libCacheProxy: %d\n", CkMyPe(), libCacheProxy);
+        CkPrintf("PE: %d libCacheProxy.id: %d\n", CkMyPe(), libCacheProxy.ckGetGroupID().idx);
+        CkPrintf("PE: %d libCacheProxy.ckLocalBranch(): %d\n", CkMyPe(), libCacheProxy.ckLocalBranch());
         contribute(CkCallback(CkReductionTarget(TreePiece, init_vertices), thisProxy));
           // thisProxy.init_vertices();
         // }
@@ -246,6 +255,7 @@ class TreePiece : public CBase_TreePiece {
         // int64_t dummy = 0;
         libPtr->initialize_vertices(numMyVertices, libVertices, offset /*offset*/, 999999999 /*batchSize - need to turn off*/);
         // int64_t offset = myID * (num_vertices / num_treepieces); /*the last PE might have different number of vertices*/;
+        CkPrintf("Finished lib:initialize_vertices(): PE: %d\n", CkMyPe());
         int64_t startID = myID;
         for (int64_t i = 0; i < numMyVertices; i++) {
           libVertices[i].vertexID = libVertices[i].parent = startID;
@@ -254,7 +264,7 @@ class TreePiece : public CBase_TreePiece {
           // assert (w_id.first == myID);
           // CkPrintf("vertexID: %ld i: %ld w_id.second: %ld\n", libVertices[i].vertexID, i, w_id.second);
           // assert (w_id.second == i);
-       }
+        }
 
 
         // reset input_file pointer
@@ -264,7 +274,9 @@ class TreePiece : public CBase_TreePiece {
             // last chare should get all remaining edges if not equal division
             numMyEdges += num_edges % num_treepieces;
         }
+        CkPrintf("PE: %d numMyEdges: %lld num_vertices: %lld\n", CkMyPe(), numMyEdges, num_vertices);
         populateMyEdges(&library_requests, numMyEdges, (num_edges/num_treepieces), thisIndex, input_file, num_vertices);
+        CkPrintf("PE: %d done populateMyEdges() num_vertices: %lld\n", CkMyPe(), num_vertices);
         libPtr->registerGetLocationFromID(getLocationFromID);
         CkPrintf("Finished reading my part of the file: %d\n", CkMyPe());
         contribute(CkCallback(CkReductionTarget(Main, dontInitVertices), mainProxy));
@@ -276,6 +288,7 @@ class TreePiece : public CBase_TreePiece {
 
     void doWork() {
       // vertices and edges populated, now fire union requests
+      CkPrintf("PE: %d started processing edges edgesProcessed: %lld library_requests.size(): %lld edge_batch_size: %lld\n", CkMyPe(), edgesProcessed, library_requests.size(), edge_batch_size);
       for (int64_t i = 0; edgesProcessed < library_requests.size(); edgesProcessed++, i++) {
         if (i == edge_batch_size) {
           break;
@@ -285,6 +298,7 @@ class TreePiece : public CBase_TreePiece {
         libPtr->union_request(req.first, req.second);
         CkPrintf("PE: %d union(%ld %ld) request done library_requests.size(): %d\n", CkMyPe(), req.first, req.second, library_requests.size());
       }
+      CkPrintf("PE: %d done processing all edges\n", CkMyPe());
     }
 
     void requestVertices() {
@@ -325,10 +339,12 @@ TreePiece::getLocationFromID(long int vid) {
 std::pair<int64_t, int64_t>
 TreePiece::getLocationFromID(int64_t vid) {
   // int64_t vRatio = num_vertices / num_treepieces;
-  // CkPrintf("Req for vid: %ld num_local_vertices: %ld\n", vid, num_local_vertices);
+  CkPrintf("PE: %d Req for vid: %ld num_local_vertices: %ld libCacheProxy: %d\n", CkMyPe(), vid, num_local_vertices, libCacheProxy);
 
+  CkPrintf("PE: %d ckLocalBranch: %d\n", CkMyPe(), libCacheProxy.ckLocalBranch());
   UnionFindLibCache *libPtrCache;
   libPtrCache = libCacheProxy.ckLocalBranch();
+  CkPrintf("PE: %d Obtained pointer for libPtrCache\n", CkMyPe());
   int64_t chareIdx = vid % num_treepieces;
   int64_t arrIdx = (vid / num_treepieces);
   int64_t off = libPtrCache->get_offset(chareIdx);

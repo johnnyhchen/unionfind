@@ -49,11 +49,12 @@ void populateMyVertices(std::vector<proteinVertex>& myVertices, int nVertices, i
 }
 
 void populateMyEdges(std::vector< std::pair<int64_t, int64_t> > *myEdges, int64_t nMyEdges, int64_t eRatio, int chareIdx, FILE *fp, int64_t totalNVertices) {
-   int startEid = (eRatio * chareIdx) + 1;
+   long long int startEid = (eRatio * chareIdx) + 1;
+   CkPrintf("startEid: %lld nMyEdges: %lld\n", startEid, nMyEdges);
    int64_t lineNum = startEid + 4; // 4 starting lines
    //printf("[%d]lineNum : %ld\n", chareIdx, lineNum);
    seekToLine(fp, lineNum);
-   for (int i = 0; i < nMyEdges; i++) {
+   for (long long int i = 0; i < nMyEdges; i++) {
        std::pair<int64_t, int64_t> edge = ReadEdge(fp);
        edge.first--;
        edge.second--;

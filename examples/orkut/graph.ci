@@ -8,7 +8,8 @@ mainmodule graph {
     readonly int64_t num_treepieces;
     readonly int64_t num_local_vertices;
     readonly int64_t edge_batch_size;
-    readonly int64_t num_nodes;
+    readonly CProxy_UnionFindLibCache libCacheProxy;
+   readonly int64_t num_nodes;
 
     mainchare Main {
         entry Main(CkArgMsg *m);

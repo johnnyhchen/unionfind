@@ -43,6 +43,7 @@ class UnionFindLibCache : public CBase_UnionFindLibCache {
 
 // class definition for library chares
 class UnionFindLib : public CBase_UnionFindLib {
+    static CkCallback libProxyDoneCb;
     std::vector<unionFindVertex> &myVertices = ret_NodeMyVertices();
     int64_t numMyVertices;
     int64_t pathCompressionThreshold = 5;
@@ -98,8 +99,6 @@ class UnionFindLib : public CBase_UnionFindLib {
     std::vector<unionFindVertex>& ret_NodeMyVertices();
     UnionFindLib();
     UnionFindLib(CkMigrateMessage *m) { }
-    static CkCallback libProxyDoneCb;
-    static CProxy_UnionFindLib unionFindInit(CkArrayID clientArray, int64_t n, CkCallback cb);
     static CProxy_UnionFindLib unionFindInit(CkCallback cb);
     void register_phase_one_cb(CkCallback cb);
     // void initialize_vertices(unionFindVertex *appVertices, int numVertices);

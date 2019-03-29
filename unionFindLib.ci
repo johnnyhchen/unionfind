@@ -8,9 +8,10 @@ module unionFindLib {
     readonly CkGroupID libGroupID;
     readonly CProxy_UnionFindLibCache _UfLibProxyCache;
     readonly CkCallback initDoneCacheCb;
+    //readonly CkCallback libProxyDoneCb;
 
     nodegroup UnionFindLibCache {
-      entry void UnionFindLibCacheInit(CkCallback cb);
+      // entry void UnionFindLibCacheInit(CkCallback cb);
       entry [reductiontarget] void initDoneCache();
       entry UnionFindLibCache();
       entry void initOffsets(CkCallback _libcb);
