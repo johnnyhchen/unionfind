@@ -7,9 +7,9 @@
 /*readonly*/ CkGroupID libGroupID;
 /*readonly*/ CProxy_UnionFindLibCache _UfLibProxyCache;
 /*readonly*/ CkCallback initDoneCacheCb;
-///*readonly*/ CkCallback libProxyDoneCb;
+/*readonly*/ CkCallback libProxyDoneCb;
 //CkCallback d;
-CkCallback UnionFindLib::libProxyDoneCb;
+//CkCallback UnionFindLib::libProxyDoneCb;
 
 
 std::vector<unionFindVertex>& UnionFindLib::
@@ -22,9 +22,9 @@ ret_NodeMyVertices()
 // class function implementations
 void UnionFindLib::
 registerGetLocationFromID(std::pair<int64_t, int64_t> (*gloc)(int64_t vid)) {
-    CkPrintf("PE: %d registerGetLocationFromID\n", CkMyPe());
+    //CkPrintf("PE: %d registerGetLocationFromID\n", CkMyPe());
     getLocationFromID = gloc;
-    gloc(4);
+    //gloc(4);
 }
 
 void UnionFindLib::
@@ -165,18 +165,23 @@ union_request(int64_t v, int64_t w) {
       CkPrintf("v: %ld w: %ld\n", v, w);
     */
 
-    CkPrintf("PE: %d union v: %ld w: %ld\n", CkMyPe(), v, w);
+    //CkPrintf("PE: %d union v: %ld w: %ld\n", CkMyPe(), v, w);
     std::pair<int64_t, int64_t> w_loc = getLocationFromID(w);
     std::pair<int64_t, int64_t> v_loc = getLocationFromID(v);
 
-    CkPrintf("PE: %d union v: %ld w: %ld\n", CkMyPe(), v, w);
+    //CkPrintf("PE: %d union v: %ld w: %ld\n", CkMyPe(), v, w);
     // FIXME: bug - need to poll v & w if they are in same PE
-    /*
-    if(myVertices[w_loc.second].componentNumber != -1 && myVertices[v_loc.second].componentNumber != -1 && (myVertices[w_loc.second].componentNumber == myVertices[v_loc.second].componentNumber)) {
-      // the edge can be safely dropped
-      return;
+    
+    // Check if I can access the myVertices data: which means "both" w & v should be in my PE/node
+
+    // if (w_loc.first == CkMyPe() && v_loc.first == CkMyPe()) {
+    if (CmiNodeOf(w_loc.first) == CkMyNode() && CmiNodeOf(v_loc.first) == CkMyNode()) {
+      if(myVertices[w_loc.second].componentNumber != -1 && (myVertices[w_loc.second].componentNumber == myVertices[v_loc.second].componentNumber)) {
+        // the edge can be safely dropped
+        droppedEdges++;
+        return;
+      }
     }
-    */
 
     // assert ((w_loc.first * (3072441 / 4) + w_loc.second) == w);
     
@@ -191,7 +196,7 @@ union_request(int64_t v, int64_t w) {
     if (w_loc.first != 0)
       CkPrintf("sending to PE: %d\n", w_loc.first);
     */
-    CkPrintf("Union request v: %ld w: %ld CkMyPe(): %d w_loc.first: %ld\n", v, w, CkMyPe(), w_loc.first);
+    // CkPrintf("Union request v: %ld w: %ld CkMyPe(): %d w_loc.first: %ld\n", v, w, CkMyPe(), w_loc.first);
     if (w_loc.first == CkMyPe()) {
       // insertDataAnchor(d);
       anchor(w_loc.second, v, -1);
@@ -365,15 +370,20 @@ void UnionFindLib::inter_start_component_labeling(CkCallback cb)
   */
 
   myLocalNumBosses = 0;
+  //int64_t off = _UfLibProxyCache.ckLocalBranch()->offsets[CkMyPe()];
+  //CkPrintf("PE: %d off: %lld totalVerticesinPE: %lld\n", CkMyPe(), off, totalVerticesinPE);
   for (int64_t i = 0; i < totalVerticesinPE; i++) {
     unionFindVertex *v = &myVertices[i];
+    // CkPrintf("PE: %d i: %lld v->vertexID: %lld v->parent: %lld\n", CkMyPe(), i, v->vertexID, v->parent);
+    // CkPrintf("PE: %d v->vertexID: %lld\n", CkMyPe(), v->vertexID);
     if (v->parent == v->vertexID) {
       // v->componentNumber = v->vertexID;
       myLocalNumBosses++;
       continue;
     }
     std::pair<int64_t, int64_t> parent_loc = getLocationFromID(v->parent);
-    if (parent_loc.first != CkMyPe()) {
+    // Send a request if this data is not in my node
+    if (CmiNodeOf(parent_loc.first) != CkMyNode()) {
       //thisProxy[parent_loc.first].need_label(v->vertexID, parent_loc.second);
       needRootData d;
       d.req_vertex = v->vertexID;
@@ -383,20 +393,21 @@ void UnionFindLib::inter_start_component_labeling(CkCallback cb)
       // Can there be a case where reqs_sent == reqs_recv; and still this PE is in this for-loop?
     }
   }
-  // CkPrintf("PE: %d reqs_sent: %ld\n", CkMyPe(), reqs_sent);
+  // CkPrintf("PE: %d reqs_sent: %ld myLocalNumBosses: %lld\n", CkMyPe(), reqs_sent, myLocalNumBosses);
   // my PE is not sending any request
   if (reqs_sent == 0) {
+    // CkPrintf("PE: %d reqs_sent = 0\n", CkMyPe());
     // CkPrintf("PE: %d is not sending any requests!\n", CkMyPe());
     for (int64_t i = 0; i < totalVerticesinPE; i++) {
       unionFindVertex *v = &myVertices[i];
       if (v->componentNumber == -1) {
         // I don't have my label; does my parent have it?
         std::pair<int64_t, int64_t> parent_loc = getLocationFromID(v->parent);
-        assert(parent_loc.first == CkMyPe());
+        assert(CmiNodeOf(parent_loc.first) == CkMyNode());
         unionFindVertex *p = &myVertices[parent_loc.second];
         while (p->componentNumber == -1) {
           std::pair<int64_t, int64_t> gparent_loc = getLocationFromID(p->parent);
-          assert(gparent_loc.first == CkMyPe());
+          assert(CmiNodeOf(gparent_loc.first) == CmiNodeOf(CkMyPe()));
           unionFindVertex *gp = &myVertices[gparent_loc.second];
           p = gp;
           // TODO: optimization possible here?
@@ -409,7 +420,12 @@ void UnionFindLib::inter_start_component_labeling(CkCallback cb)
 
     CkCallback cb(CkReductionTarget(UnionFindLib, inter_total_components), thisProxy[0]);
     // CkPrintf("PE: %d totalRoots: %lld\n", CkMyPe(), myLocalNumBosses);
-    contribute(sizeof(int64_t), &myLocalNumBosses, CkReduction::sum_long_long, cb);
+    int64_t vv[2];
+    vv[0] = myLocalNumBosses;
+    vv[1] = droppedEdges;
+    // contribute(sizeof(int64_t), &myLocalNumBosses, CkReduction::sum_long_long, cb);
+    droppedEdges = 0;
+    contribute(2*sizeof(int64_t), vv, CkReduction::sum_long_long, cb);
   }
 }
 
@@ -439,12 +455,15 @@ void UnionFindLib::inter_need_label(needRootData data)
   // At the end of the phase the compression would anyway happen; just that intermediate requests need to again the traverse the path
   int64_t req_vertex = data.req_vertex;
   int64_t parent_arrID = data.parent_arrID;
+  // CkPrintf("PE: %d req_vertex: %lld parent_arrID: %lld\n", CkMyPe(), req_vertex, parent_arrID);
   while (1) {
     unionFindVertex *p = &myVertices[parent_arrID];
     std::pair<int64_t, int64_t> gparent_loc = getLocationFromID(p->parent);
+    // CkPrintf("PE: %d p->parent: %lld p->vertexID: %lld p->componentNumber: %lld gparent_loc.first: %lld gparent_loc.second: %lld\n", CkMyPe(), p->parent, p->vertexID, p->componentNumber, gparent_loc.first, gparent_loc.second);
     if (p->parent == p->vertexID || p->componentNumber != -1 /* I already have my componentNumber? TODO: check*/) {
       // found the component number; reply back to the requestor
       std::pair<int64_t, int64_t> req_loc = getLocationFromID(req_vertex);
+      // CkPrintf("PE: %d req_loc.first: %lld req_loc.second: %lld\n", CkMyPe(), req_loc.first, req_loc.second);
       thisProxy[req_loc.first].inter_recv_label(req_loc.second, p->componentNumber);
       // if (p->componentNumber == -1) {
         // CkPrintf("Error here p->parent: %ld p->vertexID: %ld\n", p->parent, p->vertexID);
@@ -462,13 +481,15 @@ void UnionFindLib::inter_need_label(needRootData data)
       parent_arrID = gparent_loc.second;
     }
   }
+  //CkPrintf("PE: %d I reached here\n", CkMyPe());
 }
 
 
 void UnionFindLib::inter_recv_label(int64_t recv_vertex_arrID, int64_t labelID)
 {
   assert(reqs_sent != 0);
-  reqs_recv++;
+  reqs_recv++; 
+  // CkPrintf("PE: %d, reqs_recv: %lld\n", CkMyPe(), reqs_recv);
   unionFindVertex *v = &myVertices[recv_vertex_arrID];
   assert(v->componentNumber == -1);
   v->componentNumber = labelID;
@@ -482,6 +503,8 @@ void UnionFindLib::inter_recv_label(int64_t recv_vertex_arrID, int64_t labelID)
 
   // all reqs received for my PE
   if (reqs_recv == reqs_sent) {
+    CkPrintf("PE: %d reqs_sent == reqs_recv\n", CkMyPe());
+    // int64_t off = _UfLibProxyCache.ckLocalBranch()->offsets[CkMyPe()];
     for (int64_t i = 0; i < totalVerticesinPE; i++) {
       unionFindVertex *v = &myVertices[i];
       if (v->componentNumber == -1) {
@@ -505,14 +528,19 @@ void UnionFindLib::inter_recv_label(int64_t recv_vertex_arrID, int64_t labelID)
     }
     CkCallback cb(CkReductionTarget(UnionFindLib, inter_total_components), thisProxy[0]);
     // CkPrintf("PE: %d totalRoots: %lld\n", CkMyPe(), myLocalNumBosses);
-    contribute(sizeof(int64_t), &myLocalNumBosses, CkReduction::sum_long_long, cb);
+    // contribute(sizeof(int64_t), &myLocalNumBosses, CkReduction::sum_long_long, cb);
+    int64_t vv[2];
+    vv[0] = myLocalNumBosses;
+    vv[1] = droppedEdges;
+    droppedEdges = 0;
+    contribute(2*sizeof(int64_t), vv, CkReduction::sum_long_long, cb);
   }
 }
 
 // Executed only on PE0
-void UnionFindLib::inter_total_components(int64_t nComponents)
+void UnionFindLib::inter_total_components(int n, int64_t* nComponents)
 {
-  CkPrintf("Total components in this phase: %lld\n", nComponents);
+  CkPrintf("Total components in this phase: %lld droppedEdges: %lld\n", nComponents[0], nComponents[1]);
   postInterComponentLabelingCb.send();
 }
 
@@ -544,6 +572,7 @@ void UnionFindLib::
 start_component_labeling() {
   // Send requests only from those vertices whose parents are not in my PE
   myLocalNumBosses = 0;
+  // int64_t off = _UfLibProxyCache.ckLocalBranch()->offsets[CkMyPe()];
   for (int64_t i = 0; i < totalVerticesinPE; i++) {
     unionFindVertex *v = &myVertices[i];
     if (v->parent == v->vertexID) {
@@ -903,7 +932,7 @@ callWork() {
 // library initialization function for group
 CProxy_UnionFindLib UnionFindLib::
 unionFindInit(CkCallback _cb) {
-    UnionFindLib::libProxyDoneCb = _cb;
+    libProxyDoneCb = _cb;
     /*  
     CkArrayOptions opts(n);
     opts.bindTo(clientArray);
@@ -917,10 +946,11 @@ unionFindInit(CkCallback _cb) {
 
 UnionFindLib::
 UnionFindLib() {
+      droppedEdges = 0;
       reqs_sent = 0;
       reqs_recv = 0;
       resetData = false;
-      CkPrintf("PE: %d myVertices.size(): %d myVerticesAddress: %p address from cache: %p cache proxy id: %d x_address: %p nodeId: %d\n", CkMyPe(), myVertices.size(), &myVertices, _UfLibProxyCache.ckLocalBranch()->myVertices, _UfLibProxyCache, &(_UfLibProxyCache.ckLocalBranch()->x), CmiPhysicalNodeID(CkMyPe()));
+      CkPrintf("PE: %d myVertices.size(): %d myVerticesAddress: %p address from cache: %p cache proxy id: %d x_address: %p nodeId: %d\n", CkMyPe(), myVertices.size(), &myVertices, _UfLibProxyCache.ckLocalBranch()->myVertices, _UfLibProxyCache, &(_UfLibProxyCache.ckLocalBranch()->x), CmiNodeOf(CkMyPe()));
       // myVertices =  (_UfLibProxyCache.ckLocalBranch()->myVertices);
       contribute(CkCallback(CkReductionTarget(UnionFindLib, doneProxyCreation), thisProxy[0]));
       // contribute();
@@ -928,6 +958,6 @@ UnionFindLib() {
 
 void UnionFindLib::
 doneProxyCreation() {
-  UnionFindLib::libProxyDoneCb.send();
+  libProxyDoneCb.send();
 }
 #include "unionFindLib.def.h"

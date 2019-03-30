@@ -8,7 +8,7 @@ module unionFindLib {
     readonly CkGroupID libGroupID;
     readonly CProxy_UnionFindLibCache _UfLibProxyCache;
     readonly CkCallback initDoneCacheCb;
-    //readonly CkCallback libProxyDoneCb;
+    readonly CkCallback libProxyDoneCb;
 
     nodegroup UnionFindLibCache {
       // entry void UnionFindLibCacheInit(CkCallback cb);
@@ -53,11 +53,11 @@ module unionFindLib {
         // entry [aggregate] void need_label(int64_t req_vertex, int64_t parent_arrID);
         entry [aggregate] void need_label(needRootData data);
         entry void recv_label(int64_t recv_vertex_arrID, int64_t labelID);
-        entry [reductiontarget] void total_components(int64_t nComponents);
+        entry [reductiontarget] void inter_total_components(int n, int64_t nComponents[n] /*[1] also contains dropped edges*/);
         
         entry [aggregate] void inter_need_label(needRootData data);
         entry void inter_recv_label(int64_t recv_vertex_arrID, int64_t labelID);
-        entry [reductiontarget] void inter_total_components(int64_t nComponents);
+        entry [reductiontarget] void total_components(int64_t nComponents);
         entry [reductiontarget] void done_prepare_for_component_labeling();
         entry void prepare_for_component_labeling(CkCallback cb);
 

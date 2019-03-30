@@ -43,7 +43,6 @@ class UnionFindLibCache : public CBase_UnionFindLibCache {
 
 // class definition for library chares
 class UnionFindLib : public CBase_UnionFindLib {
-    static CkCallback libProxyDoneCb;
     std::vector<unionFindVertex> &myVertices = ret_NodeMyVertices();
     int64_t numMyVertices;
     int64_t pathCompressionThreshold = 5;
@@ -63,6 +62,8 @@ class UnionFindLib : public CBase_UnionFindLib {
     int64_t thresholdReqs;
     int64_t totalReqsProcessed;
     CkCallback batchCb;
+
+    int64_t droppedEdges;
 
     // path compression
     std::vector<int64_t> verticesToCompress;
@@ -88,7 +89,7 @@ class UnionFindLib : public CBase_UnionFindLib {
     
     void inter_need_label(needRootData data);
     void inter_recv_label(int64_t recv_vertex_arrID, int64_t labelID);
-    void inter_total_components(int64_t nComponents);
+    void inter_total_components(int n, int64_t* nComponents);
     void inter_start_component_labeling(CkCallback cb);
     void prepare_for_component_labeling(CkCallback cb);
     void done_prepare_for_component_labeling();

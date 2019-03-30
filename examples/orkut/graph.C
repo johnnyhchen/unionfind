@@ -294,9 +294,9 @@ class TreePiece : public CBase_TreePiece {
           break;
         }
         std::pair<int64_t, int64_t> req = library_requests[edgesProcessed];
-        CkPrintf("PE: %d union(%ld %ld) library_requests.size(): %d\n", CkMyPe(), req.first, req.second, library_requests.size());
+        //CkPrintf("PE: %d union(%ld %ld) library_requests.size(): %d\n", CkMyPe(), req.first, req.second, library_requests.size());
         libPtr->union_request(req.first, req.second);
-        CkPrintf("PE: %d union(%ld %ld) request done library_requests.size(): %d\n", CkMyPe(), req.first, req.second, library_requests.size());
+        //CkPrintf("PE: %d union(%ld %ld) request done library_requests.size(): %d\n", CkMyPe(), req.first, req.second, library_requests.size());
       }
       CkPrintf("PE: %d done processing all edges\n", CkMyPe());
     }
@@ -339,12 +339,12 @@ TreePiece::getLocationFromID(long int vid) {
 std::pair<int64_t, int64_t>
 TreePiece::getLocationFromID(int64_t vid) {
   // int64_t vRatio = num_vertices / num_treepieces;
-  CkPrintf("PE: %d Req for vid: %ld num_local_vertices: %ld libCacheProxy: %d\n", CkMyPe(), vid, num_local_vertices, libCacheProxy);
+  //CkPrintf("PE: %d Req for vid: %ld num_local_vertices: %ld libCacheProxy: %d\n", CkMyPe(), vid, num_local_vertices, libCacheProxy);
 
-  CkPrintf("PE: %d ckLocalBranch: %d\n", CkMyPe(), libCacheProxy.ckLocalBranch());
+  //CkPrintf("PE: %d ckLocalBranch: %d\n", CkMyPe(), libCacheProxy.ckLocalBranch());
   UnionFindLibCache *libPtrCache;
   libPtrCache = libCacheProxy.ckLocalBranch();
-  CkPrintf("PE: %d Obtained pointer for libPtrCache\n", CkMyPe());
+  //CkPrintf("PE: %d Obtained pointer for libPtrCache\n", CkMyPe());
   int64_t chareIdx = vid % num_treepieces;
   int64_t arrIdx = (vid / num_treepieces);
   int64_t off = libPtrCache->get_offset(chareIdx);
@@ -376,7 +376,7 @@ TreePiece::getLocationFromID(int64_t vid) {
     CkExit();
   }
   */
-  CkPrintf("PE: %d vid: %ld chareIdx: %ld arrIdx: %ld\n", CkMyPe(), vid, chareIdx, arrIdx);
+  //CkPrintf("PE: %d vid: %ld chareIdx: %ld arrIdx: %ld\n", CkMyPe(), vid, chareIdx, arrIdx);
 
   return std::make_pair(chareIdx, arrIdx);
 }
