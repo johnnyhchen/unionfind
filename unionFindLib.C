@@ -160,6 +160,7 @@ recv_reqs_processed() {
 
 void UnionFindLib::
 union_request(int64_t v, int64_t w) {
+    totEdges++;
     /*
     if (v < 0 || w < 0)
       CkPrintf("v: %ld w: %ld\n", v, w);
@@ -420,12 +421,14 @@ void UnionFindLib::inter_start_component_labeling(CkCallback cb)
 
     CkCallback cb(CkReductionTarget(UnionFindLib, inter_total_components), thisProxy[0]);
     // CkPrintf("PE: %d totalRoots: %lld\n", CkMyPe(), myLocalNumBosses);
-    int64_t vv[2];
+    int64_t vv[3];
     vv[0] = myLocalNumBosses;
     vv[1] = droppedEdges;
+    vv[2] = totEdges;
     // contribute(sizeof(int64_t), &myLocalNumBosses, CkReduction::sum_long_long, cb);
     droppedEdges = 0;
-    contribute(2*sizeof(int64_t), vv, CkReduction::sum_long_long, cb);
+    totEdges = 0;
+    contribute(3*sizeof(int64_t), vv, CkReduction::sum_long_long, cb);
   }
 }
 
@@ -529,18 +532,20 @@ void UnionFindLib::inter_recv_label(int64_t recv_vertex_arrID, int64_t labelID)
     CkCallback cb(CkReductionTarget(UnionFindLib, inter_total_components), thisProxy[0]);
     // CkPrintf("PE: %d totalRoots: %lld\n", CkMyPe(), myLocalNumBosses);
     // contribute(sizeof(int64_t), &myLocalNumBosses, CkReduction::sum_long_long, cb);
-    int64_t vv[2];
+    int64_t vv[3];
     vv[0] = myLocalNumBosses;
     vv[1] = droppedEdges;
+    vv[2] = totEdges;
     droppedEdges = 0;
-    contribute(2*sizeof(int64_t), vv, CkReduction::sum_long_long, cb);
+    totEdges = 0;
+    contribute(3*sizeof(int64_t), vv, CkReduction::sum_long_long, cb);
   }
 }
 
 // Executed only on PE0
 void UnionFindLib::inter_total_components(int n, int64_t* nComponents)
 {
-  CkPrintf("Total components in this phase: %lld droppedEdges: %lld\n", nComponents[0], nComponents[1]);
+  CkPrintf("Total components in this phase: %lld droppedEdges: %lld totEdges: %lld percent_dropped: %lf\n", nComponents[0], nComponents[1], nComponents[2], (nComponents[1]/(double)nComponents[2]));
   postInterComponentLabelingCb.send();
 }
 
@@ -947,6 +952,7 @@ unionFindInit(CkCallback _cb) {
 UnionFindLib::
 UnionFindLib() {
       droppedEdges = 0;
+      totEdges = 0;
       reqs_sent = 0;
       reqs_recv = 0;
       resetData = false;

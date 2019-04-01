@@ -64,6 +64,7 @@ class UnionFindLib : public CBase_UnionFindLib {
     CkCallback batchCb;
 
     int64_t droppedEdges;
+    int64_t totEdges;
 
     // path compression
     std::vector<int64_t> verticesToCompress;
