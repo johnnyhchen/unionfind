@@ -10,10 +10,12 @@ mainmodule mesh {
     readonly int64_t numMeshPieces;
     readonly int64_t edge_batch_size;
     readonly int64_t batchSize;
-    
+
+    /*    
     group Map : CkArrayMap {
       entry Map();
     };
+    */
 
     mainchare Main {
         entry Main(CkArgMsg *m);
@@ -28,7 +30,7 @@ mainmodule mesh {
         entry [reductiontarget] void donePrinting();
     }
 
-    array [1D] MeshPiece {
+    group MeshPiece {
       entry MeshPiece(CProxy_UnionFindLib libProxy);
       entry void initializeLibVertices();
       entry [reductiontarget] void doWork();

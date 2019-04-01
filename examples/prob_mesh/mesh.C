@@ -13,6 +13,7 @@
 /*readonly*/ long batchSize;
 /*readonly*/ int64_t edge_batch_size;
 
+/*
 class Map : public CkArrayMap {
   public:
     Map() {}
@@ -21,7 +22,7 @@ class Map : public CkArrayMap {
       return (index[0] % CkNumPes());
     }
 };
-
+*/
 class Main : public CBase_Main {
     CProxy_UnionFindLib libProxy;
     CProxy_MeshPiece mpProxy;
@@ -47,6 +48,7 @@ class Main : public CBase_Main {
         PROBABILITY = atof(m->argv[3]);
         batchSize = atol(m->argv[4]);
         edge_batch_size = atol(m->argv[5]);
+        num_edge_batches = 9999;
 
         if (MESH_SIZE % MESHPIECE_SIZE != 0) {
             CkAbort("Mesh piece size should divide mesh size\n");
@@ -56,7 +58,8 @@ class Main : public CBase_Main {
         recvMPs = 0;
 
         numMeshPieces = (MESH_SIZE/MESHPIECE_SIZE) * (MESH_SIZE/MESHPIECE_SIZE);
-        // assert ((numMeshPieces % CkNumPes()) == 0); // Finicky handling of group based union-find library
+        CkPrintf("numMeshPieces: %lld CkNumPes(): %d\n", numMeshPieces, CkNumPes());
+        assert ((numMeshPieces / (double)CkNumPes()) == 1.0); // Finicky handling of group based union-find library
 
         // Create library vertex cache
         CkCallback cb(CkIndex_Main::doneCacheInit(), thisProxy);
@@ -71,10 +74,10 @@ class Main : public CBase_Main {
 
     void prCrDone() 
     {
-        CProxy_Map myMap = CProxy_Map::ckNew();
-        CkArrayOptions opts(numMeshPieces);
-        opts.setMap(myMap);
-        mpProxy = CProxy_MeshPiece::ckNew(libProxy, opts);
+        // CProxy_Map myMap = CProxy_Map::ckNew();
+        // CkArrayOptions opts(numMeshPieces);
+        // opts.setMap(myMap);
+        mpProxy = CProxy_MeshPiece::ckNew(libProxy);
 
         mpProxy.initializeLibVertices();
     }
@@ -89,8 +92,8 @@ class Main : public CBase_Main {
         CkPrintf("[Main] Library array with %d chares created and proxy obtained\n", numMeshPieces);
         libProxy[0].register_phase_one_cb(cb);
         
-        CkCallback cbB(CkIndex_MeshPiece::allowNextBatch(), mpProxy);
-        libProxy[0].register_batch_cb(cbB);
+        // CkCallback cbB(CkIndex_MeshPiece::allowNextBatch(), mpProxy);
+        // libProxy[0].register_batch_cb(cbB);
         startWork(); 
     }
 
@@ -103,8 +106,8 @@ class Main : public CBase_Main {
 
     void done() 
     {
-        CkPrintf("[Main] Inverted trees constructed. Notify library to do component detection\n");
-        CkPrintf("[Main] Tree construction time: %f\n", CkWallTimer()-start_time);
+        // CkPrintf("[Main] Inverted trees constructed. Notify library to do component detection\n");
+        // CkPrintf("[Main] Tree construction time: %f\n", CkWallTimer()-start_time);
         // mpProxy.getNumEdges();
        /* // ask the lib group chares to contribute counts
         CProxy_UnionFindLibGroup libGroup(libGroupID);
@@ -126,7 +129,7 @@ class Main : public CBase_Main {
     void doneFindComponents() 
     {
       if (ebatchNo <= num_edge_batches) {
-        CkPrintf("Done component labeling batchNo: %ld\n", ebatchNo);
+        CkPrintf("Done component labeling batchNo: %ld time: %lf\n", ebatchNo, CkWallTimer() - start_time);
         ebatchNo++;
         CkCallback cb(CkIndex_Main::done(), thisProxy);
         libProxy[0].register_phase_one_cb(cb);
@@ -178,10 +181,15 @@ class MeshPiece : public CBase_MeshPiece {
     bool blockedBatch;
     uint64_t numEdges;
     CProxy_UnionFindLib libProxy;
+    int64_t edgesProcessed;
+    int myNode;
 
     public:
     MeshPiece(CProxy_UnionFindLib _libProxy) { 
-      _libProxy = libProxy;
+      edgesProcessed = 0;
+      myNode = CkMyPe();
+      offset = 0;
+      libProxy = _libProxy;
       CkPrintf("I am chare: %d in PE: %d\n", thisIndex, CkMyPe());
     }
 
@@ -199,6 +207,29 @@ class MeshPiece : public CBase_MeshPiece {
         // Initialize vertices by providing the library what the offset should be
         // The library in this case would allocate memory for all the chares in the PE by using allocate_libVertices()
         // A different usage of this library is where the application decides the offset, and allocates the vertices in the initialize_vertices() call; so offset should be passed as -1
+        int64_t totVerticesinNode = 0;
+        std::vector<int> nodePeList;
+        for (int pe = 0; pe < CkNumPes(); pe++) {
+          if (CmiNodeOf(pe) == myNode) {
+            nodePeList.push_back(pe);
+          }
+        }
+        int numpes = nodePeList.size();
+        for (int i = 0; i < numpes; i++) {
+          totVerticesinNode += (MESHPIECE_SIZE*MESHPIECE_SIZE);
+
+          // For offset calculation
+          if (nodePeList[i] < CkMyPe()) {
+             offset += (MESHPIECE_SIZE*MESHPIECE_SIZE);
+          }
+        }
+        libPtr = libProxy.ckLocalBranch();
+        // only the first PE in the node calls for allocation
+        if (nodePeList[0] == CkMyPe()) {
+          libPtr->allocate_libVertices(totVerticesinNode, 1);
+        }
+        
+        /*
         int64_t totalCharesinPe = numMeshPieces / CkNumPes();
         int64_t remChares = numMeshPieces % CkNumPes();
         // assert ((thisIndex / totalCharesinPe) == CkMyPe()); 
@@ -212,8 +243,9 @@ class MeshPiece : public CBase_MeshPiece {
           libProxy.ckLocalBranch()->allocate_libVertices((MESHPIECE_SIZE * MESHPIECE_SIZE), totalCharesinPe);
         }
         offset = numMyVertices * offset;
+        */
         // CkPrintf("thisIndex: %d totalChareinPe: %ld offset: %ld\n", thisIndex, totalCharesinPe, offset);
-        libPtr->initialize_vertices(MESHPIECE_SIZE*MESHPIECE_SIZE, libVertices, offset, batchSize);
+        libPtr->initialize_vertices(numMyVertices, libVertices, offset, 999999999/*batchSize*/);
         libPtr->registerGetLocationFromID(getLocationFromID);
         init_vertices();
 
@@ -284,7 +316,10 @@ class MeshPiece : public CBase_MeshPiece {
       allowBatch = false;
       totalReqs = 0;
       // continue from previous iteration
-      for (; witer < numMyVertices; witer++) {
+      for (int64_t i = 0; witer < numMyVertices; witer++, i++) {
+        if (i == edge_batch_size) {
+          break;
+        }
         // check probability for east edge
         float eastProb = 0.0;
         if (myVertices[witer].y + 1 < MESH_SIZE) {
@@ -313,6 +348,7 @@ class MeshPiece : public CBase_MeshPiece {
           }
         }
 
+        /*
         if (totalReqs >= batchSize) {
           numEdges += totalReqs;
           if (allowBatch == false) {
@@ -321,14 +357,18 @@ class MeshPiece : public CBase_MeshPiece {
             break;
           }
         }
+        */
       }
+      /*
       if (witer == numMyVertices) {
         // CkPrintf("Done doWork() thisIndex: %d myPE: %d totalReqs: %ld blockedBatch: %d\n", thisIndex, CkMyPe(), totalReqs, blockedBatch);
         blockedBatch = false;
       }
+      */
     }
 
     void allowNextBatch() {
+      CkAssert(0);
       allowBatch = true;
       if (blockedBatch == true) {
         // CkPrintf("In allowNextBatch() thisIndex: %d blockedBatch: %d witer: %ld numMyVertices: %ld\n", thisIndex, blockedBatch, witer, numMyVertices);
