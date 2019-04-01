@@ -1,237 +1,1454 @@
-In doWork() thisIndex: 12 blockedBatch: 1
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 2499 numMyVertices: 250000
-In doWork() thisIndex: 12 blockedBatch: 1
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 5354 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 5354 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 5354 numMyVertices: 250000
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 14995 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 14995 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 14995 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 14995 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 14995 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 14995 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 14995 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 14995 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 14995 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 14995 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 14995 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 14995 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 14995 numMyVertices: 250000
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 55338 numMyVertices: 250000
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In allowNextBatch() thisIndex: 12 blockedBatch: 1 witer: 130315 numMyVertices: 250000
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-In doWork() thisIndex: 12 blockedBatch: 1
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 111 blockedBatch: 1
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
-Done doWork() thisIndex: 12 myPE: 3 totalReqs: 0 blockedBatch: 0
+mesh.C:333:41: error: cannot define member function ‘Main::MeshPiece::getLocationFromID’ within ‘Main’
+ MeshPiece::getLocationFromID(int64_t vid) {
+                                         ^
+In file included from mesh.C:363:0:
+mesh.def.h:21:26: error: declaration of ‘struct Closure_Main::doneCacheInit_2_closure’ in ‘class Main’ which does not enclose ‘class Closure_Main’
+     struct Closure_Main::doneCacheInit_2_closure : public SDAG::Closure {
+                          ^
+mesh.def.h:41:26: error: declaration of ‘struct Closure_Main::prCrDone_3_closure’ in ‘class Main’ which does not enclose ‘class Closure_Main’
+     struct Closure_Main::prCrDone_3_closure : public SDAG::Closure {
+                          ^
+mesh.def.h:61:26: error: declaration of ‘struct Closure_Main::doneInitVertices_4_closure’ in ‘class Main’ which does not enclose ‘class Closure_Main’
+     struct Closure_Main::doneInitVertices_4_closure : public SDAG::Closure {
+                          ^
+mesh.def.h:81:26: error: declaration of ‘struct Closure_Main::startWork_5_closure’ in ‘class Main’ which does not enclose ‘class Closure_Main’
+     struct Closure_Main::startWork_5_closure : public SDAG::Closure {
+                          ^
+mesh.def.h:101:26: error: declaration of ‘struct Closure_Main::done_6_closure’ in ‘class Main’ which does not enclose ‘class Closure_Main’
+     struct Closure_Main::done_6_closure : public SDAG::Closure {
+                          ^
+mesh.def.h:121:26: error: declaration of ‘struct Closure_Main::donePrepareFindComponents_7_closure’ in ‘class Main’ which does not enclose ‘class Closure_Main’
+     struct Closure_Main::donePrepareFindComponents_7_closure : public SDAG::Closure {
+                          ^
+mesh.def.h:141:26: error: declaration of ‘struct Closure_Main::doneFindComponents_8_closure’ in ‘class Main’ which does not enclose ‘class Closure_Main’
+     struct Closure_Main::doneFindComponents_8_closure : public SDAG::Closure {
+                          ^
+mesh.def.h:161:26: error: declaration of ‘struct Closure_Main::recvNumEdges_9_closure’ in ‘class Main’ which does not enclose ‘class Closure_Main’
+     struct Closure_Main::recvNumEdges_9_closure : public SDAG::Closure {
+                          ^
+mesh.def.h:184:26: error: declaration of ‘struct Closure_Main::donePrinting_10_closure’ in ‘class Main’ which does not enclose ‘class Closure_Main’
+     struct Closure_Main::donePrinting_10_closure : public SDAG::Closure {
+                          ^
+mesh.def.h:209:31: error: declaration of ‘struct Closure_MeshPiece::initializeLibVertices_2_closure’ in ‘class Main’ which does not enclose ‘class Closure_MeshPiece’
+     struct Closure_MeshPiece::initializeLibVertices_2_closure : public SDAG::Closure {
+                               ^
+mesh.def.h:229:31: error: declaration of ‘struct Closure_MeshPiece::doWork_3_closure’ in ‘class Main’ which does not enclose ‘class Closure_MeshPiece’
+     struct Closure_MeshPiece::doWork_3_closure : public SDAG::Closure {
+                               ^
+mesh.def.h:249:31: error: declaration of ‘struct Closure_MeshPiece::allowNextBatch_4_closure’ in ‘class Main’ which does not enclose ‘class Closure_MeshPiece’
+     struct Closure_MeshPiece::allowNextBatch_4_closure : public SDAG::Closure {
+                               ^
+mesh.def.h:269:31: error: declaration of ‘struct Closure_MeshPiece::getNumEdges_5_closure’ in ‘class Main’ which does not enclose ‘class Closure_MeshPiece’
+     struct Closure_MeshPiece::getNumEdges_5_closure : public SDAG::Closure {
+                               ^
+mesh.def.h:289:31: error: declaration of ‘struct Closure_MeshPiece::printVertices_6_closure’ in ‘class Main’ which does not enclose ‘class Closure_MeshPiece’
+     struct Closure_MeshPiece::printVertices_6_closure : public SDAG::Closure {
+                               ^
+mesh.def.h:314:28: error: storage class specified for ‘libProxy’
+ extern CProxy_UnionFindLib libProxy;
+                            ^
+mesh.def.h:316:8: error: expected unqualified-id before string constant
+ extern "C" void __xlater_roPup_libProxy(void *_impl_pup_er) {
+        ^
+mesh.def.h:324:20: error: storage class specified for ‘mainProxy’
+ extern CProxy_Main mainProxy;
+                    ^
+mesh.def.h:326:8: error: expected unqualified-id before string constant
+ extern "C" void __xlater_roPup_mainProxy(void *_impl_pup_er) {
+        ^
+mesh.def.h:334:16: error: storage class specified for ‘MESH_SIZE’
+ extern int64_t MESH_SIZE;
+                ^
+mesh.def.h:336:8: error: expected unqualified-id before string constant
+ extern "C" void __xlater_roPup_MESH_SIZE(void *_impl_pup_er) {
+        ^
+mesh.def.h:344:16: error: storage class specified for ‘MESHPIECE_SIZE’
+ extern int64_t MESHPIECE_SIZE;
+                ^
+mesh.def.h:346:8: error: expected unqualified-id before string constant
+ extern "C" void __xlater_roPup_MESHPIECE_SIZE(void *_impl_pup_er) {
+        ^
+mesh.def.h:354:14: error: storage class specified for ‘PROBABILITY’
+ extern float PROBABILITY;
+              ^
+mesh.def.h:356:8: error: expected unqualified-id before string constant
+ extern "C" void __xlater_roPup_PROBABILITY(void *_impl_pup_er) {
+        ^
+mesh.def.h:364:16: error: storage class specified for ‘numMeshPieces’
+ extern int64_t numMeshPieces;
+                ^
+mesh.def.h:366:8: error: expected unqualified-id before string constant
+ extern "C" void __xlater_roPup_numMeshPieces(void *_impl_pup_er) {
+        ^
+mesh.def.h:374:16: error: storage class specified for ‘edge_batch_size’
+ extern int64_t edge_batch_size;
+                ^
+mesh.def.h:376:8: error: expected unqualified-id before string constant
+ extern "C" void __xlater_roPup_edge_batch_size(void *_impl_pup_er) {
+        ^
+mesh.def.h:384:16: error: storage class specified for ‘batchSize’
+ extern int64_t batchSize;
+                ^
+mesh.def.h:386:8: error: expected unqualified-id before string constant
+ extern "C" void __xlater_roPup_batchSize(void *_impl_pup_er) {
+        ^
+mesh.def.h:397:25: error: invalid use of qualified-name ‘CkIndex_Map::__idx’
+  int CkIndex_Map::__idx=0;
+                         ^
+mesh.def.h:409:62: error: cannot define member function ‘CProxy_Map::ckNew’ within ‘Main’
+ CkGroupID CProxy_Map::ckNew(const CkEntryOptions *impl_e_opts)
+                                                              ^
+mesh.def.h:418:31: error: cannot define member function ‘CkIndex_Map::reg_Map_void’ within ‘Main’
+ int CkIndex_Map::reg_Map_void() {
+                               ^
+mesh.def.h:424:69: error: cannot define member function ‘CkIndex_Map::_call_Map_void’ within ‘Main’
+ void CkIndex_Map::_call_Map_void(void* impl_msg, void* impl_obj_void)
+                                                                     ^
+mesh.def.h:441:56: error: cannot define member function ‘CkIndex_Map::__register’ within ‘Main’
+ void CkIndex_Map::__register(const char *s, size_t size) {
+                                                        ^
+mesh.def.h:466:26: error: invalid use of qualified-name ‘CkIndex_Main::__idx’
+  int CkIndex_Main::__idx=0;
+                          ^
+mesh.def.h:473:63: error: cannot define member function ‘CProxy_Main::ckNew’ within ‘Main’
+ CkChareID CProxy_Main::ckNew(CkArgMsg* impl_msg, int impl_onPE)
+                                                               ^
+mesh.def.h:479:75: error: cannot define member function ‘CProxy_Main::ckNew’ within ‘Main’
+ void CProxy_Main::ckNew(CkArgMsg* impl_msg, CkChareID* pcid, int impl_onPE)
+                                                                           ^
+mesh.def.h:483:61: error: cannot define member function ‘CProxy_Main::CProxy_Main’ within ‘Main’
+   CProxy_Main::CProxy_Main(CkArgMsg* impl_msg, int impl_onPE)
+                                                             ^
+mesh.def.h:491:37: error: cannot define member function ‘CkIndex_Main::reg_Main_CkArgMsg’ within ‘Main’
+ int CkIndex_Main::reg_Main_CkArgMsg() {
+                                     ^
+mesh.def.h:498:75: error: cannot define member function ‘CkIndex_Main::_call_Main_CkArgMsg’ within ‘Main’
+ void CkIndex_Main::_call_Main_CkArgMsg(void* impl_msg, void* impl_obj_void)
+                                                                           ^
+mesh.def.h:508:66: error: cannot define member function ‘CProxy_Main::doneCacheInit’ within ‘Main’
+ void CProxy_Main::doneCacheInit(const CkEntryOptions *impl_e_opts)
+                                                                  ^
+In file included from mesh.C:363:0:
+mesh.def.h:521:42: error: cannot define member function ‘CkIndex_Main::reg_doneCacheInit_void’ within ‘Main’
+ int CkIndex_Main::reg_doneCacheInit_void() {
+                                          ^
+mesh.def.h:527:80: error: cannot define member function ‘CkIndex_Main::_call_doneCacheInit_void’ within ‘Main’
+ void CkIndex_Main::_call_doneCacheInit_void(void* impl_msg, void* impl_obj_void)
+                                                                                ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:809:49: error: invalid use of incomplete type ‘struct Closure_Main::doneCacheInit_2_closure’
+  PUP::able *className::call_PUP_constructor(void) \
+                                                 ^
+mesh.def.h:534:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::doneCacheInit_2_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1309:12: note: forward declaration of ‘struct Closure_Main::doneCacheInit_2_closure’
+     struct doneCacheInit_2_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:811:55: error: invalid use of incomplete type ‘struct Closure_Main::doneCacheInit_2_closure’
+  const PUP::able::PUP_ID &className::get_PUP_ID(void) const\
+                                                       ^
+mesh.def.h:534:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::doneCacheInit_2_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1309:12: note: forward declaration of ‘struct Closure_Main::doneCacheInit_2_closure’
+     struct doneCacheInit_2_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:813:31: error: invalid use of qualified-name ‘Closure_Main::doneCacheInit_2_closure::my_PUP_ID’
+  PUP::able::PUP_ID className::my_PUP_ID;\
+                               ^
+mesh.def.h:534:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::doneCacheInit_2_closure))
+ ^
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:814:50: error: invalid use of incomplete type ‘struct Closure_Main::doneCacheInit_2_closure’
+  void className::register_PUP_ID(const char* name)\
+                                                  ^
+mesh.def.h:534:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::doneCacheInit_2_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1309:12: note: forward declaration of ‘struct Closure_Main::doneCacheInit_2_closure’
+     struct doneCacheInit_2_closure;
+            ^
+In file included from mesh.C:363:0:
+mesh.def.h:540:61: error: cannot define member function ‘CProxy_Main::prCrDone’ within ‘Main’
+ void CProxy_Main::prCrDone(const CkEntryOptions *impl_e_opts)
+                                                             ^
+mesh.def.h:553:37: error: cannot define member function ‘CkIndex_Main::reg_prCrDone_void’ within ‘Main’
+ int CkIndex_Main::reg_prCrDone_void() {
+                                     ^
+mesh.def.h:559:75: error: cannot define member function ‘CkIndex_Main::_call_prCrDone_void’ within ‘Main’
+ void CkIndex_Main::_call_prCrDone_void(void* impl_msg, void* impl_obj_void)
+                                                                           ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:809:49: error: invalid use of incomplete type ‘struct Closure_Main::prCrDone_3_closure’
+  PUP::able *className::call_PUP_constructor(void) \
+                                                 ^
+mesh.def.h:566:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::prCrDone_3_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1312:12: note: forward declaration of ‘struct Closure_Main::prCrDone_3_closure’
+     struct prCrDone_3_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:811:55: error: invalid use of incomplete type ‘struct Closure_Main::prCrDone_3_closure’
+  const PUP::able::PUP_ID &className::get_PUP_ID(void) const\
+                                                       ^
+mesh.def.h:566:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::prCrDone_3_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1312:12: note: forward declaration of ‘struct Closure_Main::prCrDone_3_closure’
+     struct prCrDone_3_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:813:31: error: invalid use of qualified-name ‘Closure_Main::prCrDone_3_closure::my_PUP_ID’
+  PUP::able::PUP_ID className::my_PUP_ID;\
+                               ^
+mesh.def.h:566:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::prCrDone_3_closure))
+ ^
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:814:50: error: invalid use of incomplete type ‘struct Closure_Main::prCrDone_3_closure’
+  void className::register_PUP_ID(const char* name)\
+                                                  ^
+mesh.def.h:566:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::prCrDone_3_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1312:12: note: forward declaration of ‘struct Closure_Main::prCrDone_3_closure’
+     struct prCrDone_3_closure;
+            ^
+In file included from mesh.C:363:0:
+mesh.def.h:572:69: error: cannot define member function ‘CProxy_Main::doneInitVertices’ within ‘Main’
+ void CProxy_Main::doneInitVertices(const CkEntryOptions *impl_e_opts)
+                                                                     ^
+mesh.def.h:585:45: error: cannot define member function ‘CkIndex_Main::reg_doneInitVertices_void’ within ‘Main’
+ int CkIndex_Main::reg_doneInitVertices_void() {
+                                             ^
+mesh.def.h:591:83: error: cannot define member function ‘CkIndex_Main::_call_doneInitVertices_void’ within ‘Main’
+ void CkIndex_Main::_call_doneInitVertices_void(void* impl_msg, void* impl_obj_void)
+                                                                                   ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:809:49: error: invalid use of incomplete type ‘struct Closure_Main::doneInitVertices_4_closure’
+  PUP::able *className::call_PUP_constructor(void) \
+                                                 ^
+mesh.def.h:598:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::doneInitVertices_4_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1315:12: note: forward declaration of ‘struct Closure_Main::doneInitVertices_4_closure’
+     struct doneInitVertices_4_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:811:55: error: invalid use of incomplete type ‘struct Closure_Main::doneInitVertices_4_closure’
+  const PUP::able::PUP_ID &className::get_PUP_ID(void) const\
+                                                       ^
+mesh.def.h:598:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::doneInitVertices_4_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1315:12: note: forward declaration of ‘struct Closure_Main::doneInitVertices_4_closure’
+     struct doneInitVertices_4_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:813:31: error: invalid use of qualified-name ‘Closure_Main::doneInitVertices_4_closure::my_PUP_ID’
+  PUP::able::PUP_ID className::my_PUP_ID;\
+                               ^
+mesh.def.h:598:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::doneInitVertices_4_closure))
+ ^
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:814:50: error: invalid use of incomplete type ‘struct Closure_Main::doneInitVertices_4_closure’
+  void className::register_PUP_ID(const char* name)\
+                                                  ^
+mesh.def.h:598:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::doneInitVertices_4_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1315:12: note: forward declaration of ‘struct Closure_Main::doneInitVertices_4_closure’
+     struct doneInitVertices_4_closure;
+            ^
+In file included from mesh.C:363:0:
+mesh.def.h:604:62: error: cannot define member function ‘CProxy_Main::startWork’ within ‘Main’
+ void CProxy_Main::startWork(const CkEntryOptions *impl_e_opts)
+                                                              ^
+mesh.def.h:617:38: error: cannot define member function ‘CkIndex_Main::reg_startWork_void’ within ‘Main’
+ int CkIndex_Main::reg_startWork_void() {
+                                      ^
+mesh.def.h:623:76: error: cannot define member function ‘CkIndex_Main::_call_startWork_void’ within ‘Main’
+ void CkIndex_Main::_call_startWork_void(void* impl_msg, void* impl_obj_void)
+                                                                            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:809:49: error: invalid use of incomplete type ‘struct Closure_Main::startWork_5_closure’
+  PUP::able *className::call_PUP_constructor(void) \
+                                                 ^
+mesh.def.h:630:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::startWork_5_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1318:12: note: forward declaration of ‘struct Closure_Main::startWork_5_closure’
+     struct startWork_5_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:811:55: error: invalid use of incomplete type ‘struct Closure_Main::startWork_5_closure’
+  const PUP::able::PUP_ID &className::get_PUP_ID(void) const\
+                                                       ^
+mesh.def.h:630:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::startWork_5_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1318:12: note: forward declaration of ‘struct Closure_Main::startWork_5_closure’
+     struct startWork_5_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:813:31: error: invalid use of qualified-name ‘Closure_Main::startWork_5_closure::my_PUP_ID’
+  PUP::able::PUP_ID className::my_PUP_ID;\
+                               ^
+mesh.def.h:630:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::startWork_5_closure))
+ ^
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:814:50: error: invalid use of incomplete type ‘struct Closure_Main::startWork_5_closure’
+  void className::register_PUP_ID(const char* name)\
+                                                  ^
+mesh.def.h:630:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::startWork_5_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1318:12: note: forward declaration of ‘struct Closure_Main::startWork_5_closure’
+     struct startWork_5_closure;
+            ^
+In file included from mesh.C:363:0:
+mesh.def.h:636:57: error: cannot define member function ‘CProxy_Main::done’ within ‘Main’
+ void CProxy_Main::done(const CkEntryOptions *impl_e_opts)
+                                                         ^
+mesh.def.h:649:33: error: cannot define member function ‘CkIndex_Main::reg_done_void’ within ‘Main’
+ int CkIndex_Main::reg_done_void() {
+                                 ^
+mesh.def.h:655:71: error: cannot define member function ‘CkIndex_Main::_call_done_void’ within ‘Main’
+ void CkIndex_Main::_call_done_void(void* impl_msg, void* impl_obj_void)
+                                                                       ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:809:49: error: invalid use of incomplete type ‘struct Closure_Main::done_6_closure’
+  PUP::able *className::call_PUP_constructor(void) \
+                                                 ^
+mesh.def.h:662:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::done_6_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1321:12: note: forward declaration of ‘struct Closure_Main::done_6_closure’
+     struct done_6_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:811:55: error: invalid use of incomplete type ‘struct Closure_Main::done_6_closure’
+  const PUP::able::PUP_ID &className::get_PUP_ID(void) const\
+                                                       ^
+mesh.def.h:662:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::done_6_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1321:12: note: forward declaration of ‘struct Closure_Main::done_6_closure’
+     struct done_6_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:813:31: error: invalid use of qualified-name ‘Closure_Main::done_6_closure::my_PUP_ID’
+  PUP::able::PUP_ID className::my_PUP_ID;\
+                               ^
+mesh.def.h:662:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::done_6_closure))
+ ^
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:814:50: error: invalid use of incomplete type ‘struct Closure_Main::done_6_closure’
+  void className::register_PUP_ID(const char* name)\
+                                                  ^
+mesh.def.h:662:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::done_6_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1321:12: note: forward declaration of ‘struct Closure_Main::done_6_closure’
+     struct done_6_closure;
+            ^
+In file included from mesh.C:363:0:
+mesh.def.h:668:78: error: cannot define member function ‘CProxy_Main::donePrepareFindComponents’ within ‘Main’
+ void CProxy_Main::donePrepareFindComponents(const CkEntryOptions *impl_e_opts)
+                                                                              ^
+mesh.def.h:681:54: error: cannot define member function ‘CkIndex_Main::reg_donePrepareFindComponents_void’ within ‘Main’
+ int CkIndex_Main::reg_donePrepareFindComponents_void() {
+                                                      ^
+mesh.def.h:687:92: error: cannot define member function ‘CkIndex_Main::_call_donePrepareFindComponents_void’ within ‘Main’
+ void CkIndex_Main::_call_donePrepareFindComponents_void(void* impl_msg, void* impl_obj_void)
+                                                                                            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:809:49: error: invalid use of incomplete type ‘struct Closure_Main::donePrepareFindComponents_7_closure’
+  PUP::able *className::call_PUP_constructor(void) \
+                                                 ^
+mesh.def.h:694:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::donePrepareFindComponents_7_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1324:12: note: forward declaration of ‘struct Closure_Main::donePrepareFindComponents_7_closure’
+     struct donePrepareFindComponents_7_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:811:55: error: invalid use of incomplete type ‘struct Closure_Main::donePrepareFindComponents_7_closure’
+  const PUP::able::PUP_ID &className::get_PUP_ID(void) const\
+                                                       ^
+mesh.def.h:694:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::donePrepareFindComponents_7_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1324:12: note: forward declaration of ‘struct Closure_Main::donePrepareFindComponents_7_closure’
+     struct donePrepareFindComponents_7_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:813:31: error: invalid use of qualified-name ‘Closure_Main::donePrepareFindComponents_7_closure::my_PUP_ID’
+  PUP::able::PUP_ID className::my_PUP_ID;\
+                               ^
+mesh.def.h:694:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::donePrepareFindComponents_7_closure))
+ ^
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:814:50: error: invalid use of incomplete type ‘struct Closure_Main::donePrepareFindComponents_7_closure’
+  void className::register_PUP_ID(const char* name)\
+                                                  ^
+mesh.def.h:694:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::donePrepareFindComponents_7_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1324:12: note: forward declaration of ‘struct Closure_Main::donePrepareFindComponents_7_closure’
+     struct donePrepareFindComponents_7_closure;
+            ^
+In file included from mesh.C:363:0:
+mesh.def.h:700:71: error: cannot define member function ‘CProxy_Main::doneFindComponents’ within ‘Main’
+ void CProxy_Main::doneFindComponents(const CkEntryOptions *impl_e_opts)
+                                                                       ^
+mesh.def.h:713:47: error: cannot define member function ‘CkIndex_Main::reg_doneFindComponents_void’ within ‘Main’
+ int CkIndex_Main::reg_doneFindComponents_void() {
+                                               ^
+mesh.def.h:719:85: error: cannot define member function ‘CkIndex_Main::_call_doneFindComponents_void’ within ‘Main’
+ void CkIndex_Main::_call_doneFindComponents_void(void* impl_msg, void* impl_obj_void)
+                                                                                     ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:809:49: error: invalid use of incomplete type ‘struct Closure_Main::doneFindComponents_8_closure’
+  PUP::able *className::call_PUP_constructor(void) \
+                                                 ^
+mesh.def.h:726:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::doneFindComponents_8_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1327:12: note: forward declaration of ‘struct Closure_Main::doneFindComponents_8_closure’
+     struct doneFindComponents_8_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:811:55: error: invalid use of incomplete type ‘struct Closure_Main::doneFindComponents_8_closure’
+  const PUP::able::PUP_ID &className::get_PUP_ID(void) const\
+                                                       ^
+mesh.def.h:726:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::doneFindComponents_8_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1327:12: note: forward declaration of ‘struct Closure_Main::doneFindComponents_8_closure’
+     struct doneFindComponents_8_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:813:31: error: invalid use of qualified-name ‘Closure_Main::doneFindComponents_8_closure::my_PUP_ID’
+  PUP::able::PUP_ID className::my_PUP_ID;\
+                               ^
+mesh.def.h:726:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::doneFindComponents_8_closure))
+ ^
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:814:50: error: invalid use of incomplete type ‘struct Closure_Main::doneFindComponents_8_closure’
+  void className::register_PUP_ID(const char* name)\
+                                                  ^
+mesh.def.h:726:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::doneFindComponents_8_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1327:12: note: forward declaration of ‘struct Closure_Main::doneFindComponents_8_closure’
+     struct doneFindComponents_8_closure;
+            ^
+In file included from mesh.C:363:0:
+mesh.def.h:732:91: error: cannot define member function ‘CProxy_Main::recvNumEdges’ within ‘Main’
+ void CProxy_Main::recvNumEdges(const uint64_t &numEdges, const CkEntryOptions *impl_e_opts)
+                                                                                           ^
+mesh.def.h:758:46: error: cannot define member function ‘CkIndex_Main::reg_recvNumEdges_marshall9’ within ‘Main’
+ int CkIndex_Main::reg_recvNumEdges_marshall9() {
+                                              ^
+mesh.def.h:767:84: error: cannot define member function ‘CkIndex_Main::_call_recvNumEdges_marshall9’ within ‘Main’
+ void CkIndex_Main::_call_recvNumEdges_marshall9(void* impl_msg, void* impl_obj_void)
+                                                                                    ^
+mesh.def.h:780:91: error: cannot define member function ‘CkIndex_Main::_callmarshall_recvNumEdges_marshall9’ within ‘Main’
+ int CkIndex_Main::_callmarshall_recvNumEdges_marshall9(char* impl_buf, void* impl_obj_void) {
+                                                                                           ^
+mesh.def.h:791:96: error: cannot define member function ‘CkIndex_Main::_marshallmessagepup_recvNumEdges_marshall9’ within ‘Main’
+ void CkIndex_Main::_marshallmessagepup_recvNumEdges_marshall9(PUP::er &implDestP,void *impl_msg) {
+                                                                                                ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:809:49: error: invalid use of incomplete type ‘struct Closure_Main::recvNumEdges_9_closure’
+  PUP::able *className::call_PUP_constructor(void) \
+                                                 ^
+mesh.def.h:803:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::recvNumEdges_9_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1330:12: note: forward declaration of ‘struct Closure_Main::recvNumEdges_9_closure’
+     struct recvNumEdges_9_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:811:55: error: invalid use of incomplete type ‘struct Closure_Main::recvNumEdges_9_closure’
+  const PUP::able::PUP_ID &className::get_PUP_ID(void) const\
+                                                       ^
+mesh.def.h:803:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::recvNumEdges_9_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1330:12: note: forward declaration of ‘struct Closure_Main::recvNumEdges_9_closure’
+     struct recvNumEdges_9_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:813:31: error: invalid use of qualified-name ‘Closure_Main::recvNumEdges_9_closure::my_PUP_ID’
+  PUP::able::PUP_ID className::my_PUP_ID;\
+                               ^
+mesh.def.h:803:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::recvNumEdges_9_closure))
+ ^
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:814:50: error: invalid use of incomplete type ‘struct Closure_Main::recvNumEdges_9_closure’
+  void className::register_PUP_ID(const char* name)\
+                                                  ^
+mesh.def.h:803:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::recvNumEdges_9_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1330:12: note: forward declaration of ‘struct Closure_Main::recvNumEdges_9_closure’
+     struct recvNumEdges_9_closure;
+            ^
+In file included from mesh.C:363:0:
+mesh.def.h:809:65: error: cannot define member function ‘CProxy_Main::donePrinting’ within ‘Main’
+ void CProxy_Main::donePrinting(const CkEntryOptions *impl_e_opts)
+                                                                 ^
+mesh.def.h:820:92: error: cannot define member function ‘CkIndex_Main::_call_redn_wrapper_donePrinting_void’ within ‘Main’
+ void CkIndex_Main::_call_redn_wrapper_donePrinting_void(void* impl_msg, void* impl_obj_void)
+                                                                                            ^
+mesh.def.h:830:41: error: cannot define member function ‘CkIndex_Main::reg_donePrinting_void’ within ‘Main’
+ int CkIndex_Main::reg_donePrinting_void() {
+                                         ^
+mesh.def.h:838:54: error: cannot define member function ‘CkIndex_Main::reg_redn_wrapper_donePrinting_void’ within ‘Main’
+ int CkIndex_Main::reg_redn_wrapper_donePrinting_void() {
+                                                      ^
+mesh.def.h:843:79: error: cannot define member function ‘CkIndex_Main::_call_donePrinting_void’ within ‘Main’
+ void CkIndex_Main::_call_donePrinting_void(void* impl_msg, void* impl_obj_void)
+                                                                               ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:809:49: error: invalid use of incomplete type ‘struct Closure_Main::donePrinting_10_closure’
+  PUP::able *className::call_PUP_constructor(void) \
+                                                 ^
+mesh.def.h:850:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::donePrinting_10_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1333:12: note: forward declaration of ‘struct Closure_Main::donePrinting_10_closure’
+     struct donePrinting_10_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:811:55: error: invalid use of incomplete type ‘struct Closure_Main::donePrinting_10_closure’
+  const PUP::able::PUP_ID &className::get_PUP_ID(void) const\
+                                                       ^
+mesh.def.h:850:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::donePrinting_10_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1333:12: note: forward declaration of ‘struct Closure_Main::donePrinting_10_closure’
+     struct donePrinting_10_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:813:31: error: invalid use of qualified-name ‘Closure_Main::donePrinting_10_closure::my_PUP_ID’
+  PUP::able::PUP_ID className::my_PUP_ID;\
+                               ^
+mesh.def.h:850:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::donePrinting_10_closure))
+ ^
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:814:50: error: invalid use of incomplete type ‘struct Closure_Main::donePrinting_10_closure’
+  void className::register_PUP_ID(const char* name)\
+                                                  ^
+mesh.def.h:850:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_Main::donePrinting_10_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1333:12: note: forward declaration of ‘struct Closure_Main::donePrinting_10_closure’
+     struct donePrinting_10_closure;
+            ^
+In file included from mesh.C:363:0:
+mesh.def.h:856:57: error: cannot define member function ‘CkIndex_Main::__register’ within ‘Main’
+ void CkIndex_Main::__register(const char *s, size_t size) {
+                                                         ^
+mesh.def.h:905:31: error: invalid use of qualified-name ‘CkIndex_MeshPiece::__idx’
+  int CkIndex_MeshPiece::__idx=0;
+                               ^
+mesh.def.h:908:88: error: cannot define member function ‘CProxySection_MeshPiece::contribute’ within ‘Main’
+ void CProxySection_MeshPiece::contribute(CkSectionInfo &sid, int userData, int fragSize)
+                                                                                        ^
+mesh.def.h:915:143: error: cannot define member function ‘CProxySection_MeshPiece::contribute’ within ‘Main’
+ void CProxySection_MeshPiece::contribute(int dataSize,void *data,CkReduction::reducerType type, CkSectionInfo &sid, int userData, int fragSize)
+                                                                                                                                               ^
+mesh.def.h:923:141: error: cannot define member function ‘CProxySection_MeshPiece::contribute’ within ‘Main’
+ void CProxySection_MeshPiece::contribute(std::vector<T> &data, CkReduction::reducerType type, CkSectionInfo &sid, int userData, int fragSize)
+                                                                                                                                             ^
+mesh.def.h:930:110: error: cannot define member function ‘CProxySection_MeshPiece::contribute’ within ‘Main’
+ void CProxySection_MeshPiece::contribute(CkSectionInfo &sid, const CkCallback &cb, int userData, int fragSize)
+                                                                                                              ^
+mesh.def.h:937:165: error: cannot define member function ‘CProxySection_MeshPiece::contribute’ within ‘Main’
+ void CProxySection_MeshPiece::contribute(int dataSize,void *data,CkReduction::reducerType type, CkSectionInfo &sid, const CkCallback &cb, int userData, int fragSize)
+                                                                                                                                                                     ^
+mesh.def.h:945:163: error: cannot define member function ‘CProxySection_MeshPiece::contribute’ within ‘Main’
+ void CProxySection_MeshPiece::contribute(std::vector<T> &data, CkReduction::reducerType type, CkSectionInfo &sid, const CkCallback &cb, int userData, int fragSize)
+                                                                                                                                                                   ^
+mesh.def.h:956:81: error: cannot define member function ‘CProxyElement_MeshPiece::insert’ within ‘Main’
+ void CProxyElement_MeshPiece::insert(int onPE, const CkEntryOptions *impl_e_opts)
+                                                                                 ^
+mesh.def.h:967:86: error: cannot define member function ‘CProxyElement_MeshPiece::initializeLibVertices’ within ‘Main’
+ void CProxyElement_MeshPiece::initializeLibVertices(const CkEntryOptions *impl_e_opts) 
+                                                                                      ^
+mesh.def.h:981:71: error: cannot define member function ‘CProxyElement_MeshPiece::doWork’ within ‘Main’
+ void CProxyElement_MeshPiece::doWork(const CkEntryOptions *impl_e_opts) 
+                                                                       ^
+mesh.def.h:990:91: error: cannot define member function ‘CkIndex_MeshPiece::_call_redn_wrapper_doWork_void’ within ‘Main’
+ void CkIndex_MeshPiece::_call_redn_wrapper_doWork_void(void* impl_msg, void* impl_obj_void)
+                                                                                           ^
+mesh.def.h:1003:79: error: cannot define member function ‘CProxyElement_MeshPiece::allowNextBatch’ within ‘Main’
+ void CProxyElement_MeshPiece::allowNextBatch(const CkEntryOptions *impl_e_opts) 
+                                                                               ^
+mesh.def.h:1017:76: error: cannot define member function ‘CProxyElement_MeshPiece::getNumEdges’ within ‘Main’
+ void CProxyElement_MeshPiece::getNumEdges(const CkEntryOptions *impl_e_opts) 
+                                                                            ^
+mesh.def.h:1031:78: error: cannot define member function ‘CProxyElement_MeshPiece::printVertices’ within ‘Main’
+ void CProxyElement_MeshPiece::printVertices(const CkEntryOptions *impl_e_opts) 
+                                                                              ^
+mesh.def.h:1050:96: error: cannot define member function ‘CProxy_MeshPiece::ckNew’ within ‘Main’
+ CkArrayID CProxy_MeshPiece::ckNew(const CkArrayOptions &opts, const CkEntryOptions *impl_e_opts)
+                                                                                                ^
+mesh.def.h:1057:125: error: cannot define member function ‘CProxy_MeshPiece::ckNew’ within ‘Main’
+ void CProxy_MeshPiece::ckNew(const CkArrayOptions &opts, CkCallback _ck_array_creation_cb, const CkEntryOptions *impl_e_opts)
+                                                                                                                             ^
+mesh.def.h:1063:82: error: cannot define member function ‘CProxy_MeshPiece::ckNew’ within ‘Main’
+ CkArrayID CProxy_MeshPiece::ckNew(const int s1, const CkEntryOptions *impl_e_opts)
+                                                                                  ^
+mesh.def.h:1071:111: error: cannot define member function ‘CProxy_MeshPiece::ckNew’ within ‘Main’
+ void CProxy_MeshPiece::ckNew(const int s1, CkCallback _ck_array_creation_cb, const CkEntryOptions *impl_e_opts)
+                                                                                                               ^
+mesh.def.h:1080:43: error: cannot define member function ‘CkIndex_MeshPiece::reg_MeshPiece_void’ within ‘Main’
+ int CkIndex_MeshPiece::reg_MeshPiece_void() {
+                                           ^
+mesh.def.h:1086:81: error: cannot define member function ‘CkIndex_MeshPiece::_call_MeshPiece_void’ within ‘Main’
+ void CkIndex_MeshPiece::_call_MeshPiece_void(void* impl_msg, void* impl_obj_void)
+                                                                                 ^
+mesh.def.h:1098:79: error: cannot define member function ‘CProxy_MeshPiece::initializeLibVertices’ within ‘Main’
+ void CProxy_MeshPiece::initializeLibVertices(const CkEntryOptions *impl_e_opts) 
+                                                                               ^
+mesh.def.h:1109:55: error: cannot define member function ‘CkIndex_MeshPiece::reg_initializeLibVertices_void’ within ‘Main’
+ int CkIndex_MeshPiece::reg_initializeLibVertices_void() {
+                                                       ^
+mesh.def.h:1115:93: error: cannot define member function ‘CkIndex_MeshPiece::_call_initializeLibVertices_void’ within ‘Main’
+ void CkIndex_MeshPiece::_call_initializeLibVertices_void(void* impl_msg, void* impl_obj_void)
+                                                                                             ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:809:49: error: invalid use of incomplete type ‘struct Closure_MeshPiece::initializeLibVertices_2_closure’
+  PUP::able *className::call_PUP_constructor(void) \
+                                                 ^
+mesh.def.h:1122:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_MeshPiece::initializeLibVertices_2_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1342:12: note: forward declaration of ‘struct Closure_MeshPiece::initializeLibVertices_2_closure’
+     struct initializeLibVertices_2_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:811:55: error: invalid use of incomplete type ‘struct Closure_MeshPiece::initializeLibVertices_2_closure’
+  const PUP::able::PUP_ID &className::get_PUP_ID(void) const\
+                                                       ^
+mesh.def.h:1122:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_MeshPiece::initializeLibVertices_2_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1342:12: note: forward declaration of ‘struct Closure_MeshPiece::initializeLibVertices_2_closure’
+     struct initializeLibVertices_2_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:813:31: error: invalid use of qualified-name ‘Closure_MeshPiece::initializeLibVertices_2_closure::my_PUP_ID’
+  PUP::able::PUP_ID className::my_PUP_ID;\
+                               ^
+mesh.def.h:1122:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_MeshPiece::initializeLibVertices_2_closure))
+ ^
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:814:50: error: invalid use of incomplete type ‘struct Closure_MeshPiece::initializeLibVertices_2_closure’
+  void className::register_PUP_ID(const char* name)\
+                                                  ^
+mesh.def.h:1122:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_MeshPiece::initializeLibVertices_2_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1342:12: note: forward declaration of ‘struct Closure_MeshPiece::initializeLibVertices_2_closure’
+     struct initializeLibVertices_2_closure;
+            ^
+In file included from mesh.C:363:0:
+mesh.def.h:1128:64: error: cannot define member function ‘CProxy_MeshPiece::doWork’ within ‘Main’
+ void CProxy_MeshPiece::doWork(const CkEntryOptions *impl_e_opts) 
+                                                                ^
+mesh.def.h:1139:40: error: cannot define member function ‘CkIndex_MeshPiece::reg_doWork_void’ within ‘Main’
+ int CkIndex_MeshPiece::reg_doWork_void() {
+                                        ^
+mesh.def.h:1147:53: error: cannot define member function ‘CkIndex_MeshPiece::reg_redn_wrapper_doWork_void’ within ‘Main’
+ int CkIndex_MeshPiece::reg_redn_wrapper_doWork_void() {
+                                                     ^
+mesh.def.h:1152:78: error: cannot define member function ‘CkIndex_MeshPiece::_call_doWork_void’ within ‘Main’
+ void CkIndex_MeshPiece::_call_doWork_void(void* impl_msg, void* impl_obj_void)
+                                                                              ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:809:49: error: invalid use of incomplete type ‘struct Closure_MeshPiece::doWork_3_closure’
+  PUP::able *className::call_PUP_constructor(void) \
+                                                 ^
+mesh.def.h:1159:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_MeshPiece::doWork_3_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1345:12: note: forward declaration of ‘struct Closure_MeshPiece::doWork_3_closure’
+     struct doWork_3_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:811:55: error: invalid use of incomplete type ‘struct Closure_MeshPiece::doWork_3_closure’
+  const PUP::able::PUP_ID &className::get_PUP_ID(void) const\
+                                                       ^
+mesh.def.h:1159:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_MeshPiece::doWork_3_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1345:12: note: forward declaration of ‘struct Closure_MeshPiece::doWork_3_closure’
+     struct doWork_3_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:813:31: error: invalid use of qualified-name ‘Closure_MeshPiece::doWork_3_closure::my_PUP_ID’
+  PUP::able::PUP_ID className::my_PUP_ID;\
+                               ^
+mesh.def.h:1159:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_MeshPiece::doWork_3_closure))
+ ^
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:814:50: error: invalid use of incomplete type ‘struct Closure_MeshPiece::doWork_3_closure’
+  void className::register_PUP_ID(const char* name)\
+                                                  ^
+mesh.def.h:1159:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_MeshPiece::doWork_3_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1345:12: note: forward declaration of ‘struct Closure_MeshPiece::doWork_3_closure’
+     struct doWork_3_closure;
+            ^
+In file included from mesh.C:363:0:
+mesh.def.h:1165:72: error: cannot define member function ‘CProxy_MeshPiece::allowNextBatch’ within ‘Main’
+ void CProxy_MeshPiece::allowNextBatch(const CkEntryOptions *impl_e_opts) 
+                                                                        ^
+mesh.def.h:1176:48: error: cannot define member function ‘CkIndex_MeshPiece::reg_allowNextBatch_void’ within ‘Main’
+ int CkIndex_MeshPiece::reg_allowNextBatch_void() {
+                                                ^
+mesh.def.h:1182:86: error: cannot define member function ‘CkIndex_MeshPiece::_call_allowNextBatch_void’ within ‘Main’
+ void CkIndex_MeshPiece::_call_allowNextBatch_void(void* impl_msg, void* impl_obj_void)
+                                                                                      ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:809:49: error: invalid use of incomplete type ‘struct Closure_MeshPiece::allowNextBatch_4_closure’
+  PUP::able *className::call_PUP_constructor(void) \
+                                                 ^
+mesh.def.h:1189:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_MeshPiece::allowNextBatch_4_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1348:12: note: forward declaration of ‘struct Closure_MeshPiece::allowNextBatch_4_closure’
+     struct allowNextBatch_4_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:811:55: error: invalid use of incomplete type ‘struct Closure_MeshPiece::allowNextBatch_4_closure’
+  const PUP::able::PUP_ID &className::get_PUP_ID(void) const\
+                                                       ^
+mesh.def.h:1189:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_MeshPiece::allowNextBatch_4_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1348:12: note: forward declaration of ‘struct Closure_MeshPiece::allowNextBatch_4_closure’
+     struct allowNextBatch_4_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:813:31: error: invalid use of qualified-name ‘Closure_MeshPiece::allowNextBatch_4_closure::my_PUP_ID’
+  PUP::able::PUP_ID className::my_PUP_ID;\
+                               ^
+mesh.def.h:1189:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_MeshPiece::allowNextBatch_4_closure))
+ ^
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:814:50: error: invalid use of incomplete type ‘struct Closure_MeshPiece::allowNextBatch_4_closure’
+  void className::register_PUP_ID(const char* name)\
+                                                  ^
+mesh.def.h:1189:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_MeshPiece::allowNextBatch_4_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1348:12: note: forward declaration of ‘struct Closure_MeshPiece::allowNextBatch_4_closure’
+     struct allowNextBatch_4_closure;
+            ^
+In file included from mesh.C:363:0:
+mesh.def.h:1195:69: error: cannot define member function ‘CProxy_MeshPiece::getNumEdges’ within ‘Main’
+ void CProxy_MeshPiece::getNumEdges(const CkEntryOptions *impl_e_opts) 
+                                                                     ^
+mesh.def.h:1206:45: error: cannot define member function ‘CkIndex_MeshPiece::reg_getNumEdges_void’ within ‘Main’
+ int CkIndex_MeshPiece::reg_getNumEdges_void() {
+                                             ^
+mesh.def.h:1212:83: error: cannot define member function ‘CkIndex_MeshPiece::_call_getNumEdges_void’ within ‘Main’
+ void CkIndex_MeshPiece::_call_getNumEdges_void(void* impl_msg, void* impl_obj_void)
+                                                                                   ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:809:49: error: invalid use of incomplete type ‘struct Closure_MeshPiece::getNumEdges_5_closure’
+  PUP::able *className::call_PUP_constructor(void) \
+                                                 ^
+mesh.def.h:1219:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_MeshPiece::getNumEdges_5_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1351:12: note: forward declaration of ‘struct Closure_MeshPiece::getNumEdges_5_closure’
+     struct getNumEdges_5_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:811:55: error: invalid use of incomplete type ‘struct Closure_MeshPiece::getNumEdges_5_closure’
+  const PUP::able::PUP_ID &className::get_PUP_ID(void) const\
+                                                       ^
+mesh.def.h:1219:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_MeshPiece::getNumEdges_5_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1351:12: note: forward declaration of ‘struct Closure_MeshPiece::getNumEdges_5_closure’
+     struct getNumEdges_5_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:813:31: error: invalid use of qualified-name ‘Closure_MeshPiece::getNumEdges_5_closure::my_PUP_ID’
+  PUP::able::PUP_ID className::my_PUP_ID;\
+                               ^
+mesh.def.h:1219:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_MeshPiece::getNumEdges_5_closure))
+ ^
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:814:50: error: invalid use of incomplete type ‘struct Closure_MeshPiece::getNumEdges_5_closure’
+  void className::register_PUP_ID(const char* name)\
+                                                  ^
+mesh.def.h:1219:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_MeshPiece::getNumEdges_5_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1351:12: note: forward declaration of ‘struct Closure_MeshPiece::getNumEdges_5_closure’
+     struct getNumEdges_5_closure;
+            ^
+In file included from mesh.C:363:0:
+mesh.def.h:1225:71: error: cannot define member function ‘CProxy_MeshPiece::printVertices’ within ‘Main’
+ void CProxy_MeshPiece::printVertices(const CkEntryOptions *impl_e_opts) 
+                                                                       ^
+mesh.def.h:1236:47: error: cannot define member function ‘CkIndex_MeshPiece::reg_printVertices_void’ within ‘Main’
+ int CkIndex_MeshPiece::reg_printVertices_void() {
+                                               ^
+mesh.def.h:1242:85: error: cannot define member function ‘CkIndex_MeshPiece::_call_printVertices_void’ within ‘Main’
+ void CkIndex_MeshPiece::_call_printVertices_void(void* impl_msg, void* impl_obj_void)
+                                                                                     ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:809:49: error: invalid use of incomplete type ‘struct Closure_MeshPiece::printVertices_6_closure’
+  PUP::able *className::call_PUP_constructor(void) \
+                                                 ^
+mesh.def.h:1249:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_MeshPiece::printVertices_6_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1354:12: note: forward declaration of ‘struct Closure_MeshPiece::printVertices_6_closure’
+     struct printVertices_6_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:811:55: error: invalid use of incomplete type ‘struct Closure_MeshPiece::printVertices_6_closure’
+  const PUP::able::PUP_ID &className::get_PUP_ID(void) const\
+                                                       ^
+mesh.def.h:1249:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_MeshPiece::printVertices_6_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1354:12: note: forward declaration of ‘struct Closure_MeshPiece::printVertices_6_closure’
+     struct printVertices_6_closure;
+            ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm.h:12:0,
+                 from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:8,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:813:31: error: invalid use of qualified-name ‘Closure_MeshPiece::printVertices_6_closure::my_PUP_ID’
+  PUP::able::PUP_ID className::my_PUP_ID;\
+                               ^
+mesh.def.h:1249:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_MeshPiece::printVertices_6_closure))
+ ^
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/pup.h:814:50: error: invalid use of incomplete type ‘struct Closure_MeshPiece::printVertices_6_closure’
+  void className::register_PUP_ID(const char* name)\
+                                                  ^
+mesh.def.h:1249:1: note: in expansion of macro ‘PUPable_def’
+ PUPable_def(SINGLE_ARG(Closure_MeshPiece::printVertices_6_closure))
+ ^
+In file included from mesh.C:4:0:
+mesh.decl.h:1354:12: note: forward declaration of ‘struct Closure_MeshPiece::printVertices_6_closure’
+     struct printVertices_6_closure;
+            ^
+In file included from mesh.C:363:0:
+mesh.def.h:1257:55: error: cannot define member function ‘CkIndex_MeshPiece::reg_MeshPiece_CkMigrateMessage’ within ‘Main’
+ int CkIndex_MeshPiece::reg_MeshPiece_CkMigrateMessage() {
+                                                       ^
+mesh.def.h:1263:93: error: cannot define member function ‘CkIndex_MeshPiece::_call_MeshPiece_CkMigrateMessage’ within ‘Main’
+ void CkIndex_MeshPiece::_call_MeshPiece_CkMigrateMessage(void* impl_msg, void* impl_obj_void)
+                                                                                             ^
+mesh.def.h:1278:86: error: cannot define member function ‘CProxySection_MeshPiece::initializeLibVertices’ within ‘Main’
+ void CProxySection_MeshPiece::initializeLibVertices(const CkEntryOptions *impl_e_opts) 
+                                                                                      ^
+mesh.def.h:1292:71: error: cannot define member function ‘CProxySection_MeshPiece::doWork’ within ‘Main’
+ void CProxySection_MeshPiece::doWork(const CkEntryOptions *impl_e_opts) 
+                                                                       ^
+mesh.def.h:1306:79: error: cannot define member function ‘CProxySection_MeshPiece::allowNextBatch’ within ‘Main’
+ void CProxySection_MeshPiece::allowNextBatch(const CkEntryOptions *impl_e_opts) 
+                                                                               ^
+mesh.def.h:1320:76: error: cannot define member function ‘CProxySection_MeshPiece::getNumEdges’ within ‘Main’
+ void CProxySection_MeshPiece::getNumEdges(const CkEntryOptions *impl_e_opts) 
+                                                                            ^
+mesh.def.h:1334:78: error: cannot define member function ‘CProxySection_MeshPiece::printVertices’ within ‘Main’
+ void CProxySection_MeshPiece::printVertices(const CkEntryOptions *impl_e_opts) 
+                                                                              ^
+mesh.def.h:1353:62: error: cannot define member function ‘CkIndex_MeshPiece::__register’ within ‘Main’
+ void CkIndex_MeshPiece::__register(const char *s, size_t size) {
+                                                              ^
+mesh.def.h:1440:8: error: expected unqualified-id before string constant
+ extern "C" void CkRegisterMainModule(void) {
+        ^
+mesh.def.h:1445:11: error: explicit specialization in non-namespace scope ‘class Main’
+ template <>
+           ^
+mesh.def.h:1446:39: error: cannot define member function ‘CBaseT1<CkArrayMap, CProxy_Map>::virtual_pup’ within ‘Main’
+ void CBase_Map::virtual_pup(PUP::er &p) {
+                                       ^
+mesh.def.h:1451:11: error: explicit specialization in non-namespace scope ‘class Main’
+ template <>
+           ^
+mesh.def.h:1452:40: error: cannot define member function ‘CBaseT1<Chare, CProxy_Main>::virtual_pup’ within ‘Main’
+ void CBase_Main::virtual_pup(PUP::er &p) {
+                                        ^
+mesh.def.h:1457:11: error: explicit specialization in non-namespace scope ‘class Main’
+ template <>
+           ^
+mesh.def.h:1458:45: error: cannot define member function ‘CBaseT1<ArrayElementT<int>, CProxy_MeshPiece>::virtual_pup’ within ‘Main’
+ void CBase_MeshPiece::virtual_pup(PUP::er &p) {
+                                             ^
+mesh.def.h:1460:1: error: expected ‘}’ at end of input
+ }
+ ^
+mesh.C: In constructor ‘Main::Main(CkArgMsg*)’:
+mesh.C:57:9: error: ‘libCacheProxy’ was not declared in this scope
+         libCacheProxy = UnionFindLibCache::UnionFindLibCacheInit(cb);
+         ^
+mesh.C: In member function ‘void Main::startWork()’:
+mesh.C:94:7: error: ‘eBatchNo’ was not declared in this scope
+       eBatchNo = 1;
+       ^
+mesh.C: In member function ‘void Main::done()’:
+mesh.C:105:59: error: ‘ebatchNo’ was not declared in this scope
+         CkPrintf("Done tree construction batchNo: %ld\n", ebatchNo);
+                                                           ^
+mesh.C: In member function ‘void Main::donePrepareFindComponents()’:
+mesh.C:111:71: error: ‘ebatchNo’ was not declared in this scope
+        CkPrintf("Done prepare for component labeling batchNo: %ld\n", ebatchNo);
+                                                                       ^
+mesh.C: In member function ‘void Main::doneFindComponents()’:
+mesh.C:119:11: error: ‘ebatchNo’ was not declared in this scope
+       if (ebatchNo <= num_edge_batches) {
+           ^
+mesh.C:119:23: error: ‘num_edge_batches’ was not declared in this scope
+       if (ebatchNo <= num_edge_batches) {
+                       ^
+mesh.C:135:25: error: a function-definition is not allowed here before ‘{’ token
+     void donePrinting() {
+                         ^
+mesh.C:141:5: error: a function-definition is not allowed here before ‘{’ token
+     {
+     ^
+mesh.C:149:1: error: expected ‘}’ at end of input
+ };
+ ^
+mesh.C: In member function ‘void Main::MeshPiece::initializeLibVertices()’:
+mesh.C:182:25: error: invalid use of non-static data member ‘Main::MESHPIECE_SIZE’
+         numMyVertices = MESHPIECE_SIZE*MESHPIECE_SIZE;
+                         ^
+In file included from mesh.C:363:0:
+mesh.def.h:344:16: note: declared here
+ extern int64_t MESHPIECE_SIZE;
+                ^
+mesh.C:182:40: error: invalid use of non-static data member ‘Main::MESHPIECE_SIZE’
+         numMyVertices = MESHPIECE_SIZE*MESHPIECE_SIZE;
+                                        ^
+In file included from mesh.C:363:0:
+mesh.def.h:344:16: note: declared here
+ extern int64_t MESHPIECE_SIZE;
+                ^
+mesh.C:183:18: error: invalid use of non-static data member ‘Main::libProxy’
+         libPtr = libProxy.ckLocalBranch();
+                  ^
+In file included from mesh.C:363:0:
+mesh.def.h:314:28: note: declared here
+ extern CProxy_UnionFindLib libProxy;
+                            ^
+mesh.C:189:35: error: invalid use of non-static data member ‘Main::numMeshPieces’
+         int64_t totalCharesinPe = numMeshPieces / CkNumPes();
+                                   ^
+In file included from mesh.C:363:0:
+mesh.def.h:364:16: note: declared here
+ extern int64_t numMeshPieces;
+                ^
+mesh.C:190:29: error: invalid use of non-static data member ‘Main::numMeshPieces’
+         int64_t remChares = numMeshPieces % CkNumPes();
+                             ^
+In file included from mesh.C:363:0:
+mesh.def.h:364:16: note: declared here
+ extern int64_t numMeshPieces;
+                ^
+mesh.C:199:11: error: invalid use of non-static data member ‘Main::libProxy’
+           libProxy.ckLocalBranch()->allocate_libVertices((MESHPIECE_SIZE * MESHPIECE_SIZE), totalCharesinPe);
+           ^
+In file included from mesh.C:363:0:
+mesh.def.h:314:28: note: declared here
+ extern CProxy_UnionFindLib libProxy;
+                            ^
+mesh.C:199:59: error: invalid use of non-static data member ‘Main::MESHPIECE_SIZE’
+           libProxy.ckLocalBranch()->allocate_libVertices((MESHPIECE_SIZE * MESHPIECE_SIZE), totalCharesinPe);
+                                                           ^
+In file included from mesh.C:363:0:
+mesh.def.h:344:16: note: declared here
+ extern int64_t MESHPIECE_SIZE;
+                ^
+mesh.C:199:76: error: invalid use of non-static data member ‘Main::MESHPIECE_SIZE’
+           libProxy.ckLocalBranch()->allocate_libVertices((MESHPIECE_SIZE * MESHPIECE_SIZE), totalCharesinPe);
+                                                                            ^
+In file included from mesh.C:363:0:
+mesh.def.h:344:16: note: declared here
+ extern int64_t MESHPIECE_SIZE;
+                ^
+mesh.C:203:37: error: invalid use of non-static data member ‘Main::MESHPIECE_SIZE’
+         libPtr->initialize_vertices(MESHPIECE_SIZE*MESHPIECE_SIZE, libVertices, offset, batchSize);
+                                     ^
+In file included from mesh.C:363:0:
+mesh.def.h:344:16: note: declared here
+ extern int64_t MESHPIECE_SIZE;
+                ^
+mesh.C:203:52: error: invalid use of non-static data member ‘Main::MESHPIECE_SIZE’
+         libPtr->initialize_vertices(MESHPIECE_SIZE*MESHPIECE_SIZE, libVertices, offset, batchSize);
+                                                    ^
+In file included from mesh.C:363:0:
+mesh.def.h:344:16: note: declared here
+ extern int64_t MESHPIECE_SIZE;
+                ^
+mesh.C:203:89: error: invalid use of non-static data member ‘Main::batchSize’
+         libPtr->initialize_vertices(MESHPIECE_SIZE*MESHPIECE_SIZE, libVertices, offset, batchSize);
+                                                                                         ^
+In file included from mesh.C:363:0:
+mesh.def.h:384:16: note: declared here
+ extern int64_t batchSize;
+                ^
+In file included from /dcsdata/home/raghaven/chaNGa/charm/bin/../include/charm++.h:1131:0,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.decl.h:3,
+                 from /dcsdata/home/raghaven/chaNGa/unionfind/unionFindLib.h:4,
+                 from mesh.C:3:
+/dcsdata/home/raghaven/chaNGa/charm/bin/../include/ckreduction.h:833:5: error: ‘redn_wrapper_doneInitVertices’ is not a member of ‘CkIndex_Main’
+     CkIndex_##me::redn_wrapper_##method(NULL)
+     ^
+mesh.C:211:31: note: in expansion of macro ‘CkReductionTarget’
+         contribute(CkCallback(CkReductionTarget(Main, doneInitVertices), mainProxy));
+                               ^
+mesh.C:211:74: error: invalid use of non-static data member ‘Main::mainProxy’
+         contribute(CkCallback(CkReductionTarget(Main, doneInitVertices), mainProxy));
+                                                                          ^
+In file included from mesh.C:363:0:
+mesh.def.h:324:20: note: declared here
+ extern CProxy_Main mainProxy;
+                    ^
+mesh.C: In member function ‘void Main::MeshPiece::init_vertices()’:
+mesh.C:217:39: error: invalid use of non-static data member ‘Main::MESHPIECE_SIZE’
+           myVertices = new meshVertex[MESHPIECE_SIZE*MESHPIECE_SIZE];
+                                       ^
+In file included from mesh.C:363:0:
+mesh.def.h:344:16: note: declared here
+ extern int64_t MESHPIECE_SIZE;
+                ^
+mesh.C:217:54: error: invalid use of non-static data member ‘Main::MESHPIECE_SIZE’
+           myVertices = new meshVertex[MESHPIECE_SIZE*MESHPIECE_SIZE];
+                                                      ^
+In file included from mesh.C:363:0:
+mesh.def.h:344:16: note: declared here
+ extern int64_t MESHPIECE_SIZE;
+                ^
+mesh.C:226:40: error: invalid use of non-static data member ‘Main::MESH_SIZE’
+         int64_t chare_x = thisIndex / (MESH_SIZE/MESHPIECE_SIZE);
+                                        ^
+In file included from mesh.C:363:0:
+mesh.def.h:334:16: note: declared here
+ extern int64_t MESH_SIZE;
+                ^
+mesh.C:226:50: error: invalid use of non-static data member ‘Main::MESHPIECE_SIZE’
+         int64_t chare_x = thisIndex / (MESH_SIZE/MESHPIECE_SIZE);
+                                                  ^
+In file included from mesh.C:363:0:
+mesh.def.h:344:16: note: declared here
+ extern int64_t MESHPIECE_SIZE;
+                ^
+mesh.C:227:40: error: invalid use of non-static data member ‘Main::MESH_SIZE’
+         int64_t chare_y = thisIndex % (MESH_SIZE/MESHPIECE_SIZE);
+                                        ^
+In file included from mesh.C:363:0:
+mesh.def.h:334:16: note: declared here
+ extern int64_t MESH_SIZE;
+                ^
+mesh.C:227:50: error: invalid use of non-static data member ‘Main::MESHPIECE_SIZE’
+         int64_t chare_y = thisIndex % (MESH_SIZE/MESHPIECE_SIZE);
+                                                  ^
+In file included from mesh.C:363:0:
+mesh.def.h:344:16: note: declared here
+ extern int64_t MESHPIECE_SIZE;
+                ^
+mesh.C:230:33: error: invalid use of non-static data member ‘Main::MESHPIECE_SIZE’
+         for (int64_t i = 0; i < MESHPIECE_SIZE; i++) {
+                                 ^
+In file included from mesh.C:363:0:
+mesh.def.h:344:16: note: declared here
+ extern int64_t MESHPIECE_SIZE;
+                ^
+mesh.C:231:37: error: invalid use of non-static data member ‘Main::MESHPIECE_SIZE’
+             for (int64_t j = 0; j < MESHPIECE_SIZE; j++) {
+                                     ^
+In file included from mesh.C:363:0:
+mesh.def.h:344:16: note: declared here
+ extern int64_t MESHPIECE_SIZE;
+                ^
+mesh.C:233:44: error: invalid use of non-static data member ‘Main::MESHPIECE_SIZE’
+                 int64_t global_x = chare_x*MESHPIECE_SIZE + i;
+                                            ^
+In file included from mesh.C:363:0:
+mesh.def.h:344:16: note: declared here
+ extern int64_t MESHPIECE_SIZE;
+                ^
+mesh.C:234:44: error: invalid use of non-static data member ‘Main::MESHPIECE_SIZE’
+                 int64_t global_y = chare_y*MESHPIECE_SIZE + j;
+                                            ^
+In file included from mesh.C:363:0:
+mesh.def.h:344:16: note: declared here
+ extern int64_t MESHPIECE_SIZE;
+                ^
+mesh.C:235:30: error: invalid use of non-static data member ‘Main::MESHPIECE_SIZE’
+                 myVertices[i*MESHPIECE_SIZE+j].x = global_x;
+                              ^
+In file included from mesh.C:363:0:
+mesh.def.h:344:16: note: declared here
+ extern int64_t MESHPIECE_SIZE;
+                ^
+mesh.C:236:30: error: invalid use of non-static data member ‘Main::MESHPIECE_SIZE’
+                 myVertices[i*MESHPIECE_SIZE+j].y = global_y;
+                              ^
+In file included from mesh.C:363:0:
+mesh.def.h:344:16: note: declared here
+ extern int64_t MESHPIECE_SIZE;
+                ^
+mesh.C:237:30: error: invalid use of non-static data member ‘Main::MESHPIECE_SIZE’
+                 myVertices[i*MESHPIECE_SIZE+j].id = global_x*MESH_SIZE + global_y;
+                              ^
+In file included from mesh.C:363:0:
+mesh.def.h:344:16: note: declared here
+ extern int64_t MESHPIECE_SIZE;
+                ^
+mesh.C:237:62: error: invalid use of non-static data member ‘Main::MESH_SIZE’
+                 myVertices[i*MESHPIECE_SIZE+j].id = global_x*MESH_SIZE + global_y;
+                                                              ^
+In file included from mesh.C:363:0:
+mesh.def.h:334:16: note: declared here
+ extern int64_t MESH_SIZE;
+                ^
+mesh.C:242:31: error: invalid use of non-static data member ‘Main::MESHPIECE_SIZE’
+                 libVertices[i*MESHPIECE_SIZE+j].vertexID = global_x*MESH_SIZE + global_y;
+                               ^
+In file included from mesh.C:363:0:
+mesh.def.h:344:16: note: declared here
+ extern int64_t MESHPIECE_SIZE;
+                ^
+mesh.C:242:69: error: invalid use of non-static data member ‘Main::MESH_SIZE’
+                 libVertices[i*MESHPIECE_SIZE+j].vertexID = global_x*MESH_SIZE + global_y;
+                                                                     ^
+In file included from mesh.C:363:0:
+mesh.def.h:334:16: note: declared here
+ extern int64_t MESH_SIZE;
+                ^
+mesh.C:243:31: error: invalid use of non-static data member ‘Main::MESHPIECE_SIZE’
+                 libVertices[i*MESHPIECE_SIZE+j].parent = libVertices[i*MESHPIECE_SIZE+j].vertexID;
+                               ^
+In file included from mesh.C:363:0:
+mesh.def.h:344:16: note: declared here
+ extern int64_t MESHPIECE_SIZE;
+                ^
+mesh.C:243:72: error: invalid use of non-static data member ‘Main::MESHPIECE_SIZE’
+                 libVertices[i*MESHPIECE_SIZE+j].parent = libVertices[i*MESHPIECE_SIZE+j].vertexID;
+                                                                        ^
+In file included from mesh.C:363:0:
+mesh.def.h:344:16: note: declared here
+ extern int64_t MESHPIECE_SIZE;
+                ^
+mesh.C: In member function ‘void Main::MeshPiece::doWork()’:
+mesh.C:277:39: error: invalid use of non-static data member ‘Main::MESH_SIZE’
+         if (myVertices[witer].y + 1 < MESH_SIZE) {
+                                       ^
+In file included from mesh.C:363:0:
+mesh.def.h:334:16: note: declared here
+ extern int64_t MESH_SIZE;
+                ^
+mesh.C:280:26: error: invalid use of non-static data member ‘Main::PROBABILITY’
+           if (eastProb < PROBABILITY) {
+                          ^
+In file included from mesh.C:363:0:
+mesh.def.h:354:14: note: declared here
+ extern float PROBABILITY;
+              ^
+mesh.C:282:51: error: invalid use of non-static data member ‘Main::MESH_SIZE’
+             int64_t eastID = (myVertices[witer].x*MESH_SIZE) + (myVertices[witer].y+1);
+                                                   ^
+In file included from mesh.C:363:0:
+mesh.def.h:334:16: note: declared here
+ extern int64_t MESH_SIZE;
+                ^
+mesh.C:291:39: error: invalid use of non-static data member ‘Main::MESH_SIZE’
+         if (myVertices[witer].x + 1 < MESH_SIZE) {
+                                       ^
+In file included from mesh.C:363:0:
+mesh.def.h:334:16: note: declared here
+ extern int64_t MESH_SIZE;
+                ^
+mesh.C:294:27: error: invalid use of non-static data member ‘Main::PROBABILITY’
+           if (southProb < PROBABILITY) {
+                           ^
+In file included from mesh.C:363:0:
+mesh.def.h:354:14: note: declared here
+ extern float PROBABILITY;
+              ^
+mesh.C:296:55: error: invalid use of non-static data member ‘Main::MESH_SIZE’
+             int64_t southID = (myVertices[witer].x+1)*MESH_SIZE + myVertices[witer].y;
+                                                       ^
+In file included from mesh.C:363:0:
+mesh.def.h:334:16: note: declared here
+ extern int64_t MESH_SIZE;
+                ^
+mesh.C:303:26: error: invalid use of non-static data member ‘Main::batchSize’
+         if (totalReqs >= batchSize) {
+                          ^
+In file included from mesh.C:363:0:
+mesh.def.h:384:16: note: declared here
+ extern int64_t batchSize;
+                ^
+mesh.C: In member function ‘void Main::MeshPiece::getNumEdges()’:
+mesh.C:328:7: error: invalid use of non-static data member ‘Main::mainProxy’
+       mainProxy.recvNumEdges(numEdges);
+       ^
+In file included from mesh.C:363:0:
+mesh.def.h:324:20: note: declared here
+ extern CProxy_Main mainProxy;
+                    ^
+In file included from mesh.C:363:0:
+mesh.def.h: In member function ‘void Main::_registermesh()’:
+mesh.def.h:1390:91: error: ‘__xlater_roPup_libProxy’ was not declared in this scope
+   CkRegisterReadonly("libProxy","CProxy_UnionFindLib",sizeof(libProxy),(void *) &libProxy,__xlater_roPup_libProxy);
+                                                                                           ^
+mesh.def.h:1392:86: error: ‘__xlater_roPup_mainProxy’ was not declared in this scope
+   CkRegisterReadonly("mainProxy","CProxy_Main",sizeof(mainProxy),(void *) &mainProxy,__xlater_roPup_mainProxy);
+                                                                                      ^
+mesh.def.h:1394:82: error: ‘__xlater_roPup_MESH_SIZE’ was not declared in this scope
+   CkRegisterReadonly("MESH_SIZE","int64_t",sizeof(MESH_SIZE),(void *) &MESH_SIZE,__xlater_roPup_MESH_SIZE);
+                                                                                  ^
+mesh.def.h:1396:97: error: ‘__xlater_roPup_MESHPIECE_SIZE’ was not declared in this scope
+   CkRegisterReadonly("MESHPIECE_SIZE","int64_t",sizeof(MESHPIECE_SIZE),(void *) &MESHPIECE_SIZE,__xlater_roPup_MESHPIECE_SIZE);
+                                                                                                 ^
+mesh.def.h:1398:86: error: ‘__xlater_roPup_PROBABILITY’ was not declared in this scope
+   CkRegisterReadonly("PROBABILITY","float",sizeof(PROBABILITY),(void *) &PROBABILITY,__xlater_roPup_PROBABILITY);
+                                                                                      ^
+mesh.def.h:1400:94: error: ‘__xlater_roPup_numMeshPieces’ was not declared in this scope
+   CkRegisterReadonly("numMeshPieces","int64_t",sizeof(numMeshPieces),(void *) &numMeshPieces,__xlater_roPup_numMeshPieces);
+                                                                                              ^
+mesh.def.h:1402:100: error: ‘__xlater_roPup_edge_batch_size’ was not declared in this scope
+   CkRegisterReadonly("edge_batch_size","int64_t",sizeof(edge_batch_size),(void *) &edge_batch_size,__xlater_roPup_edge_batch_size);
+                                                                                                    ^
+mesh.def.h:1404:82: error: ‘__xlater_roPup_batchSize’ was not declared in this scope
+   CkRegisterReadonly("batchSize","int64_t",sizeof(batchSize),(void *) &batchSize,__xlater_roPup_batchSize);
+                                                                                  ^
+mesh.def.h: At global scope:
+mesh.def.h:1439:1: error: expected unqualified-id at end of input
+ }
+ ^
+Fatal Error by charmc in directory /dcsdata/home/raghaven/chaNGa/unionfind/examples/prob_mesh
+   Command g++ -DCMK_GFORTRAN -DCMK_GFORTRAN -D_REENTRANT -I./../include -D__CHARMC__=1 -O2 -U_FORTIFY_SOURCE -fno-stack-protector -D_REENTRANT -I/dcsdata/home/raghaven/chaNGa/charm/bin/../include -D__CHARMC__=1 -DANCHOR_ALGO -DPROFILING -I/dcsdata/home/raghaven/chaNGa/unionfind -I/dcsdata/home/raghaven/chaNGa/unionfind/prefixLib -std=c++11 -O0 -g -U_FORTIFY_SOURCE -fno-stack-protector -std=c++11 -fno-lifetime-dse -c mesh.C -o mesh.o returned error code 1
+charmc exiting...
+make: *** [mesh.o] Error 1

@@ -1,12 +1,14 @@
 mainmodule mesh {
     extern module unionFindLib;
 
-    readonly CProxy_UnionFindLib libProxy;
+    // readonly CProxy_UnionFindLib libProxy;
+    readonly CProxy_UnionFindLibCache libCacheProxy;
     readonly CProxy_Main mainProxy;
     readonly int64_t MESH_SIZE;
     readonly int64_t MESHPIECE_SIZE;
     readonly float PROBABILITY;
     readonly int64_t numMeshPieces;
+    readonly int64_t edge_batch_size;
     readonly int64_t batchSize;
     
     group Map : CkArrayMap {
@@ -15,14 +17,19 @@ mainmodule mesh {
 
     mainchare Main {
         entry Main(CkArgMsg *m);
-        entry void doneInveretdTree();
+        entry void doneCacheInit();
+        entry void prCrDone();
+        entry [reductiontarget] void doneInitVertices();
+        entry [reductiontarget] void startWork();
+        entry void done();
+        entry void donePrepareFindComponents();
         entry void doneFindComponents();
         entry void recvNumEdges(uint64_t numEdges);
         entry [reductiontarget] void donePrinting();
     }
 
-    array[1D] MeshPiece {
-      entry MeshPiece();
+    array [1D] MeshPiece {
+      entry MeshPiece(CProxy_UnionFindLib libProxy);
       entry void initializeLibVertices();
       entry [reductiontarget] void doWork();
       entry void allowNextBatch();

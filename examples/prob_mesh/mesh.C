@@ -3,14 +3,15 @@
 #include "unionFindLib.h"
 #include "mesh.decl.h"
 
-/*readonly*/ CProxy_UnionFindLib libProxy;
+///*readonly*/ CProxy_UnionFindLib libProxy;
+/*readonly*/ CProxy_UnionFindLibCache libCacheProxy;
 /*readonly*/ CProxy_Main mainProxy;
 /*readonly*/ int64_t MESH_SIZE;
 /*readonly*/ int64_t MESHPIECE_SIZE;
 /*readonly*/ float PROBABILITY;
 /*readonly*/ int64_t numMeshPieces;
 /*readonly*/ long batchSize;
-
+/*readonly*/ int64_t edge_batch_size;
 
 class Map : public CkArrayMap {
   public:
@@ -22,15 +23,20 @@ class Map : public CkArrayMap {
 };
 
 class Main : public CBase_Main {
+    CProxy_UnionFindLib libProxy;
     CProxy_MeshPiece mpProxy;
     double start_time;
     uint64_t totEdges;
     uint64_t recvMPs;
+    int64_t ebatchNo;
+    int64_t num_edge_batches;
+
 
     public:
-    Main(CkArgMsg *m) {
-        if (m->argc != 5) {
-            CkPrintf("Usage: ./mesh <mesh_size> <mesh_piece_size> <probability>");
+    Main(CkArgMsg *m) 
+    {
+        if (m->argc != 6) {
+            CkPrintf("Usage: ./mesh <mesh_size> <mesh_piece_size> <probability> <batchSize> <edge_batch_size>");
             CkExit();
         }
 
@@ -40,6 +46,7 @@ class Main : public CBase_Main {
             CkAbort("Invalid input: Mesh piece size must divide the mesh size!\n");
         PROBABILITY = atof(m->argv[3]);
         batchSize = atol(m->argv[4]);
+        edge_batch_size = atol(m->argv[5]);
 
         if (MESH_SIZE % MESHPIECE_SIZE != 0) {
             CkAbort("Mesh piece size should divide mesh size\n");
@@ -50,36 +57,97 @@ class Main : public CBase_Main {
 
         numMeshPieces = (MESH_SIZE/MESHPIECE_SIZE) * (MESH_SIZE/MESHPIECE_SIZE);
         // assert ((numMeshPieces % CkNumPes()) == 0); // Finicky handling of group based union-find library
+
+        // Create library vertex cache
+        CkCallback cb(CkIndex_Main::doneCacheInit(), thisProxy);
+        libCacheProxy = UnionFindLibCache::UnionFindLibCacheInit(cb);
+    }
+
+    void doneCacheInit() 
+    {
+      CkCallback cb(CkIndex_Main::prCrDone(), thisProxy);
+      libProxy = UnionFindLib::unionFindInit(cb);
+    }
+
+    void prCrDone() 
+    {
         CProxy_Map myMap = CProxy_Map::ckNew();
         CkArrayOptions opts(numMeshPieces);
         opts.setMap(myMap);
-        mpProxy = CProxy_MeshPiece::ckNew(opts);
+        mpProxy = CProxy_MeshPiece::ckNew(libProxy, opts);
+
+        mpProxy.initializeLibVertices();
+    }
+
+    void doneInitVertices() 
+    {
+
         // mpProxy = CProxy_MeshPiece::ckNew(numMeshPieces);
         // callback for library to return to after inverted tree construction
-        CkCallback cb(CkIndex_Main::doneInveretdTree(), thisProxy);
-        libProxy = UnionFindLib::unionFindInit(mpProxy, numMeshPieces);
+        CkCallback cb(CkIndex_Main::done(), thisProxy);
+        // libProxy = UnionFindLib::unionFindInit(mpProxy, numMeshPieces);
         CkPrintf("[Main] Library array with %d chares created and proxy obtained\n", numMeshPieces);
         libProxy[0].register_phase_one_cb(cb);
         
         CkCallback cbB(CkIndex_MeshPiece::allowNextBatch(), mpProxy);
         libProxy[0].register_batch_cb(cbB);
-        
-        start_time = CkWallTimer();
-        mpProxy.initializeLibVertices();
+        startWork(); 
     }
 
-    void doneInveretdTree() {
+    void startWork()
+    {
+      start_time = CkWallTimer();
+      ebatchNo = 1;
+      mpProxy.doWork();
+    }
+
+    void done() 
+    {
         CkPrintf("[Main] Inverted trees constructed. Notify library to do component detection\n");
         CkPrintf("[Main] Tree construction time: %f\n", CkWallTimer()-start_time);
         // mpProxy.getNumEdges();
        /* // ask the lib group chares to contribute counts
         CProxy_UnionFindLibGroup libGroup(libGroupID);
         libGroup.contribute_count();*/
-        CkCallback cb(CkIndex_Main::doneFindComponents(), thisProxy);
-        start_time = CkWallTimer();
-        libProxy.find_components(cb);
+        CkPrintf("Done tree construction batchNo: %ld\n", ebatchNo);
+        CkCallback cb(CkIndex_Main::donePrepareFindComponents(), thisProxy);
+        libProxy.prepare_for_component_labeling(cb);
     }
 
+    void donePrepareFindComponents() 
+    {
+       CkPrintf("Done prepare for component labeling batchNo: %ld\n", ebatchNo);
+       CkCallback cb(CkIndex_Main::doneFindComponents(), thisProxy);
+       libProxy.inter_start_component_labeling(cb);
+       // start_time = CkWallTimer();
+       // libProxy.find_components(cb);
+    }
+
+    void doneFindComponents() 
+    {
+      if (ebatchNo <= num_edge_batches) {
+        CkPrintf("Done component labeling batchNo: %ld\n", ebatchNo);
+        ebatchNo++;
+        CkCallback cb(CkIndex_Main::done(), thisProxy);
+        libProxy[0].register_phase_one_cb(cb);
+        mpProxy.doWork();
+      }
+      else {
+        // CkPrintf("[Main] Components identified, prune unecessary ones now\n");
+        CkPrintf("[Main] Components detection time: %f\n", CkWallTimer() - start_time);
+        CkExit();
+        // callback for library to report to after pruning
+        CkCallback cb(CkIndex_MeshPiece::printVertices(), mpProxy);
+        libProxy.prune_components(1, cb);
+      }
+    }
+
+    void donePrinting() 
+    {
+        CkPrintf("[Main] Final runtime: %f\n", CkWallTimer()-start_time);
+        CkExit();
+    }
+    
     void recvNumEdges(uint64_t numEdges)
     {
       totEdges += numEdges;
@@ -88,20 +156,6 @@ class Main : public CBase_Main {
         CkPrintf("Total edges: %lld\n", totEdges);
         // CkExit();
       }
-    }
-
-    void doneFindComponents() {
-        CkPrintf("[Main] Components identified, prune unecessary ones now\n");
-        CkPrintf("[Main] Components detection time: %f\n", CkWallTimer()-start_time);
-        CkExit();
-        // callback for library to report to after pruning
-        CkCallback cb(CkIndex_MeshPiece::printVertices(), mpProxy);
-        libProxy.prune_components(1, cb);
-    }
-
-    void donePrinting() {
-        CkPrintf("[Main] Final runtime: %f\n", CkWallTimer()-start_time);
-        CkExit();
     }
 };
 
@@ -123,9 +177,11 @@ class MeshPiece : public CBase_MeshPiece {
     bool allowBatch;
     bool blockedBatch;
     uint64_t numEdges;
+    CProxy_UnionFindLib libProxy;
 
     public:
-    MeshPiece() { 
+    MeshPiece(CProxy_UnionFindLib _libProxy) { 
+      _libProxy = libProxy;
       CkPrintf("I am chare: %d in PE: %d\n", thisIndex, CkMyPe());
     }
 
@@ -165,7 +221,7 @@ class MeshPiece : public CBase_MeshPiece {
         witer = 0;
         numEdges = 0;
 
-        contribute(CkCallback(CkReductionTarget(MeshPiece, doWork), thisProxy));
+        contribute(CkCallback(CkReductionTarget(Main, doneInitVertices), mainProxy));
     }
 
     void init_vertices()
@@ -306,6 +362,13 @@ MeshPiece::getLocationFromID(int64_t vid) {
     int64_t offset = chareIdx / CkNumPes();
     offset *= MESHPIECE_SIZE * MESHPIECE_SIZE;
     int64_t arrIdx = offset + (local_x * MESHPIECE_SIZE + local_y);
+
+    // for group based cache
+    UnionFindLibCache *libPtrCache;
+    libPtrCache = libCacheProxy.ckLocalBranch();
+    int64_t off = libPtrCache->get_offset(chareIdx);
+    arrIdx += off;
+
 
     return std::make_pair(groupIdx, arrIdx);
 }
