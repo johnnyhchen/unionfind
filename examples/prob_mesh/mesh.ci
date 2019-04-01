@@ -88,6 +88,8 @@ mainmodule mesh {
       */
 
       entry void printVertices();
+      entry [reductiontarget] void init_vertices();
+
     }
 
     //array[1D] UnionFindLib;

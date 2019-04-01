@@ -245,9 +245,9 @@ class MeshPiece : public CBase_MeshPiece {
         offset = numMyVertices * offset;
         */
         // CkPrintf("thisIndex: %d totalChareinPe: %ld offset: %ld\n", thisIndex, totalCharesinPe, offset);
-        libPtr->initialize_vertices(numMyVertices, libVertices, offset, 999999999/*batchSize*/);
-        libPtr->registerGetLocationFromID(getLocationFromID);
-        init_vertices();
+        contribute(CkCallback(CkReductionTarget(MeshPiece, init_vertices), thisProxy));
+
+        // init_vertices();
 
         blockedBatch = true;
         witer = 0;
@@ -258,6 +258,8 @@ class MeshPiece : public CBase_MeshPiece {
 
     void init_vertices()
     {
+        libPtr->initialize_vertices(numMyVertices, libVertices, offset, 999999999/*batchSize*/);
+        libPtr->registerGetLocationFromID(getLocationFromID);
         try {
           myVertices = new meshVertex[MESHPIECE_SIZE*MESHPIECE_SIZE];
         }
