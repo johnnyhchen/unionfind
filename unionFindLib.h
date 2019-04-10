@@ -8,6 +8,7 @@ struct unionFindVertex {
     int64_t vertexID;
     int64_t parent;
     int64_t componentNumber = -1;
+    int64_t componentNumberTemp = -1;
     std::vector<int64_t> need_boss_requests; //request queue for processing need_boss requests
     int64_t findOrAnchorCount = 0;
 
@@ -15,6 +16,7 @@ struct unionFindVertex {
         p|vertexID;
         p|parent;
         p|componentNumber;
+        p|componentNumberTemp;
         p|need_boss_requests;
     }
 };
@@ -38,6 +40,30 @@ class UnionFindLibCache : public CBase_UnionFindLibCache {
       return offsets[peNo];
     }
     int x;
+
+    // Moving component labeling to cache to be handled by a single PE in the nodegroup
+    // component labeling
+    uint64_t reqs_sent;
+    uint64_t reqs_recv;
+    std::map<int64_t, std::vector<int64_t> > need_label_reqs;
+
+    // edge batch
+    bool resetData;
+    CkCallback postInterComponentLabelingCb;
+    
+    int64_t myLocalNumBosses;
+    
+    //void need_label(needRootData data);
+    //void recv_label(int64_t recv_vertex_arrID, int64_t labelID);
+    //void total_components(int64_t nComponents);
+    
+    void inter_need_label(needRootData data);
+    void inter_recv_label(int64_t recv_vertex_arrID, int64_t labelID);
+    void inter_total_components(int n, int64_t* nComponents);
+    void inter_start_component_labeling(CkCallback cb);
+    void prepare_for_component_labeling(CkCallback cb);
+    void done_prepare_for_component_labeling();
+    CkCallback postPreCompLabCb;
 };
 
 
@@ -48,9 +74,8 @@ class UnionFindLib : public CBase_UnionFindLib {
     int64_t pathCompressionThreshold = 5;
     int componentPruneThreshold;
     std::pair<int64_t, int64_t> (*getLocationFromID)(int64_t vid);
-    int64_t myLocalNumBosses;
     int64_t totalNumBosses;
-    CkCallback postComponentLabelingCb;
+    // CkCallback postComponentLabelingCb;
     int64_t totalVerticesinPE;
     
     // Batch
@@ -69,32 +94,13 @@ class UnionFindLib : public CBase_UnionFindLib {
     // path compression
     std::vector<int64_t> verticesToCompress;
 
-    // component labeling
-    uint64_t reqs_sent;
-    uint64_t reqs_recv;
-    std::map<int64_t, std::vector<int64_t> > need_label_reqs;
-
-    // edge batch
-    bool resetData;
-    CkCallback postInterComponentLabelingCb;
 
     // within logical node optimization
   public:
     void doneProxyCreation();
 
-  public:
+  // public:
     //void need_label(int64_t req_vertex, int64_t parent_arrID);
-    void need_label(needRootData data);
-    void recv_label(int64_t recv_vertex_arrID, int64_t labelID);
-    void total_components(int64_t nComponents);
-    
-    void inter_need_label(needRootData data);
-    void inter_recv_label(int64_t recv_vertex_arrID, int64_t labelID);
-    void inter_total_components(int n, int64_t* nComponents);
-    void inter_start_component_labeling(CkCallback cb);
-    void prepare_for_component_labeling(CkCallback cb);
-    void done_prepare_for_component_labeling();
-    CkCallback postPreCompLabCb;
 
 
     public:
@@ -123,7 +129,7 @@ class UnionFindLib : public CBase_UnionFindLib {
     public:
     void find_components(CkCallback cb);
     void insertDataFindBoss(const findBossData & data);
-    void start_component_labeling();
+    //void start_component_labeling();
     void insertDataNeedBoss(const uint64_t & data);
     void insertDataAnchor(const anchorData & data);
     void need_boss(int64_t arrIdx, int64_t fromID);

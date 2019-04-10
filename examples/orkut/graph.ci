@@ -9,23 +9,26 @@ mainmodule graph {
     readonly int64_t num_local_vertices;
     readonly int64_t edge_batch_size;
     readonly CProxy_UnionFindLibCache libCacheProxy;
-   readonly int64_t num_nodes;
+    readonly int64_t num_nodes;
 
     mainchare Main {
         entry Main(CkArgMsg *m);
         entry [reductiontarget] void startWork();
-        entry void done();
+        entry [reductiontarget] void done();
+        entry [reductiontarget] void done_exit();
         entry void doneFindComponents();
         entry [reductiontarget] void donePrinting();
         entry void donePrepareFindComponents();
         entry void doneCacheInit();
         entry [reductiontarget] void dontInitVertices();
         entry void prCrDone();
+        entry void done_treeAndLabeling();
+        entry void donePrepareFindComponentsFinal();
     }
 
     group TreePiece {
         entry TreePiece(std::string, CProxy_UnionFindLib libProxy);
-        entry void doWork();
+        entry [reductiontarget] void doWork();
         entry void requestVertices();
         entry void getConnectedComponents();
         entry void test();

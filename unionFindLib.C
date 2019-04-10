@@ -35,7 +35,7 @@ register_phase_one_cb(CkCallback cb) {
     CkStartQD(cb);
 }
 
-// Called only by the one chare in the PE
+// Called only by the one PE in the node
 void UnionFindLib::
 allocate_libVertices(int64_t numVertices, int64_t nPe)
 {
@@ -320,17 +320,18 @@ local_path_compression(unionFindVertex *src, int64_t compressedParent) {
 }
 
 
-void UnionFindLib::prepare_for_component_labeling(CkCallback cb)
+void UnionFindLibCache::prepare_for_component_labeling(CkCallback cb)
 {
   postPreCompLabCb = cb;
   if (true) {
-    // reset the componentNumber for the next use
-    for (int64_t i = 0; i < totalVerticesinPE; i++) {
+    // reset the componentNumberTemp for the next use
+    // the actual componentNumber will still be used for dropping edges; update this componentNumber to be the same as componentNumberTemp at the end of this phase
+    for (int64_t i = 0; i < myVertices.size(); i++) {
       unionFindVertex *v = &myVertices[i];
-      v->componentNumber = -1;
+      v->componentNumberTemp = -1;
       assert(v->parent != -1);
       if (v->parent == v->vertexID) {
-        v->componentNumber = v->vertexID;
+        v->componentNumberTemp = v->vertexID;
       }
     }
     need_label_reqs.clear();
@@ -340,16 +341,16 @@ void UnionFindLib::prepare_for_component_labeling(CkCallback cb)
   else {
     resetData = true;
   }
-  contribute(CkCallback(CkReductionTarget(UnionFindLib, done_prepare_for_component_labeling), _UfLibProxy[0]));
+  contribute(CkCallback(CkReductionTarget(UnionFindLibCache, done_prepare_for_component_labeling), _UfLibProxy[0]));
 }
 
-void UnionFindLib::done_prepare_for_component_labeling()
+void UnionFindLibCache::done_prepare_for_component_labeling()
 {
   postPreCompLabCb.send();
 }
 
 
-void UnionFindLib::inter_start_component_labeling(CkCallback cb)
+void UnionFindLibCache::inter_start_component_labeling(CkCallback cb)
 {
   postInterComponentLabelingCb = cb;
   // When this phase begins, only either inter_start_component_labeling() or inter_need_label() might be called
@@ -373,7 +374,7 @@ void UnionFindLib::inter_start_component_labeling(CkCallback cb)
   myLocalNumBosses = 0;
   //int64_t off = _UfLibProxyCache.ckLocalBranch()->offsets[CkMyPe()];
   //CkPrintf("PE: %d off: %lld totalVerticesinPE: %lld\n", CkMyPe(), off, totalVerticesinPE);
-  for (int64_t i = 0; i < totalVerticesinPE; i++) {
+  for (int64_t i = 0; i < myVertices.size(); i++) {
     unionFindVertex *v = &myVertices[i];
     // CkPrintf("PE: %d i: %lld v->vertexID: %lld v->parent: %lld\n", CkMyPe(), i, v->vertexID, v->parent);
     // CkPrintf("PE: %d v->vertexID: %lld\n", CkMyPe(), v->vertexID);
@@ -399,40 +400,41 @@ void UnionFindLib::inter_start_component_labeling(CkCallback cb)
   if (reqs_sent == 0) {
     // CkPrintf("PE: %d reqs_sent = 0\n", CkMyPe());
     // CkPrintf("PE: %d is not sending any requests!\n", CkMyPe());
-    for (int64_t i = 0; i < totalVerticesinPE; i++) {
+    for (int64_t i = 0; i < myVertices.size(); i++) {
       unionFindVertex *v = &myVertices[i];
-      if (v->componentNumber == -1) {
+      if (v->componentNumberTemp == -1) {
         // I don't have my label; does my parent have it?
         std::pair<int64_t, int64_t> parent_loc = getLocationFromID(v->parent);
         assert(CmiNodeOf(parent_loc.first) == CkMyNode());
         unionFindVertex *p = &myVertices[parent_loc.second];
-        while (p->componentNumber == -1) {
+        while (p->componentNumberTemp == -1) {
           std::pair<int64_t, int64_t> gparent_loc = getLocationFromID(p->parent);
           assert(CmiNodeOf(gparent_loc.first) == CmiNodeOf(CkMyPe()));
           unionFindVertex *gp = &myVertices[gparent_loc.second];
           p = gp;
           // TODO: optimization possible here?
         }
-        v->componentNumber = p->componentNumber;
-        v->parent = v->componentNumber;
+        v->componentNumberTemp = p->componentNumberTemp;
+        v->parent = v->componentNumberTemp;
+        v->componentNumber = v->componentNumberTemp; // Update the component number as we have reached the end of this phase here
         assert(v->parent != -1);
       }
     }
 
-    CkCallback cb(CkReductionTarget(UnionFindLib, inter_total_components), thisProxy[0]);
+    CkCallback cb(CkReductionTarget(UnionFindLibCache, inter_total_components), thisProxy[0]);
     // CkPrintf("PE: %d totalRoots: %lld\n", CkMyPe(), myLocalNumBosses);
     int64_t vv[3];
     vv[0] = myLocalNumBosses;
-    vv[1] = droppedEdges;
-    vv[2] = totEdges;
+    vv[1] = 1; //droppedEdges;
+    vv[2] = 1; //totEdges;
     // contribute(sizeof(int64_t), &myLocalNumBosses, CkReduction::sum_long_long, cb);
-    droppedEdges = 0;
-    totEdges = 0;
+    //droppedEdges = 0;
+    //totEdges = 0;
     contribute(3*sizeof(int64_t), vv, CkReduction::sum_long_long, cb);
   }
 }
 
-void UnionFindLib::inter_need_label(needRootData data)
+void UnionFindLibCache::inter_need_label(needRootData data)
 {
   // When this phase begins, only either inter_start_component_labeling() or inter_need_label() might be called
   /*
@@ -463,11 +465,11 @@ void UnionFindLib::inter_need_label(needRootData data)
     unionFindVertex *p = &myVertices[parent_arrID];
     std::pair<int64_t, int64_t> gparent_loc = getLocationFromID(p->parent);
     // CkPrintf("PE: %d p->parent: %lld p->vertexID: %lld p->componentNumber: %lld gparent_loc.first: %lld gparent_loc.second: %lld\n", CkMyPe(), p->parent, p->vertexID, p->componentNumber, gparent_loc.first, gparent_loc.second);
-    if (p->parent == p->vertexID || p->componentNumber != -1 /* I already have my componentNumber? TODO: check*/) {
+    if (p->parent == p->vertexID || p->componentNumberTemp != -1 /* I already have my componentNumber? TODO: check*/) {
       // found the component number; reply back to the requestor
       std::pair<int64_t, int64_t> req_loc = getLocationFromID(req_vertex);
       // CkPrintf("PE: %d req_loc.first: %lld req_loc.second: %lld\n", CkMyPe(), req_loc.first, req_loc.second);
-      thisProxy[req_loc.first].inter_recv_label(req_loc.second, p->componentNumber);
+      thisProxy[req_loc.first].inter_recv_label(req_loc.second, p->componentNumberTemp);
       // if (p->componentNumber == -1) {
         // CkPrintf("Error here p->parent: %ld p->vertexID: %ld\n", p->parent, p->vertexID);
       // }
@@ -475,7 +477,7 @@ void UnionFindLib::inter_need_label(needRootData data)
     }
     else if (gparent_loc.first != CkMyPe()) {
       // parent's parent not in this PE; add it to the map, and do nothing
-      assert(p->componentNumber == -1); // not yet received the componentID; would have already sent a request
+      assert(p->componentNumberTemp == -1); // not yet received the componentID; would have already sent a request
       need_label_reqs[p->vertexID].push_back(req_vertex);
       break;
     }
@@ -488,14 +490,14 @@ void UnionFindLib::inter_need_label(needRootData data)
 }
 
 
-void UnionFindLib::inter_recv_label(int64_t recv_vertex_arrID, int64_t labelID)
+void UnionFindLibCache::inter_recv_label(int64_t recv_vertex_arrID, int64_t labelID)
 {
   assert(reqs_sent != 0);
   reqs_recv++; 
   // CkPrintf("PE: %d, reqs_recv: %lld\n", CkMyPe(), reqs_recv);
   unionFindVertex *v = &myVertices[recv_vertex_arrID];
-  assert(v->componentNumber == -1);
-  v->componentNumber = labelID;
+  assert(v->componentNumberTemp == -1);
+  v->componentNumberTemp = labelID;
   v->parent = labelID;
   assert(v->parent != -1);
   // reply back to all those requests that were queued in this ID
@@ -508,53 +510,55 @@ void UnionFindLib::inter_recv_label(int64_t recv_vertex_arrID, int64_t labelID)
   if (reqs_recv == reqs_sent) {
     CkPrintf("PE: %d reqs_sent == reqs_recv\n", CkMyPe());
     // int64_t off = _UfLibProxyCache.ckLocalBranch()->offsets[CkMyPe()];
-    for (int64_t i = 0; i < totalVerticesinPE; i++) {
+    for (int64_t i = 0; i < myVertices.size(); i++) {
       unionFindVertex *v = &myVertices[i];
-      if (v->componentNumber == -1) {
+      if (v->componentNumberTemp == -1) {
         // I don't have my label; does my parent have it?
         std::pair<int64_t, int64_t> parent_loc = getLocationFromID(v->parent);
         if (parent_loc.first != CkMyPe()) {
-          CkPrintf("Error here in PE: %d parent_loc.first: %ld v->vertexID: %ld v->parent: %ld v->componentNumber: %ld\n", CkMyPe(), parent_loc.first, v->vertexID, v->parent, v->componentNumber);
+          CkPrintf("Error here in PE: %d parent_loc.first: %ld v->vertexID: %ld v->parent: %ld v->componentNumberTemp: %ld\n", CkMyPe(), parent_loc.first, v->vertexID, v->parent, v->componentNumberTemp);
         }
         assert(parent_loc.first == CkMyPe());
         unionFindVertex *p = &myVertices[parent_loc.second];
-        while (p->componentNumber == -1) {
+        while (p->componentNumberTemp == -1) {
           std::pair<int64_t, int64_t> gparent_loc = getLocationFromID(p->parent);
           assert(gparent_loc.first == CkMyPe());
           unionFindVertex *gp = &myVertices[gparent_loc.second];
           p = gp;
           // TODO: optimization possible here?
         }
-        v->componentNumber = p->componentNumber;
-        v->parent = v->componentNumber;
+        v->componentNumberTemp = p->componentNumberTemp;
+        v->parent = v->componentNumberTemp;
+        v->componentNumber = v->componentNumberTemp; // Update the component number as we have reached the end of this phase here
       }
     }
-    CkCallback cb(CkReductionTarget(UnionFindLib, inter_total_components), thisProxy[0]);
+    CkCallback cb(CkReductionTarget(UnionFindLibCache, inter_total_components), thisProxy[0]);
     // CkPrintf("PE: %d totalRoots: %lld\n", CkMyPe(), myLocalNumBosses);
     // contribute(sizeof(int64_t), &myLocalNumBosses, CkReduction::sum_long_long, cb);
     int64_t vv[3];
     vv[0] = myLocalNumBosses;
-    vv[1] = droppedEdges;
-    vv[2] = totEdges;
-    droppedEdges = 0;
-    totEdges = 0;
+    vv[1] = 1; //droppedEdges;
+    vv[2] = 1; //totEdges;
+    //droppedEdges = 0;
+    //totEdges = 0;
     contribute(3*sizeof(int64_t), vv, CkReduction::sum_long_long, cb);
   }
 }
 
 // Executed only on PE0
-void UnionFindLib::inter_total_components(int n, int64_t* nComponents)
+void UnionFindLibCache::inter_total_components(int n, int64_t* nComponents)
 {
   CkPrintf("Total components in this phase: %lld droppedEdges: %lld totEdges: %lld percent_dropped: %lf\n", nComponents[0], nComponents[1], nComponents[2], (nComponents[1]/(double)nComponents[2]));
   postInterComponentLabelingCb.send();
 }
 
 /** Functions for finding connected components **/
+/*
 void UnionFindLib::
 find_components(CkCallback cb) {
     postComponentLabelingCb = cb;
 
-    /*
+    
     // count local numBosses
     myLocalNumBosses = 0;
     for (int64_t i = 0; i < numMyVertices; i++) {
@@ -569,10 +573,12 @@ find_components(CkCallback cb) {
     // myPrefixElem->startPrefixCalculation(myLocalNumBosses, doneCb);
     prefixLibArray[thisIndex].startPrefixCalculation(myLocalNumBosses, doneCb);
     //CkPrintf("[%d] Local num bosses: %d\n", thisIndex, myLocalNumBosses);
-    */
+    
     start_component_labeling();
 }
+*/
 
+/*
 void UnionFindLib::
 start_component_labeling() {
   // Send requests only from those vertices whose parents are not in my PE
@@ -638,7 +644,7 @@ void UnionFindLib::need_label(needRootData data)
   while (1) {
     unionFindVertex *p = &myVertices[parent_arrID];
     std::pair<int64_t, int64_t> gparent_loc = getLocationFromID(p->parent);
-    if (p->parent == p->vertexID || p->componentNumber != -1 /* I already have my componentNumber? TODO: check*/) {
+    if (p->parent == p->vertexID || p->componentNumber != -1) {
       // found the component number; reply back to the requestor
       assert(p->componentNumber != -1);
       std::pair<int64_t, int64_t> req_loc = getLocationFromID(req_vertex);
@@ -702,7 +708,7 @@ void UnionFindLib::total_components(int64_t nComponents)
   CkPrintf("Total components: %lld\n", nComponents);
   postComponentLabelingCb.send();
 }
-
+*/
 void UnionFindLib::
 insertDataFindBoss(const findBossData & data) {
 #ifndef ANCHOR_ALGO
@@ -776,7 +782,7 @@ prune_components(int64_t threshold, CkCallback appReturnCb) {
     //    CkAbort("We are out of memory!");
     //}
 
-    for (int64_t i = 0; i < totalVerticesinPE; i++) {
+    for (int64_t i = 0; i < myVertices.size(); i++) {
         int64_t bossID = myVertices[i].componentNumber;
         CkAssert(bossID >= 0 && bossID < totalNumBosses);
         localCounts[bossID]++;
@@ -804,7 +810,7 @@ perform_pruning() {
 
     CProxy_UnionFindLibGroup libGroup(libGroupID);
 
-    for (int64_t i = 0; i < totalVerticesinPE; i++) {
+    for (int64_t i = 0; i < myVertices.size(); i++) {
         int64_t myComponentCount = libGroup.ckLocalBranch()->get_component_count(myVertices[i].componentNumber);
         if (myComponentCount <= componentPruneThreshold) {
             myVertices[i].componentNumber = -1;
