@@ -81,7 +81,7 @@ class Main : public CBase_Main {
     }
 
     void prCrDone() {
-        CkPrintf("In prCrDone()\n");
+        // CkPrintf("In prCrDone()\n");
         tpProxy = CProxy_TreePiece::ckNew(inputFileName, libProxy);
         // find first vertex ID on last chare
         // create a callback for library to inform application after
@@ -90,7 +90,7 @@ class Main : public CBase_Main {
 
     void dontInitVertices() {
       // Initialize offsets in each nodegroup
-      CkPrintf("In dontInitVertices()\n");
+      // CkPrintf("In dontInitVertices()\n");
       CkCallback cb(CkIndex_Main::done_treeAndLabeling(), thisProxy);
       libProxy[0].register_phase_one_cb(cb);
       startWork();
@@ -116,7 +116,7 @@ class Main : public CBase_Main {
         // CkPrintf("[Main] Tree construction time: %f\n", CkWallTimer()-startTime);
         // callback for library to inform application after completing
         // connected components detection
-        CkPrintf("Done tree construction batchNo: %ld\n", ebatchNo);
+        // CkPrintf("Done tree construction batchNo: %ld\n", ebatchNo);
         ebatchNo++;
         if (ebatchNo <= num_edge_batches) {
           // CkPrintf("Done component labeling batchNo: %ld\n", ebatchNo);
@@ -132,7 +132,7 @@ class Main : public CBase_Main {
     }
 
     void donePrepareFindComponents() {
-        CkPrintf("Done prepare for component labeling batchNo: %ld\n", ebatchNo);
+        //CkPrintf("Done prepare for component labeling batchNo: %ld\n", ebatchNo);
         CkCallback cb(CkIndex_Main::doneFindComponents(), thisProxy);
         libCacheProxy.inter_start_component_labeling(cb);
     }
@@ -157,7 +157,7 @@ class Main : public CBase_Main {
       else {
         thisProxy.done_treeAndLabeling();
       }
-      CkPrintf("Done component labeling batchNo: %ld\n", ebatchNo);
+      //CkPrintf("Done component labeling batchNo: %ld\n", ebatchNo);
     }
 
     void done_treeAndLabeling()
@@ -171,7 +171,7 @@ class Main : public CBase_Main {
     }
     
     void donePrepareFindComponentsFinal() {
-        CkPrintf("Done prepare for component labeling for the final time batchNo: %ld\n", ebatchNo);
+        //CkPrintf("Done prepare for component labeling for the final time batchNo: %ld\n", ebatchNo);
         CkCallback cb(CkIndex_Main::done_exit(), thisProxy);
         libCacheProxy.inter_start_component_labeling(cb);
     }
@@ -183,7 +183,7 @@ class Main : public CBase_Main {
 
     void done_exit()
     {
-        CkPrintf("[Main] Components identified, prune unecessary ones now\n");
+        //CkPrintf("[Main] Components identified, prune unecessary ones now\n");
         CkPrintf("[Main] Tree construction + components detection time: %f\n", CkWallTimer() - startTime);
         CkExit();
         CkCallback cb(CkIndex_TreePiece::requestVertices(), tpProxy);
@@ -333,10 +333,10 @@ class TreePiece : public CBase_TreePiece {
 
     void doWork() {
       // vertices and edges populated, now fire union requests
-      CkPrintf("PE: %d started processing edges edgesProcessed: %lld library_requests.size(): %lld edge_batch_size: %lld\n", CkMyPe(), edgesProcessed, library_requests.size(), edge_batch_size);
+      //CkPrintf("PE: %d started processing edges edgesProcessed: %lld library_requests.size(): %lld edge_batch_size: %lld\n", CkMyPe(), edgesProcessed, library_requests.size(), edge_batch_size);
       for (int64_t i = 0; edgesProcessed < library_requests.size(); edgesProcessed++, i++) {
         if (i == edge_batch_size) {
-          CkPrintf("Calling done() PE: %d\n", CkMyPe());
+          //CkPrintf("Calling done() PE: %d\n", CkMyPe());
           contribute(CkCallback(CkReductionTarget(Main, done), mainProxy));
           // contribute(CkCallback(CkReductionTarget(TreePiece, doWork), thisProxy));
           break;
@@ -347,12 +347,12 @@ class TreePiece : public CBase_TreePiece {
         //CkPrintf("PE: %d union(%ld %ld) request done library_requests.size(): %d\n", CkMyPe(), req.first, req.second, library_requests.size());
       }
       if (edgesProcessed == library_requests.size()) {
-        CkPrintf("Calling done() PE: %d\n", CkMyPe());
+        //CkPrintf("Calling done() PE: %d\n", CkMyPe());
         contribute(CkCallback(CkReductionTarget(Main, done), mainProxy));
         // contribute(CkCallback(CkReductionTarget(TreePiece, doWork), thisProxy));
         // break;
       }
-      CkPrintf("PE: %d done processing all edges\n", CkMyPe());
+      //CkPrintf("PE: %d done processing all edges\n", CkMyPe());
     }
 
     void requestVertices() {
