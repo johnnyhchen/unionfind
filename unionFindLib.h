@@ -57,6 +57,7 @@ class UnionFindLibCache : public CBase_UnionFindLibCache {
     //void recv_label(int64_t recv_vertex_arrID, int64_t labelID);
     //void total_components(int64_t nComponents);
     
+    std::pair<int64_t, int64_t> (*getLocationFromID)(int64_t vid);
     void inter_need_label(needRootData data);
     void inter_recv_label(int64_t recv_vertex_arrID, int64_t labelID);
     void inter_total_components(int n, int64_t* nComponents);

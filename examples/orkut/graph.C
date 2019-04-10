@@ -108,7 +108,7 @@ class Main : public CBase_Main {
 
         // start component labeling in parallel
         CkCallback cb(CkIndex_Main::donePrepareFindComponents(), thisProxy);
-        libProxy.prepare_for_component_labeling(cb);
+        libCacheProxy.prepare_for_component_labeling(cb);
     }
 
     void done() {
@@ -134,7 +134,7 @@ class Main : public CBase_Main {
     void donePrepareFindComponents() {
         CkPrintf("Done prepare for component labeling batchNo: %ld\n", ebatchNo);
         CkCallback cb(CkIndex_Main::doneFindComponents(), thisProxy);
-        libProxy.inter_start_component_labeling(cb);
+        libCacheProxy.inter_start_component_labeling(cb);
     }
 
     void doneFindComponents() {
@@ -152,7 +152,7 @@ class Main : public CBase_Main {
       // If I have not yet reached the required number of batches
       if (ebatchNo <= num_edge_batches) {
         CkCallback cb(CkIndex_Main::donePrepareFindComponents(), thisProxy);
-        libProxy.prepare_for_component_labeling(cb);
+        libCacheProxy.prepare_for_component_labeling(cb);
       }
       else {
         thisProxy.done_treeAndLabeling();
@@ -165,7 +165,7 @@ class Main : public CBase_Main {
       done_treeAndLabelingCalled++;
       if (done_treeAndLabelingCalled == 2) {
         CkCallback cb(CkIndex_Main::donePrepareFindComponentsFinal(), thisProxy);
-        libProxy.prepare_for_component_labeling(cb);
+        libCacheProxy.prepare_for_component_labeling(cb);
       }
       assert (done_treeAndLabelingCalled <= 2);
     }
@@ -173,7 +173,7 @@ class Main : public CBase_Main {
     void donePrepareFindComponentsFinal() {
         CkPrintf("Done prepare for component labeling for the final time batchNo: %ld\n", ebatchNo);
         CkCallback cb(CkIndex_Main::done_exit(), thisProxy);
-        libProxy.inter_start_component_labeling(cb);
+        libCacheProxy.inter_start_component_labeling(cb);
     }
 
     void donePrinting() {

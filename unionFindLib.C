@@ -24,6 +24,7 @@ void UnionFindLib::
 registerGetLocationFromID(std::pair<int64_t, int64_t> (*gloc)(int64_t vid)) {
     //CkPrintf("PE: %d registerGetLocationFromID\n", CkMyPe());
     getLocationFromID = gloc;
+    _UfLibProxyCache.ckLocalBranch()->getLocationFromID = gloc;
     //gloc(4);
 }
 
@@ -341,7 +342,8 @@ void UnionFindLibCache::prepare_for_component_labeling(CkCallback cb)
   else {
     resetData = true;
   }
-  contribute(CkCallback(CkReductionTarget(UnionFindLibCache, done_prepare_for_component_labeling), _UfLibProxy[0]));
+  //contribute(CkCallback(CkReductionTarget(UnionFindLibCache, done_prepare_for_component_labeling), _UfLibProxy[0]));
+  contribute(CkCallback(CkReductionTarget(UnionFindLibCache, done_prepare_for_component_labeling), _UfLibProxyCache[0]));
 }
 
 void UnionFindLibCache::done_prepare_for_component_labeling()
@@ -959,9 +961,11 @@ UnionFindLib::
 UnionFindLib() {
       droppedEdges = 0;
       totEdges = 0;
+      /*
       reqs_sent = 0;
       reqs_recv = 0;
       resetData = false;
+      */
       CkPrintf("PE: %d myVertices.size(): %d myVerticesAddress: %p address from cache: %p cache proxy id: %d x_address: %p nodeId: %d\n", CkMyPe(), myVertices.size(), &myVertices, _UfLibProxyCache.ckLocalBranch()->myVertices, _UfLibProxyCache, &(_UfLibProxyCache.ckLocalBranch()->x), CmiNodeOf(CkMyPe()));
       // myVertices =  (_UfLibProxyCache.ckLocalBranch()->myVertices);
       contribute(CkCallback(CkReductionTarget(UnionFindLib, doneProxyCreation), thisProxy[0]));
