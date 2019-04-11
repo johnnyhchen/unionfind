@@ -387,7 +387,7 @@ void UnionFindLibCache::inter_start_component_labeling(CkCallback cb)
     }
     std::pair<int64_t, int64_t> parent_loc = getLocationFromID(v->parent);
     parent_loc.second = parent_loc.second - get_offset(parent_loc.first);
-    CkAssert(parent_loc.second >= 0);
+    assert(parent_loc.second >= 0);
     // Send a request if this data is not in my node
     if (CmiNodeOf(parent_loc.first) != CkMyNode()) {
       //thisProxy[parent_loc.first].need_label(v->vertexID, parent_loc.second);
@@ -410,13 +410,13 @@ void UnionFindLibCache::inter_start_component_labeling(CkCallback cb)
         // I don't have my label; does my parent have it?
         std::pair<int64_t, int64_t> parent_loc = getLocationFromID(v->parent);
         parent_loc.second = parent_loc.second - get_offset(parent_loc.first);
-        CkAssert(parent_loc.second >= 0);
+        assert(parent_loc.second >= 0);
         assert(CmiNodeOf(parent_loc.first) == CkMyNode());
         unionFindVertex *p = &myVertices[parent_loc.second];
         while (p->componentNumberTemp == -1) {
           std::pair<int64_t, int64_t> gparent_loc = getLocationFromID(p->parent);
           gparent_loc.second = gparent_loc.second - get_offset(gparent_loc.first);
-          CkAssert(gparent_loc.second >= 0);
+          assert(gparent_loc.second >= 0);
           assert(CmiNodeOf(gparent_loc.first) == CmiNodeOf(CkMyPe()));
           unionFindVertex *gp = &myVertices[gparent_loc.second];
           p = gp;
@@ -447,7 +447,7 @@ void UnionFindLibCache::inter_need_label(needRootData data)
   // When this phase begins, only either inter_start_component_labeling() or inter_need_label() might be called
   /*
   if (resetData == true) {
-    CkAssert(0); // Such a case cannot exist; inter_start_component_labeling() should always be called first; else use a different logic
+    assert(0); // Such a case cannot exist; inter_start_component_labeling() should always be called first; else use a different logic
     // reset the componentNumber for the next use
     for (int64_t i = 0; i < totalVerticesinPE; i++) {
       unionFindVertex *v = &myVertices[i];
@@ -473,13 +473,13 @@ void UnionFindLibCache::inter_need_label(needRootData data)
     unionFindVertex *p = &myVertices[parent_arrID];
     std::pair<int64_t, int64_t> gparent_loc = getLocationFromID(p->parent);
     gparent_loc.second = gparent_loc.second - get_offset(gparent_loc.first);
-    CkAssert(gparent_loc.second >= 0);
+    assert(gparent_loc.second >= 0);
     // CkPrintf("PE: %d p->parent: %lld p->vertexID: %lld p->componentNumber: %lld gparent_loc.first: %lld gparent_loc.second: %lld\n", CkMyPe(), p->parent, p->vertexID, p->componentNumber, gparent_loc.first, gparent_loc.second);
     if (p->parent == p->vertexID || p->componentNumberTemp != -1 /* I already have my componentNumber? TODO: check*/) {
       // found the component number; reply back to the requestor
       std::pair<int64_t, int64_t> req_loc = getLocationFromID(req_vertex);
       req_loc.second = req_loc.second - get_offset(req_loc.first);
-      CkAssert(req_loc.second >= 0);
+      assert(req_loc.second >= 0);
       // CkPrintf("PE: %d req_loc.first: %lld req_loc.second: %lld\n", CkMyPe(), req_loc.first, req_loc.second);
       thisProxy[CmiNodeOf(req_loc.first)].inter_recv_label(req_loc.second, p->componentNumberTemp);
       // if (p->componentNumber == -1) {
@@ -487,7 +487,8 @@ void UnionFindLibCache::inter_need_label(needRootData data)
       // }
       break;
     }
-    else if (gparent_loc.first != CkMyPe()) {
+    // else if (gparent_loc.first != CkMyPe()) {
+    else if (CmiNodeOf(gparent_loc.first) != CkMyNode()) {
       // parent's parent not in this PE; add it to the map, and do nothing
       assert(p->componentNumberTemp == -1); // not yet received the componentID; would have already sent a request
       need_label_reqs[p->vertexID].push_back(req_vertex);
@@ -516,7 +517,7 @@ void UnionFindLibCache::inter_recv_label(int64_t recv_vertex_arrID, int64_t labe
   for (std::vector<int64_t>::iterator it = need_label_reqs[v->vertexID].begin() ; it != need_label_reqs[v->vertexID].end(); ++it) {
     std::pair<int64_t, int64_t> req_loc = getLocationFromID(*it);
     req_loc.second = req_loc.second - get_offset(req_loc.first);
-    CkAssert(req_loc.second >= 0);
+    assert(req_loc.second >= 0);
     thisProxy[CmiNodeOf(req_loc.first)].inter_recv_label(req_loc.second, labelID);
   }
 
@@ -530,17 +531,18 @@ void UnionFindLibCache::inter_recv_label(int64_t recv_vertex_arrID, int64_t labe
         // I don't have my label; does my parent have it?
         std::pair<int64_t, int64_t> parent_loc = getLocationFromID(v->parent);
         parent_loc.second = parent_loc.second - get_offset(parent_loc.first);
-        CkAssert(parent_loc.second >= 0);
-        if (parent_loc.first != CkMyPe()) {
+        assert(parent_loc.second >= 0);
+        //if (parent_loc.first != CkMyPe()) {
+        if (CmiNodeOf(parent_loc.first) != CkMyNode()) {
           CkPrintf("Error here in PE: %d parent_loc.first: %ld v->vertexID: %ld v->parent: %ld v->componentNumberTemp: %ld\n", CkMyPe(), parent_loc.first, v->vertexID, v->parent, v->componentNumberTemp);
         }
-        assert(parent_loc.first == CkMyPe());
+        assert(CmiNodeOf(parent_loc.first) == CkMyNode());
         unionFindVertex *p = &myVertices[parent_loc.second];
         while (p->componentNumberTemp == -1) {
           std::pair<int64_t, int64_t> gparent_loc = getLocationFromID(p->parent);
           gparent_loc.second = gparent_loc.second - get_offset(gparent_loc.first);
-          CkAssert(gparent_loc.second >= 0);
-          assert(gparent_loc.first == CkMyPe());
+          assert(gparent_loc.second >= 0);
+          assert(CmiNodeOf(gparent_loc.first) == CkMyNode());
           unionFindVertex *gp = &myVertices[gparent_loc.second];
           p = gp;
           // TODO: optimization possible here?
@@ -802,7 +804,7 @@ prune_components(int64_t threshold, CkCallback appReturnCb) {
 
     for (int64_t i = 0; i < myVertices.size(); i++) {
         int64_t bossID = myVertices[i].componentNumber;
-        CkAssert(bossID >= 0 && bossID < totalNumBosses);
+        assert(bossID >= 0 && bossID < totalNumBosses);
         localCounts[bossID]++;
     }
 
@@ -864,7 +866,7 @@ perform_pruning() {
 #ifdef PROFILING
 void UnionFindLib::
 profiling_count_max(int64_t maxCount) {
-    CkAssert(thisIndex == 0);
+    assert(thisIndex == 0);
     CkPrintf("Max number of find/anchor messages per vertex: %ld\n", maxCount);
 }
 #endif
