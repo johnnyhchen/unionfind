@@ -392,7 +392,7 @@ void UnionFindLibCache::inter_start_component_labeling(CkCallback cb)
       needRootData d;
       d.req_vertex = v->vertexID;
       d.parent_arrID = parent_loc.second;
-      thisProxy[parent_loc.first].inter_need_label(d);
+      thisProxy[CmiNodeOf(parent_loc.first)].inter_need_label(d);
       reqs_sent++;
       // Can there be a case where reqs_sent == reqs_recv; and still this PE is in this for-loop?
     }
@@ -417,9 +417,9 @@ void UnionFindLibCache::inter_start_component_labeling(CkCallback cb)
           // TODO: optimization possible here?
         }
         v->componentNumberTemp = p->componentNumberTemp;
-        v->parent = v->componentNumberTemp;
+        //v->parent = v->componentNumberTemp;
         v->componentNumber = v->componentNumberTemp; // Update the component number as we have reached the end of this phase here
-        assert(v->parent != -1);
+        //assert(v->parent != -1);
       }
     }
 
@@ -471,7 +471,7 @@ void UnionFindLibCache::inter_need_label(needRootData data)
       // found the component number; reply back to the requestor
       std::pair<int64_t, int64_t> req_loc = getLocationFromID(req_vertex);
       // CkPrintf("PE: %d req_loc.first: %lld req_loc.second: %lld\n", CkMyPe(), req_loc.first, req_loc.second);
-      thisProxy[req_loc.first].inter_recv_label(req_loc.second, p->componentNumberTemp);
+      thisProxy[CmiNodeOf(req_loc.first)].inter_recv_label(req_loc.second, p->componentNumberTemp);
       // if (p->componentNumber == -1) {
         // CkPrintf("Error here p->parent: %ld p->vertexID: %ld\n", p->parent, p->vertexID);
       // }
@@ -505,7 +505,7 @@ void UnionFindLibCache::inter_recv_label(int64_t recv_vertex_arrID, int64_t labe
   // reply back to all those requests that were queued in this ID
   for (std::vector<int64_t>::iterator it = need_label_reqs[v->vertexID].begin() ; it != need_label_reqs[v->vertexID].end(); ++it) {
     std::pair<int64_t, int64_t> req_loc = getLocationFromID(*it);
-    thisProxy[req_loc.first].inter_recv_label(req_loc.second, labelID);
+    thisProxy[CmiNodeOf(req_loc.first)].inter_recv_label(req_loc.second, labelID);
   }
 
   // all reqs received for my PE
@@ -530,7 +530,7 @@ void UnionFindLibCache::inter_recv_label(int64_t recv_vertex_arrID, int64_t labe
           // TODO: optimization possible here?
         }
         v->componentNumberTemp = p->componentNumberTemp;
-        v->parent = v->componentNumberTemp;
+        //v->parent = v->componentNumberTemp;
         v->componentNumber = v->componentNumberTemp; // Update the component number as we have reached the end of this phase here
       }
     }
