@@ -509,6 +509,16 @@ void UnionFindLibCache::inter_recv_label(int64_t recv_vertex_arrID, int64_t labe
   reqs_recv++; 
   // CkPrintf("PE: %d, reqs_recv: %lld\n", CkMyPe(), reqs_recv);
   unionFindVertex *v = &myVertices[recv_vertex_arrID];
+    
+  
+  std::pair<int64_t, int64_t> req_loc1 = getLocationFromID(v->vertexID);
+  assert(CmiNodeOf(req_loc1.first) == CkMyNode());
+
+  if (v->componentNumberTemp != -1) {
+    CkPrintf("Lib: Component number temp error, componentNumberTemp: %ld vertexID: %ld PE: %d node: %d\n", v->componentNumberTemp, v->vertexID, CkMyPe(), CkMyNode());
+  }
+  
+  
   assert(v->componentNumberTemp == -1);
   v->componentNumberTemp = labelID;
   v->parent = labelID;
