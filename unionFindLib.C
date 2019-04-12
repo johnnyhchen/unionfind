@@ -124,6 +124,7 @@ initialize_vertices(int64_t numVertices, unionFindVertex* &appVertices, int64_t 
       
       assert ((offset + numMyVertices) <= myVertices.size());
       appVertices = &myVertices[offset];
+      _LabelersProxy.ckLocalBranch()->numMyVertices = numMyVertices + offset;
     }
     _UfLibProxyCache.ckLocalBranch()->offsets[CkMyPe()] = offset;
     CkPrintf("App: setting offset: %lld for PE: %d in mynode: %d\n", offset, CkMyPe(), CkMyNode());
@@ -326,6 +327,14 @@ local_path_compression(unionFindVertex *src, int64_t compressedParent) {
 
 void Labelers::prepare_for_component_labeling(CkCallback cb)
 {
+  CkPrintf("prepare_for_component_labeling PE: %d\n", CkMyPe());
+  offset = _UfLibProxyCache.ckLocalBranch()->offsets[CkMyPe()];
+  CkPrintf("got offset prepare_for_component_labeling PE: %d\n", CkMyPe());
+  //numMyVertices = _UfLibProxy.ckLocalBranch()->numMyVertices;
+  //CkPrintf("got numMyVertices prepare_for_component_labeling PE: %d\n", CkMyPe());
+  //numMyVertices += offset;
+
+  //std::vector<unionFindVertex>& myVertices = _UfLibProxyCache.ckLocalBranch()->myVertices[offset];
   std::vector<unionFindVertex>& myVertices = _UfLibProxyCache.ckLocalBranch()->myVertices;
 
   postPreCompLabCb = cb;
@@ -338,7 +347,7 @@ void Labelers::prepare_for_component_labeling(CkCallback cb)
     // reset the componentNumberTemp for the next use
     // the actual componentNumber will still be used for dropping edges; update this componentNumber to be the same as componentNumberTemp at the end of this phase
     //CkPrintf("Lib: prepare_for_component_labeling() node: %d\n", CkMyNode());
-    for (int64_t i = 0; i < myVertices.size(); i++) {
+    for (int64_t i = offset; i < numMyVertices; i++) {
       unionFindVertex *v = &myVertices[i];
 
       // Once this parentTemp is set, all code path for component labeling use this alone
@@ -404,7 +413,7 @@ void Labelers::inter_start_component_labeling(CkCallback cb)
   myLocalNumBosses = 0;
   //int64_t off = _UfLibProxyCache.ckLocalBranch()->offsets[CkMyPe()];
   //CkPrintf("PE: %d off: %lld totalVerticesinPE: %lld\n", CkMyPe(), off, totalVerticesinPE);
-  for (int64_t i = 0; i < myVertices.size(); i++) {
+  for (int64_t i = offset; i < numMyVertices; i++) {
     unionFindVertex *v = &myVertices[i];
     // CkPrintf("PE: %d i: %lld v->vertexID: %lld v->parent: %lld\n", CkMyPe(), i, v->vertexID, v->parent);
     // CkPrintf("PE: %d v->vertexID: %lld\n", CkMyPe(), v->vertexID);
@@ -426,14 +435,14 @@ void Labelers::inter_start_component_labeling(CkCallback cb)
     //parent_loc.second = parent_loc.second - get_offset(parent_loc.first);
     //assert(parent_loc.second >= 0);
     // Send a request if this data is not in my node
-    if (CmiNodeOf(parent_loc.first) != CkMyNode()) {
+    if (parent_loc.first != CkMyPe()) {
       //thisProxy[parent_loc.first].need_label(v->vertexID, parent_loc.second);
       needRootData d;
       d.req_vertex = v->vertexID;
       d.parent_arrID = parent_loc.second;
-      thisProxy[CmiNodeOf(parent_loc.first)].inter_need_label(d);
+      thisProxy[parent_loc.first].inter_need_label(d);
       //CkPrintf("Lib: inter_need_label() sent for vertexID: %lld v->parentTemp: %lld parent_arrID: %lld parent_loc.first: %d parent_loc.second: %lld node sent to CmiNodeof(parent_loc.first): %d myNode: %d myPE: %d\n", v->vertexID, v->parentTemp, d.parent_arrID, parent_loc.first, parent_loc.second, CmiNodeOf(parent_loc.first), CkMyNode(), CkMyPe());
-      CkPrintf("call inter_need_label() for vertexID: %lld v->parentTemp: %lld parent_arrID: %lld parent_pe: %d parent_node: %lld myNode: %d myPE: %d\n", v->vertexID, v->parentTemp, d.parent_arrID, parent_loc.first, CmiNodeOf(parent_loc.first), CkMyNode(), CkMyPe());
+      //CkPrintf("call inter_need_label() for vertexID: %lld v->parentTemp: %lld parent_arrID: %lld parent_pe: %d parent_node: %lld myNode: %d myPE: %d\n", v->vertexID, v->parentTemp, d.parent_arrID, parent_loc.first, CmiNodeOf(parent_loc.first), CkMyNode(), CkMyPe());
       reqs_sent++;
       // Can there be a case where reqs_sent == reqs_recv; and still this PE is in this for-loop?
     }
@@ -443,21 +452,21 @@ void Labelers::inter_start_component_labeling(CkCallback cb)
   if (reqs_sent == 0) {
     // CkPrintf("PE: %d reqs_sent = 0\n", CkMyPe());
     // CkPrintf("PE: %d is not sending any requests!\n", CkMyPe());
-    for (int64_t i = 0; i < myVertices.size(); i++) {
+    for (int64_t i = offset; i < numMyVertices; i++) {
       unionFindVertex *v = &myVertices[i];
       if (v->componentNumberTemp == -1) {
         // I don't have my label; does my parent have it?
         std::pair<int64_t, int64_t> parent_loc = getLocationFromID(v->parentTemp);
         //parent_loc.second = parent_loc.second - get_offset(parent_loc.first);
         //assert(parent_loc.second >= 0);
-        assert(CmiNodeOf(parent_loc.first) == CkMyNode());
+        assert(parent_loc.first == CkMyPe());
         unionFindVertex *p = &myVertices[parent_loc.second];
         while (p->componentNumberTemp == -1) {
           std::pair<int64_t, int64_t> gparent_loc = getLocationFromID(p->parentTemp);
           //gparent_loc.second = gparent_loc.second - get_offset(gparent_loc.first);
           //assert(gparent_loc.second >= 0);
-          assert(CmiNodeOf(gparent_loc.first) == CmiNodeOf(CkMyPe()));
-          assert(CmiNodeOf(gparent_loc.first) == CkMyNode());
+          //assert(CmiNodeOf(gparent_loc.first) == CmiNodeOf(CkMyPe()));
+          assert(gparent_loc.first == CkMyPe());
           unionFindVertex *gp = &myVertices[gparent_loc.second];
           p = gp;
           // TODO: optimization possible here?
@@ -532,15 +541,15 @@ void Labelers::inter_need_label(needRootData data)
       //req_loc.second = req_loc.second - get_offset(req_loc.first);
       //assert(req_loc.second >= 0);
       // CkPrintf("Lib: calling inter_recv_label req_vertex: %lld myNode: %d req_loc.first: %lld req_loc.second: %lld req.node: %d offset for req_loc.first: %lld\n", req_vertex, CkMyNode(), req_loc.first, req_loc.second, CmiNodeOf(req_loc.first), get_offset(req_loc.first));
-      CkPrintf("call inter_recv_label() for vertexID: %lld parent_id: %lld parent_arrID: %lld req_pe: %d req_node: %lld myNode: %d myPE: %d\n", req_vertex, p->vertexID, parent_arrID, req_loc.first, CmiNodeOf(req_loc.first), CkMyNode(), CkMyPe());
-      thisProxy[CmiNodeOf(req_loc.first)].inter_recv_label(req_loc.second, p->componentNumberTemp);
+      //CkPrintf("call inter_recv_label() for vertexID: %lld parent_id: %lld parent_arrID: %lld req_pe: %d req_node: %lld myNode: %d myPE: %d\n", req_vertex, p->vertexID, parent_arrID, req_loc.first, CmiNodeOf(req_loc.first), CkMyNode(), CkMyPe());
+      thisProxy[req_loc.first].inter_recv_label(req_loc.second, p->componentNumberTemp);
       // if (p->componentNumber == -1) {
         // CkPrintf("Error here p->parent: %ld p->vertexID: %ld\n", p->parent, p->vertexID);
       // }
       break;
     }
     // else if (gparent_loc.first != CkMyPe()) {
-    else if (CmiNodeOf(gparent_loc.first) != CkMyNode()) {
+    else if (gparent_loc.first != CkMyPe()) {
       // parent's parent not in this PE; add it to the map, and do nothing
       assert(p->componentNumberTemp == -1); // not yet received the componentID; would have already sent a request
       need_label_reqs[p->vertexID].push_back(req_vertex);
@@ -568,7 +577,7 @@ void Labelers::inter_recv_label(int64_t recv_vertex_arrID, int64_t labelID)
   assert(reqs_sent != 0);
   reqs_recv++; 
   // CkPrintf("PE: %d, reqs_recv: %lld\n", CkMyPe(), reqs_recv);
-  assert(CmiNodeOf(req_loc1.first) == CkMyNode());
+  assert(req_loc1.first == CkMyPe());
 
   /*
   if (v->componentNumberTemp != -1) {
@@ -586,8 +595,8 @@ void Labelers::inter_recv_label(int64_t recv_vertex_arrID, int64_t labelID)
     //req_loc.second = req_loc.second - get_offset(req_loc.first);
     //assert(req_loc.second >= 0);
     // CkPrintf("Lib: calling inter_recv_label req_vertex(*it): %lld myNode: %d req_loc.first: %lld req_loc.second: %lld req.node: %d\n", *it, CkMyNode(), req_loc.first, req_loc.second, CmiNodeOf(req_loc.first));
-    CkPrintf("call2 inter_recv_label() for vertexID: %lld parent_id: %lld req_pe: %d req_node: %lld myNode: %d myPE: %d\n", *it, v->vertexID, req_loc.first, CmiNodeOf(req_loc.first), CkMyNode(), CkMyPe());
-    thisProxy[CmiNodeOf(req_loc.first)].inter_recv_label(req_loc.second, labelID);
+    //CkPrintf("call2 inter_recv_label() for vertexID: %lld parent_id: %lld req_pe: %d req_node: %lld myNode: %d myPE: %d\n", *it, v->vertexID, req_loc.first, CmiNodeOf(req_loc.first), CkMyNode(), CkMyPe());
+    thisProxy[req_loc.first].inter_recv_label(req_loc.second, labelID);
   }
 
   // all reqs received for my PE
@@ -595,26 +604,26 @@ void Labelers::inter_recv_label(int64_t recv_vertex_arrID, int64_t labelID)
   if (reqs_recv == reqs_sent /*&& reqsSentIsFinal*/) {
     //CkPrintf("PE: %d reqs_sent == reqs_recv\n", CkMyPe());
     // int64_t off = _UfLibProxyCache.ckLocalBranch()->offsets[CkMyPe()];
-    for (int64_t i = 0; i < myVertices.size(); i++) {
+    for (int64_t i = offset; i < numMyVertices; i++) {
       unionFindVertex *v = &myVertices[i];
       if (v->componentNumberTemp == -1) {
         // I don't have my label; does my parent have it?
         std::pair<int64_t, int64_t> parent_loc = getLocationFromID(v->parentTemp);
         //parent_loc.second = parent_loc.second - get_offset(parent_loc.first);
         //assert(parent_loc.second >= 0);
-        //if (parent_loc.first != CkMyPe()) {
-        if (CmiNodeOf(parent_loc.first) != CkMyNode()) {
+        if (parent_loc.first != CkMyPe()) {
+          // if (CmiNodeOf(parent_loc.first) != CkMyNode()) {
           // CkPrintf("Error here in PE: %d myNode: %d parent_loc.first: %ld CmiNodeOf(parent_loc.first): %d v->vertexID: %ld v->parentTemp: %ld v->componentNumberTemp: %ld\n", CkMyPe(), CkMyNode(), parent_loc.first, CmiNodeOf(parent_loc.first), v->vertexID, v->parentTemp, v->componentNumberTemp);
-          CkPrintf("Error here in inter_recv_label() for vertexID: %lld parent_id: %lld parent_arrID: %lld parent_pe: %d parent_node: %lld myNode: %d myPE: %d\n", v->vertexID, v->parentTemp, parent_loc.second, parent_loc.first, CmiNodeOf(parent_loc.first), CkMyNode(), CkMyPe());
+          // CkPrintf("Error here in inter_recv_label() for vertexID: %lld parent_id: %lld parent_arrID: %lld parent_pe: %d parent_node: %lld myNode: %d myPE: %d\n", v->vertexID, v->parentTemp, parent_loc.second, parent_loc.first, CmiNodeOf(parent_loc.first), CkMyNode(), CkMyPe());
         }
         
-        assert(CmiNodeOf(parent_loc.first) == CkMyNode());
+        assert(parent_loc.first == CkMyPe());
         unionFindVertex *p = &myVertices[parent_loc.second];
         while (p->componentNumberTemp == -1) {
           std::pair<int64_t, int64_t> gparent_loc = getLocationFromID(p->parentTemp);
           //gparent_loc.second = gparent_loc.second - get_offset(gparent_loc.first);
           //assert(gparent_loc.second >= 0);
-          assert(CmiNodeOf(gparent_loc.first) == CkMyNode());
+          assert(gparent_loc.first == CkMyPe());
           unionFindVertex *gp = &myVertices[gparent_loc.second];
           p = gp;
           // TODO: optimization possible here?

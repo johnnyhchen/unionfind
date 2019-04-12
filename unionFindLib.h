@@ -51,6 +51,8 @@ class UnionFindLibCache : public CBase_UnionFindLibCache {
 
 class Labelers : public CBase_Labelers {
     public:
+    int64_t numMyVertices;
+    int64_t offset;
     static CProxy_Labelers LabelersInit();
       Labelers() {}
     // Moving component labeling to cache to be handled by a single PE in the nodegroup
@@ -82,7 +84,6 @@ class Labelers : public CBase_Labelers {
 // class definition for library chares
 class UnionFindLib : public CBase_UnionFindLib {
     std::vector<unionFindVertex> &myVertices = ret_NodeMyVertices();
-    int64_t numMyVertices;
     int64_t pathCompressionThreshold = 5;
     int componentPruneThreshold;
     std::pair<int64_t, int64_t> (*getLocationFromID)(int64_t vid);
@@ -109,6 +110,7 @@ class UnionFindLib : public CBase_UnionFindLib {
 
     // within logical node optimization
   public:
+    int64_t numMyVertices;
     void doneProxyCreation();
 
   // public:

@@ -410,9 +410,11 @@ TreePiece::getLocationFromID(int64_t vid) {
     assert (off != 0);
   */
   arrIdx += off;
+  /*
   if (vid == 1088 || vid == 1089) {
     CkPrintf("App: myNode: %d vid: %lld chareIdx: %lld arrIdx: %lld off: %lld\n", CkMyNode(), vid, chareIdx, arrIdx, off);
   }
+  */
   /*
   if (chareIdx == num_treepieces) {
     chareIdx--;
