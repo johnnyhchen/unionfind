@@ -45,13 +45,20 @@ class UnionFindLibCache : public CBase_UnionFindLibCache {
     }
     int x;
 
+
+    // edge batch
+};
+
+class Labelers : public CBase_Labelers {
+    public:
+    static CProxy_Labelers LabelersInit();
+      Labelers() {}
     // Moving component labeling to cache to be handled by a single PE in the nodegroup
     // component labeling
     uint64_t reqs_sent;
     uint64_t reqs_recv;
     std::map<int64_t, std::vector<int64_t> > need_label_reqs;
-
-    // edge batch
+    
     bool resetData;
     CkCallback postInterComponentLabelingCb;
     
@@ -69,8 +76,8 @@ class UnionFindLibCache : public CBase_UnionFindLibCache {
     void prepare_for_component_labeling(CkCallback cb);
     void done_prepare_for_component_labeling();
     CkCallback postPreCompLabCb;
+    
 };
-
 
 // class definition for library chares
 class UnionFindLib : public CBase_UnionFindLib {

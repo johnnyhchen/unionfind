@@ -9,6 +9,7 @@ module unionFindLib {
     readonly CProxy_UnionFindLibCache _UfLibProxyCache;
     readonly CkCallback initDoneCacheCb;
     readonly CkCallback libProxyDoneCb;
+    readonly CProxy_Labelers _LabelersProxy;
 
     nodegroup UnionFindLibCache {
       // entry void UnionFindLibCacheInit(CkCallback cb);
@@ -19,6 +20,19 @@ module unionFindLib {
       entry [reductiontarget] void doneOffsets(int64_t result[n], int n);
       entry [reductiontarget] void callWork();
         
+
+      // entry [reductiontarget] void reqs_recv_is_final();
+      /*
+      entry [reductiontarget] void reqs_recv_is_final() {
+        serial {
+          
+        }
+      }
+      */
+    }
+
+    group Labelers {
+      entry void Labelers();
       entry void prepare_for_component_labeling(CkCallback cb);
       entry [reductiontarget] void done_prepare_for_component_labeling();
       entry void inter_start_component_labeling(CkCallback cb);

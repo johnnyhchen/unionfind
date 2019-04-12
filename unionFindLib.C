@@ -8,6 +8,7 @@
 /*readonly*/ CProxy_UnionFindLibCache _UfLibProxyCache;
 /*readonly*/ CkCallback initDoneCacheCb;
 /*readonly*/ CkCallback libProxyDoneCb;
+/*readonly*/ CProxy_Labelers _LabelersProxy;
 //CkCallback d;
 //CkCallback UnionFindLib::libProxyDoneCb;
 
@@ -24,7 +25,8 @@ void UnionFindLib::
 registerGetLocationFromID(std::pair<int64_t, int64_t> (*gloc)(int64_t vid)) {
     //CkPrintf("PE: %d registerGetLocationFromID\n", CkMyPe());
     getLocationFromID = gloc;
-    _UfLibProxyCache.ckLocalBranch()->getLocationFromID = gloc;
+    // _UfLibProxyCache.ckLocalBranch()->getLocationFromID = gloc;
+    _LabelersProxy.ckLocalBranch()->getLocationFromID = gloc;
     //gloc(4);
 }
 
@@ -322,8 +324,10 @@ local_path_compression(unionFindVertex *src, int64_t compressedParent) {
 }
 
 
-void UnionFindLibCache::prepare_for_component_labeling(CkCallback cb)
+void Labelers::prepare_for_component_labeling(CkCallback cb)
 {
+  std::vector<unionFindVertex>& myVertices = _UfLibProxyCache.ckLocalBranch()->myVertices;
+
   postPreCompLabCb = cb;
   /*
   for (int i = 0; i < CkNumPes(); i++) {
@@ -365,18 +369,19 @@ void UnionFindLibCache::prepare_for_component_labeling(CkCallback cb)
     resetData = true;
   }
   //contribute(CkCallback(CkReductionTarget(UnionFindLibCache, done_prepare_for_component_labeling), _UfLibProxy[0]));
-  contribute(CkCallback(CkReductionTarget(UnionFindLibCache, done_prepare_for_component_labeling), _UfLibProxyCache[0]));
+  contribute(CkCallback(CkReductionTarget(Labelers, done_prepare_for_component_labeling), thisProxy[0]));
 }
 
-void UnionFindLibCache::done_prepare_for_component_labeling()
+void Labelers::done_prepare_for_component_labeling()
 {
   CkPrintf("Lib: done_prepare_for_component_labeling() node: %d\n", CkMyNode());
   postPreCompLabCb.send();
 }
 
 
-void UnionFindLibCache::inter_start_component_labeling(CkCallback cb)
+void Labelers::inter_start_component_labeling(CkCallback cb)
 {
+  std::vector<unionFindVertex>& myVertices = _UfLibProxyCache.ckLocalBranch()->myVertices;
   postInterComponentLabelingCb = cb;
   // When this phase begins, only either inter_start_component_labeling() or inter_need_label() might be called
   /*
@@ -464,7 +469,7 @@ void UnionFindLibCache::inter_start_component_labeling(CkCallback cb)
       }
     }
 
-    CkCallback cb(CkReductionTarget(UnionFindLibCache, inter_total_components), thisProxy[0]);
+    CkCallback cb(CkReductionTarget(Labelers, inter_total_components), thisProxy[0]);
     // CkPrintf("PE: %d totalRoots: %lld\n", CkMyPe(), myLocalNumBosses);
     int64_t vv[3];
     vv[0] = myLocalNumBosses;
@@ -478,16 +483,18 @@ void UnionFindLibCache::inter_start_component_labeling(CkCallback cb)
   // Either my node has not sent any request or it has gone through all its vertices and finished requesting; if a contribute is called here, it makes sure that
   // reqs_sent is the final value
   // int dummy = 1;
-  contribute(CkCallback(CkReductionTarget(UnionFindLibCache, reqs_sent_is_final), thisProxy));  
+  // contribute(CkCallback(CkReductionTarget(UnionFindLibCache, reqs_sent_is_final), thisProxy));  
 }
 
+/*
 void UnionFindLibCache::reqs_sent_is_final()
 {
   reqsSentIsFinal = true;
 }
-
-void UnionFindLibCache::inter_need_label(needRootData data)
+*/
+void Labelers::inter_need_label(needRootData data)
 {
+  std::vector<unionFindVertex>& myVertices = _UfLibProxyCache.ckLocalBranch()->myVertices;
   // When this phase begins, only either inter_start_component_labeling() or inter_need_label() might be called
   /*
   if (resetData == true) {
@@ -548,20 +555,19 @@ void UnionFindLibCache::inter_need_label(needRootData data)
 }
 
 
-void UnionFindLibCache::inter_recv_label(int64_t recv_vertex_arrID, int64_t labelID)
+void Labelers::inter_recv_label(int64_t recv_vertex_arrID, int64_t labelID)
 {
-  /*
+  std::vector<unionFindVertex>& myVertices = _UfLibProxyCache.ckLocalBranch()->myVertices;
+  
+  unionFindVertex *v = &myVertices[recv_vertex_arrID]; 
+  std::pair<int64_t, int64_t> req_loc1 = getLocationFromID(v->vertexID);
   if (reqs_sent == 0) {
-    CkPrintf("Lib: reqs_sent == 0, recv_vertex_arrID: %lld myPE: %d myNode: %d\n", recv_vertex_arrID, CkMyPe(), CkMyNode());
+    CkPrintf("Lib: reqs_sent == 0, recv_vertex_arrID: %lld myPE: %d myNode: %d vid: %lld reqs_recv: %lld\n", recv_vertex_arrID, CkMyPe(), CkMyNode(), v->vertexID, reqs_recv);
   }
-  */
+  
   assert(reqs_sent != 0);
   reqs_recv++; 
   // CkPrintf("PE: %d, reqs_recv: %lld\n", CkMyPe(), reqs_recv);
-  unionFindVertex *v = &myVertices[recv_vertex_arrID];
-    
-  
-  std::pair<int64_t, int64_t> req_loc1 = getLocationFromID(v->vertexID);
   assert(CmiNodeOf(req_loc1.first) == CkMyNode());
 
   /*
@@ -580,12 +586,13 @@ void UnionFindLibCache::inter_recv_label(int64_t recv_vertex_arrID, int64_t labe
     //req_loc.second = req_loc.second - get_offset(req_loc.first);
     //assert(req_loc.second >= 0);
     // CkPrintf("Lib: calling inter_recv_label req_vertex(*it): %lld myNode: %d req_loc.first: %lld req_loc.second: %lld req.node: %d\n", *it, CkMyNode(), req_loc.first, req_loc.second, CmiNodeOf(req_loc.first));
-    CkPrintf("call inter_recv_label() for vertexID: %lld parent_id: %lld req_pe: %d req_node: %lld myNode: %d myPE: %d\n", *it, v->vertexID, req_loc.first, CmiNodeOf(req_loc.first), CkMyNode(), CkMyPe());
+    CkPrintf("call2 inter_recv_label() for vertexID: %lld parent_id: %lld req_pe: %d req_node: %lld myNode: %d myPE: %d\n", *it, v->vertexID, req_loc.first, CmiNodeOf(req_loc.first), CkMyNode(), CkMyPe());
     thisProxy[CmiNodeOf(req_loc.first)].inter_recv_label(req_loc.second, labelID);
   }
 
   // all reqs received for my PE
-  if (reqs_recv == reqs_sent) {
+  // if reqsSentIsFinal is false, my Node 
+  if (reqs_recv == reqs_sent /*&& reqsSentIsFinal*/) {
     //CkPrintf("PE: %d reqs_sent == reqs_recv\n", CkMyPe());
     // int64_t off = _UfLibProxyCache.ckLocalBranch()->offsets[CkMyPe()];
     for (int64_t i = 0; i < myVertices.size(); i++) {
@@ -617,7 +624,7 @@ void UnionFindLibCache::inter_recv_label(int64_t recv_vertex_arrID, int64_t labe
         v->componentNumber = v->componentNumberTemp; // Update the component number as we have reached the end of this phase here
       }
     }
-    CkCallback cb(CkReductionTarget(UnionFindLibCache, inter_total_components), thisProxy[0]);
+    CkCallback cb(CkReductionTarget(Labelers, inter_total_components), thisProxy[0]);
     // CkPrintf("PE: %d totalRoots: %lld\n", CkMyPe(), myLocalNumBosses);
     // contribute(sizeof(int64_t), &myLocalNumBosses, CkReduction::sum_long_long, cb);
     int64_t vv[3];
@@ -631,7 +638,7 @@ void UnionFindLibCache::inter_recv_label(int64_t recv_vertex_arrID, int64_t labe
 }
 
 // Executed only on PE0
-void UnionFindLibCache::inter_total_components(int n, int64_t* nComponents)
+void Labelers::inter_total_components(int n, int64_t* nComponents)
 {
   CkPrintf("Total components in this phase: %lld droppedEdges: %lld totEdges: %lld percent_dropped: %lf\n", nComponents[0], nComponents[1], nComponents[2], (nComponents[1]/(double)nComponents[2]));
   postInterComponentLabelingCb.send();
@@ -977,6 +984,12 @@ UnionFindLibCacheInit(CkCallback cb) {
     _UfLibProxyCache = CProxy_UnionFindLibCache::ckNew();
     CkPrintf("From library PE: %d libCacheProxy.id: %d\n", CkMyPe(), _UfLibProxyCache.ckGetGroupID().idx);
     return _UfLibProxyCache;
+}
+
+CProxy_Labelers Labelers::
+LabelersInit() {
+  _LabelersProxy = CProxy_Labelers::ckNew();
+  return _LabelersProxy;
 }
 
 
