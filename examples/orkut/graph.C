@@ -91,16 +91,16 @@ class Main : public CBase_Main {
     void dontInitVertices() {
       // Initialize offsets in each nodegroup
       CkPrintf("In dontInitVertices()\n");
-      CkCallback cb(CkIndex_Main::done_treeAndLabeling(), thisProxy);
-      libProxy[0].register_phase_one_cb(cb);
-      startWork();
-      /*
+      //startWork();
+      
       CkCallback cb1(CkIndex_Main::startWork(), thisProxy);
       libCacheProxy.initOffsets(cb1);
-      */
+      
     }
 
     void startWork() {
+        CkCallback cb1(CkIndex_Main::done_treeAndLabeling(), thisProxy);
+        libProxy[0].register_phase_one_cb(cb1);
         CkPrintf("[Main] Library array with %d chares created and proxy obtained max_local_edges: %ld num_edge_batches: %ld\n", num_treepieces, max_local_edges, num_edge_batches);
         startTime = CkWallTimer();
         ebatchNo = 1;
@@ -402,11 +402,15 @@ TreePiece::getLocationFromID(int64_t vid) {
   int64_t chareIdx = vid % num_treepieces;
   int64_t arrIdx = (vid / num_treepieces);
   int64_t off = libPtrCache->get_offset(chareIdx);
+
   /*
   if (chareIdx != 0)
     assert (off != 0);
   */
   arrIdx += off;
+  if (vid == 1088 || vid == 1089) {
+    CkPrintf("App: myNode: %d vid: %lld chareIdx: %lld arrIdx: %lld off: %lld\n", CkMyNode(), vid, chareIdx, arrIdx, off);
+  }
   /*
   if (chareIdx == num_treepieces) {
     chareIdx--;

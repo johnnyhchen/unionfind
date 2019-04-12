@@ -15,7 +15,8 @@ module unionFindLib {
       entry [reductiontarget] void initDoneCache();
       entry UnionFindLibCache();
       entry void initOffsets(CkCallback _libcb);
-      entry [reductiontarget] void doneOffsets(std::vector<int64_t> result);
+      // entry [reductiontarget] void doneOffsets(std::vector<int64_t> result);
+      entry [reductiontarget] void doneOffsets(int64_t result[n], int n);
       entry [reductiontarget] void callWork();
         
       entry void prepare_for_component_labeling(CkCallback cb);

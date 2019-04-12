@@ -7,6 +7,7 @@
 struct unionFindVertex {
     int64_t vertexID;
     int64_t parent;
+    int64_t parentTemp;
     int64_t componentNumber = -1;
     int64_t componentNumberTemp = -1;
     std::vector<int64_t> need_boss_requests; //request queue for processing need_boss requests
@@ -15,6 +16,7 @@ struct unionFindVertex {
     void pup(PUP::er &p) {
         p|vertexID;
         p|parent;
+        p|parentTemp;
         p|componentNumber;
         p|componentNumberTemp;
         p|need_boss_requests;
@@ -31,9 +33,11 @@ class UnionFindLibCache : public CBase_UnionFindLibCache {
     UnionFindLibCache();
     void initDoneCache();
     std::vector<unionFindVertex> myVertices;
-    std::vector<int64_t> offsets;
+    // std::vector<int64_t> offsets;
+    int64_t *offsets;
     void initOffsets(CkCallback _libcb);
-    void doneOffsets(std::vector<int64_t> result);
+    //void doneOffsets(std::vector<int64_t> result);
+    void doneOffsets(int64_t* result, int n);
     void callWork();
     CkCallback callWorkCb;
     int64_t get_offset(int64_t peNo) {
