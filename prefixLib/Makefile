@@ -1,4 +1,4 @@
-CHARMC=/dcsdata/home/raghaven/chaNGa/charm/bin/charmc $(OPTS)
+CHARMC=/Users/johnnychen/Documents/Projects/research/charm/bin/charmc $(OPTS)
 
 all: libprefix.a
 

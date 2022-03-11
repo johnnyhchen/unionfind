@@ -1,6 +1,6 @@
 #set the following variables to absolute paths
-CHARM_DIR = /dcsdata/home/raghaven/chaNGa/charm
-UNION_FIND_DIR = /dcsdata/home/raghaven/chaNGa/unionfind
+CHARM_DIR = /Users/johnnychen/Documents/Projects/research/charm
+UNION_FIND_DIR = /Users/johnnychen/Documents/Projects/research/unionFind
 PREFIX_LIB_DIR = $(UNION_FIND_DIR)/prefixLib
 
 #charmc options
