@@ -3,6 +3,7 @@
 This library provides the functionality of performing union-find operations
 on graphs in a distributed asynchronous fashion. The implementation is in
 Charm++ and can be used in any generic Charm++-based graph applications.
+The initial code was developed by Karthik Senthil.
 
 ### Example
 
