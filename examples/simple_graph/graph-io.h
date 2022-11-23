@@ -28,7 +28,7 @@ proteinVertex ReadVertex(FILE *fp);
 
 
 void populateMyVertices(std::vector<proteinVertex>& myVertices, int nVertices, int nChares, int chareIdx, FILE *fp) {
-    int startVid = chareIdx + 1;
+    int startVid = chareIdx + 1;  // start vertex id: different chare elements are reading different vertices out of the file (distributes the vertices to different chare elements)
 #ifdef USE_PROTEIN
     long int lineNum = startVid + 3;
 #endif
@@ -38,7 +38,7 @@ void populateMyVertices(std::vector<proteinVertex>& myVertices, int nVertices, i
 #endif
     seekToLine(fp, lineNum);
 
-    while (startVid <= nVertices) {
+    while (startVid <= nVertices) {  // populates vector (standard way)
         proteinVertex v = ReadVertex(fp);
         if ((startVid-1) % nChares == chareIdx) {
             myVertices.push_back(v);
@@ -49,6 +49,8 @@ void populateMyVertices(std::vector<proteinVertex>& myVertices, int nVertices, i
 }
 
 void populateMyEdges(std::vector< std::pair<long int, long int> > *myEdges, int nMyEdges, int eRatio, int chareIdx, FILE *fp, int totalNVertices) {
+   // same as for vertices but now edges
+   // edge = pair of integers (integers represent vertex number)
    int startEid = (eRatio * chareIdx) + 1;
 #ifdef USE_PROTEIN   
    long int lineNum = startEid + totalNVertices + 3; //3 starting lines

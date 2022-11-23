@@ -635,7 +635,7 @@ perform_pruning() {
     }
 
     if (thisIndex == 0) {
-        CkPrintf("Number of components found: %d\n", totalNumBosses);
+        CkPrintf("Number of components found: %d\n", totalNumBosses);  // reports back # of components in parent tree once it's constructed
         int numPrunedComponents = 0;
         for (int i = 0; i < totalNumBosses; i++) {
             int compCount = libGroup.ckLocalBranch()->get_component_count(i);

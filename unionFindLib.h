@@ -11,6 +11,10 @@ struct unionFindVertex {
     std::vector<long int> need_boss_requests; //request queue for processing need_boss requests
     long int findOrAnchorCount = 0;
 
+    // pup = pack, unpack. whenever you send an object across processors, charm needs to be told
+    // "how do you turn object into string of bytes to send across network."
+    // exact same method is used to pack string of objects into bytes and unpacking it into object on other end of network
+    // overloads bitwise or "|" here to do "packing" or "unpacking" depending on properties of the er p object
     void pup(PUP::er &p) {
         p|vertexID;
         p|parent;
