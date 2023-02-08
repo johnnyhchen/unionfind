@@ -261,6 +261,9 @@ class TreePiece : public CBase_TreePiece {
         contribute(CkCallback(CkReductionTarget(Main, startWork), mainProxy));
         // so...when all chares are finished running this method. the next thing that gets called is the startWork method by the mainProxy chare
     }
+    // if I am in a chare, how do I refer to my own element in the chare array? use thisIndex
+    // becuse libProxy is bound to me (a chare) I know I can get a local pointer to this element in the libProxy array (that's how I get UnionFindLib in scope)
+    // via ckLocal() we can get address of UnionFindLib (if array not bound, no gaurentee where element is in parallel machine: address might be out of scope for local node)
 
     void doWork() {
 

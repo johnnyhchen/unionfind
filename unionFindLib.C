@@ -702,6 +702,8 @@ done_profiling(int total_count) {
 CProxy_UnionFindLib UnionFindLib::
 unionFindInit(CkArrayID clientArray, int n) {
     CkArrayOptions opts(n);
+    // a bound array: having one array, you create a second array that is matched element by element: if element 1 of array (OG) is on node 10, element 1 on bound array is also on node 10
+    // you can use a direct pointer to access that element because of that property
     opts.bindTo(clientArray);
     _UfLibProxy = CProxy_UnionFindLib::ckNew(opts, NULL);
 
@@ -711,7 +713,7 @@ unionFindInit(CkArrayID clientArray, int n) {
     prefix_opts.bindTo(_UfLibProxy);
     prefixLibArray = CProxy_Prefix::ckNew(n, prefix_opts);
 
-    libGroupID = CProxy_UnionFindLibGroup::ckNew();
+    libGroupID = CProxy_UnionFindLibGroup::ckNew(); // what's a group?
     return _UfLibProxy;
 }
 
