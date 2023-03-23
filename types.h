@@ -26,7 +26,7 @@ struct anchorData {
 
 struct shortCircuitData {
     uint64_t arrIdx;
-    uint64_t grandparentID;
+    int64_t grandparentID;
 
     void pup(PUP::er &p) {
         p|arrIdx;

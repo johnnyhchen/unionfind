@@ -46,7 +46,7 @@ static void register_merge_count_maps_reduction() {
 // class function implementations
 
 void UnionFindLib::
-registerGetLocationFromID(std::pair<int, int> (*gloc)(long int vid)) {
+registerGetLocationFromID(std::pair<int, int> (*gloc)(uint64_t vid)) {
     getLocationFromID = gloc;
 }
 
@@ -72,13 +72,15 @@ initialize_vertices(unionFindVertex *appVertices, int numVertices) {
 
 #ifndef ANCHOR_ALGO
 void UnionFindLib::
-union_request(long int vid1, long int vid2) {
+union_request(uint64_t vid1, uint64_t vid2) {
+    assert(vid1!=vid2);
     if (vid2 < vid1) {
         // found a back edge, flip and reprocess
         union_request(vid2, vid1);
     }
     else {
         //std::pair<int,int> vid1_loc = appPtr->getLocationFromID(vid1);
+        CkPrintf("union_request gloc\n");
         std::pair<int, int> vid1_loc = getLocationFromID(vid1);
         //message the chare containing first vertex to find boss1
         //pass the initilizer ID for initiating path compression
@@ -109,12 +111,14 @@ union_request(long int v, long int w) {
 
 #ifndef ANCHOR_ALGO
 void UnionFindLib::
-find_boss1(int arrIdx, long int partnerID, long int senderID) {
+find_boss1(int arrIdx, uint64_t partnerID, uint64_t senderID) {
     unionFindVertex *src = &myVertices[arrIdx];
+    CkAssert(src->vertexID != src->parent);
     src->findOrAnchorCount++;
 
     if (src->parent == -1) {
         //boss1 found
+        CkPrintf("find_boss1 if gloc\n");
         std::pair<int, int> partner_loc = getLocationFromID(partnerID);
         //message the chare containing the partner
         //senderID for first find_boss2 is not relevant, similar to first find_boss1
@@ -135,6 +139,7 @@ find_boss1(int arrIdx, long int partnerID, long int senderID) {
     }
     else {
         //boss1 not found, move to parent
+        CkPrintf("find_boss1 else gloc\n");
         std::pair<int, int> parent_loc = getLocationFromID(src->parent);
         unionFindVertex *path_base = src;
         unionFindVertex *parent, *curr = src;
@@ -165,6 +170,8 @@ find_boss1(int arrIdx, long int partnerID, long int senderID) {
 
             // move pointers to traverse tree
             curr = parent;
+            CkPrintf("find_boss1 else compression gloc\n");
+            CkPrintf("thisIndex=%d\n", this->thisIndex);
             parent_loc = getLocationFromID(curr->parent);
         } //end of local tree climbing
 
@@ -188,6 +195,7 @@ find_boss1(int arrIdx, long int partnerID, long int senderID) {
         // check if sender and current vertex are on different chares
         if (senderID != -1 && !check_same_chares(senderID, curr->vertexID)) {
             // short circuit the sender to point to grandparent
+            CkPrintf("find_boss1 else sender and curr diff gloc\n");
             std::pair<int,int> sender_loc = getLocationFromID(senderID);
             shortCircuitData scd;
             scd.arrIdx = sender_loc.second;
@@ -202,8 +210,9 @@ find_boss1(int arrIdx, long int partnerID, long int senderID) {
 
 
 void UnionFindLib::
-find_boss2(int arrIdx, long int boss1ID, long int senderID) {
-    unionFindVertex *src = &myVertices[arrIdx];
+find_boss2(int arrIdx, uint64_t boss1ID, uint64_t senderID) {
+    unionFindVertex *src = &myVertices[arrIdx]; // vid1, other field is vid2 (boss1ID) - same for find_boss1
+    CkAssert(src->vertexID != src->parent);
     src->findOrAnchorCount++;
 
     if (src->parent == -1) {
@@ -214,6 +223,7 @@ find_boss2(int arrIdx, long int boss1ID, long int senderID) {
         else {
             //valid edge
             if (boss1ID != src->vertexID) {//avoid self-loop
+                //J.C: end of recursion, I think
                 src->parent = boss1ID;
                 //message initID to start path compression in boss2's chain
                 /*std::pair<int,int> init_loc = appPtr->getLocationFromID(initID);
@@ -226,6 +236,7 @@ find_boss2(int arrIdx, long int boss1ID, long int senderID) {
     else {
         //boss2 not found, move to parent
         //std::pair<int,int> parent_loc = appPtr->getLocationFromID(src->parent);
+        CkPrintf("find_boss2 else gloc\n");
         std::pair<int, int> parent_loc = getLocationFromID(src->parent);
         unionFindVertex *path_base = src;
         unionFindVertex *parent, *curr = src;
@@ -249,6 +260,8 @@ find_boss2(int arrIdx, long int boss1ID, long int senderID) {
             }
 
             curr = parent;
+
+            CkPrintf("find_boss2 else compression gloc\n");
             parent_loc = getLocationFromID(curr->parent);
         } //end of local tree climbing
 
@@ -272,6 +285,8 @@ find_boss2(int arrIdx, long int boss1ID, long int senderID) {
         // check if sender and current vertex are on different chares
         if (senderID != -1 && !check_same_chares(senderID, curr->vertexID)) {
             // short circuit the sender to point to grandparent
+            
+            CkPrintf("find_boss2 else sender and curr diff gloc\n");
             std::pair<int,int> sender_loc = getLocationFromID(senderID);
             shortCircuitData scd;
             scd.arrIdx = sender_loc.second;
@@ -365,21 +380,25 @@ anchor(int w_arrIdx, long int v, long int path_base_arrIdx) {
 
 // perform local path compression
 void UnionFindLib::
-local_path_compression(unionFindVertex *src, long int compressedParent) {
+local_path_compression(unionFindVertex *src, uint64_t compressedParent) {
     unionFindVertex* tmp;
     // An infinite loop if this function is called on itself (a node which does not have itself as its parent)
     while (src->parent != compressedParent) {
         // CkPrintf("Stuck here\n");
+        CkPrintf("local_path_compression gloc\n");
         tmp = &myVertices[getLocationFromID(src->parent).second];
         src->parent = compressedParent;
+        CkAssert(src->parent != src->vertexID); // TODO: remove assert
         src =tmp;
     }
 }
 
 // check if two vertices are on same chare
 bool UnionFindLib::
-check_same_chares(long int v1, long int v2) {
+check_same_chares(uint64_t v1, uint64_t v2) {
+    CkPrintf("check_same_chares v1 gloc\n");
     std::pair<int,int> v1_loc = getLocationFromID(v1);
+    CkPrintf("check_same_chares v2 gloc\n");
     std::pair<int,int> v2_loc = getLocationFromID(v2);
     if (v1_loc.first == v2_loc.first)
         return true;
@@ -392,19 +411,23 @@ short_circuit_parent(shortCircuitData scd) {
     unionFindVertex *src = &myVertices[scd.arrIdx];
     //CkPrintf("[TP %d] Short circuiting %ld from current parent %ld to grandparent %ld\n", thisIndex, src->vertexID, src->parent, grandparentID);
     src->parent = scd.grandparentID;
+    CkAssert(src->parent != src->vertexID); // TODO: remove assert
 }
 
 // function to implement simple path compression; currently unused
 void UnionFindLib::
-compress_path(int arrIdx, long int compressedParent) {
+compress_path(int arrIdx, int64_t compressedParent) {
     unionFindVertex *src = &myVertices[arrIdx];
     //message the parent before reseting it
     if (src->vertexID != compressedParent) {//reached the top of path
+
+        CkPrintf("compress_path gloc\n");
         std::pair<int, int> parent_loc = getLocationFromID(src->parent);
         this->thisProxy[parent_loc.first].compress_path(parent_loc.second, compressedParent);
         CProxy_UnionFindLibGroup libGroup(libGroupID);
         libGroup.ckLocalBranch()->increase_message_count();
         src->parent = compressedParent;
+        CkAssert(src->parent != src->vertexID); // TODO: remove assert
     }
 }
 
@@ -433,8 +456,9 @@ find_components(CkCallback cb) {
 
     // send local count to prefix library
     CkCallback doneCb(CkReductionTarget(UnionFindLib, boss_count_prefix_done), thisProxy);
-    Prefix* myPrefixElem = prefixLibArray[thisIndex].ckLocal();
-    myPrefixElem->startPrefixCalculation(myLocalNumBosses, doneCb);
+    // Prefix* myPrefixElem = prefixLibArray[thisIndex].ckLocal();
+    // myPrefixElem->startPrefixCalculation(myLocalNumBosses, doneCb);
+    prefixLibArray.startPrefixCalculation(myLocalNumBosses, doneCb);
     //CkPrintf("[%d] Local num bosses: %d\n", thisIndex, myLocalNumBosses);
 }
 
@@ -444,8 +468,9 @@ boss_count_prefix_done(int totalCount) {
     totalNumBosses = totalCount;
     // access value from prefix lib elem to find starting index
     Prefix* myPrefixElem = prefixLibArray[thisIndex].ckLocal();
-    int v = myPrefixElem->getValue();
-    int myStartIndex = v - myLocalNumBosses;
+    int v = 74632; // myPrefixElem->getValue(); // TODO restore this
+    int myStartIndex = 0; // v - myLocalNumBosses; // J.C. this must not be negative. Let's print this out
+    CkAssert(myStartIndex >= 0);
     //CkPrintf("[%d] My start index: %d\n", thisIndex, myStartIndex);
 
     // start labeling my local bosses from myStartIndex
@@ -485,6 +510,7 @@ start_component_labeling() {
 
         if (v->componentNumber == -1) {
             // an internal node or leaf node, request parent for boss
+            CkPrintf("start_component_labeling gloc\n");
             std::pair<int, int> parent_loc = getLocationFromID(v->parent);
             //this->thisProxy[parent_loc.first].need_boss(parent_loc.second, v->vertexID);
             uint64_t data = ((uint64_t) parent_loc.second) << 32 | ((uint64_t) v->vertexID);
@@ -532,6 +558,7 @@ need_boss(int arrIdx, long int fromID) {
 
     if (myVertices[arrIdx].componentNumber != -1) {
         // component already set, reply back
+        CkPrintf("need_boss gloc\n");
         std::pair<int, int> requestor_loc = getLocationFromID(fromID);
         if (requestor_loc.first == thisIndex)
             set_component(requestor_loc.second, myVertices[arrIdx].componentNumber);
@@ -552,6 +579,7 @@ set_component(int arrIdx, long int compNum) {
     std::vector<long int>::iterator req_iter = myVertices[arrIdx].need_boss_requests.begin();
     while (req_iter != myVertices[arrIdx].need_boss_requests.end()) {
         long int requestorID = *req_iter;
+        CkPrintf("set_component gloc\n");
         std::pair<int, int> requestor_loc = getLocationFromID(requestorID);
         if (requestor_loc.first == thisIndex)
             set_component(requestor_loc.second, compNum);
