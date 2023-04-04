@@ -8,7 +8,7 @@ struct unionFindVertex {
     uint64_t vertexID;
     int64_t parent;
     long int componentNumber = -1;
-    std::vector<long int> need_boss_requests; //request queue for processing need_boss requests
+    std::vector<uint64_t> need_boss_requests; //request queue for processing need_boss requests
     long int findOrAnchorCount = 0;
 
     void pup(PUP::er &p) {
@@ -73,12 +73,12 @@ class UnionFindLib : public CBase_UnionFindLib {
     void find_components(CkCallback cb);
     void boss_count_prefix_done(int totalCount);
     void start_component_labeling();
-    void insertDataNeedBoss(const uint64_t & data);
+    void insertDataNeedBoss(const needBossData & data);
     void insertDataFindBoss(const findBossData & data);
 #ifdef ANCHOR_ALGO
     void insertDataAnchor(const anchorData & data);
 #endif
-    void need_boss(int arrIdx, long int fromID);
+    void need_boss(int arrIdx, uint64_t fromID);
     void set_component(int arrIdx, long int compNum);
     void prune_components(int threshold, CkCallback appReturnCb);
     void perform_pruning();
