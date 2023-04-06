@@ -564,9 +564,9 @@ set_component(int arrIdx, long int compNum) {
     myVertices[arrIdx].componentNumber = compNum;
 
     // since component number is set, respond to your requestors
-    std::vector<uint64_t>::iterator req_iter = myVertices[arrIdx].need_boss_requests.begin();
-    while (req_iter != myVertices[arrIdx].need_boss_requests.end()) {
-        uint64_t requestorID = *req_iter;
+    std::vector<uint64_t> need_boss_queue = myVertices[arrIdx].need_boss_requests;
+    while (!need_boss_queue.empty()) {
+        uint64_t requestorID = (need_boss_queue).back();
         std::pair<int, int> requestor_loc = getLocationFromID(requestorID);
         if (requestor_loc.first == thisIndex) {
             set_component(requestor_loc.second, compNum);
@@ -574,7 +574,7 @@ set_component(int arrIdx, long int compNum) {
             this->thisProxy[requestor_loc.first].set_component(requestor_loc.second, compNum);
         }
         // done with current requestor, delete from request queue
-        req_iter = myVertices[arrIdx].need_boss_requests.erase(req_iter);
+        need_boss_queue.pop_back();
     }
 }
 
