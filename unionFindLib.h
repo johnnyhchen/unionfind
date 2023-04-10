@@ -58,13 +58,13 @@ class UnionFindLib : public CBase_UnionFindLib {
     void find_boss1(int arrIdx, uint64_t partnerID, uint64_t senderID);
     void find_boss2(int arrIdx, uint64_t boss1ID, uint64_t senderID);
 #else
-    void union_request(long int v, long int w);
-    void anchor(int w_arrIdx, long int v, long int path_base_arrIdx);
+    void union_request(uint64_t v, uint64_t w);
+    void anchor(int w_arrIdx, uint64_t v, long int path_base_arrIdx);
 #endif
     void local_path_compression(unionFindVertex *src, uint64_t compressedParent);
     bool check_same_chares(uint64_t v1, uint64_t v2);
     void short_circuit_parent(shortCircuitData scd);
-    void compress_path(int arrIdx, int64_t compressedParent);
+    void compress_path(int arrIdx, uint64_t compressedParent);
     unionFindVertex *return_vertices();
 
     // functions and data structures for finding connected components

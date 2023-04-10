@@ -18,13 +18,13 @@ module unionFindLib {
         entry void find_boss1(int arrIdx, uint64_t partnerID, uint64_t initID);
         entry void find_boss2(int arrIdx, uint64_t boss1ID, uint64_t initID);
 #else
-        entry void anchor(int w_arrIdx, long v, long path_base_arrIdx);
+        entry void anchor(int w_arrIdx, uint64_t v, long path_base_arrIdx);
 #endif
         // function for grandparent short-circuiting
         entry [aggregate] void short_circuit_parent(shortCircuitData scd);
 
         // function for path compression support
-        entry void compress_path(int arrIdx, int64_t compressedParent);
+        entry void compress_path(int arrIdx, uint64_t compressedParent);
 
         // functions to perform distributed connected components
         entry void find_components(CkCallback cb);
