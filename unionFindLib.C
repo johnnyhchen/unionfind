@@ -100,7 +100,6 @@ initialize_vertices(unionFindVertex *appVertices, int numVertices) {
 #ifndef ANCHOR_ALGO
 void UnionFindLib::
 union_request(uint64_t vid1, uint64_t vid2) {
-    CkPrintf("[unionfind] union_request on %llu, %llu\n", v, w);
     assert(vid1!=vid2);
     if (vid2 < vid1) {
         // found a back edge, flip and reprocess
@@ -127,7 +126,6 @@ union_request(uint64_t vid1, uint64_t vid2) {
 #else
 void UnionFindLib::
 union_request(uint64_t v, uint64_t w) {
-    CkPrintf("[unionfind] union_request on %llu, %llu\n", v, w);
     std::pair<int, int> w_loc = getLocationFromID(w);
     // message w to anchor to v
     anchorData d;
