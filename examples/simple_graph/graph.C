@@ -130,7 +130,7 @@ class TreePiece : public CBase_TreePiece {
     // function that must be always defined by application
     // return type -> std::pair<int, int>
     // this specific logic assumes equal distribution of vertices across all tps
-    static std::pair<int, int> getLocationFromID(long int vid);
+    static std::pair<int, int> getLocationFromID(uint64_t vid);
 
     void initializeLibVertices() {
         // provide vertices data to library
@@ -147,7 +147,7 @@ class TreePiece : public CBase_TreePiece {
         libPtr = libProxy[thisIndex].ckLocal();
         libPtr->initialize_vertices(libVertices, numMyVertices);
         libPtr->registerGetLocationFromID(getLocationFromID);
-        contribute(CkCallback(CkReductionTarget(Main, Main::startWork), mainProxy));
+        contribute(CkCallback(CkReductionTarget(Main, startWork), mainProxy));
     }
 
     void doWork() {
@@ -172,7 +172,7 @@ class TreePiece : public CBase_TreePiece {
                 CkAbort("Something wrong in inverted-tree construction!\n");
             }
         }
-        contribute(CkCallback(CkReductionTarget(Main, Main::donePrinting), mainProxy));
+        contribute(CkCallback(CkReductionTarget(Main, donePrinting), mainProxy));
     }
 
     void getConnectedComponents() {
@@ -203,7 +203,7 @@ TreePiece::getLocationFromID(long int vid) {
 */
 
 std::pair<int, int>
-TreePiece::getLocationFromID(long int vid) {
+TreePiece::getLocationFromID(uint64_t vid) {
     int chareIdx = (vid-1) % NUM_TREEPIECES;
     int arrIdx = (vid-1) / NUM_TREEPIECES;
     return std::make_pair(chareIdx, arrIdx);
